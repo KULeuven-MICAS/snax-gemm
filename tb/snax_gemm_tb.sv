@@ -92,6 +92,7 @@ module snax_gemm_tb;
         snax_qvalid = 1'b0;
         #(CYCLE_PERIOD * 10)
 
+        // write start signal
         snax_qvalid = 1'b1;
         snax_req.data_op = CSRRW;
         snax_req.data_arga = 3;
@@ -99,10 +100,23 @@ module snax_gemm_tb;
         #(CYCLE_PERIOD)   
         snax_qvalid = 1'b0;
         #(CYCLE_PERIOD * 2)
-        #1000;
+        #100;
 
-        // write start signal
         // give data a and data b
+        for ( int i = 0 ; i < SnaxTcdmPorts ; i = i + 1) begin
+            snax_tcdm_rsp[0][i].p.data = {8'(i * 8 + 7), 8'(i * 8 + 6), 8'(i * 8 + 5), 8'(i * 8 + 4), 8'(i * 8 + 3), 8'(i * 8 + 2), 8'(i * 8 + 1), 8'(i * 8 + 0)};
+            snax_tcdm_rsp[0][i].p_valid = 1'b1;
+        end
+        // #(CYCLE_PERIOD * 2)
+        // snax_tcdm_rsp[0][SnaxTcdmPorts - 1].p.data = 16;
+        // snax_tcdm_rsp[0][SnaxTcdmPorts - 1].p_valid = 1'b1;
+        #(CYCLE_PERIOD)
+        for ( int i = 0 ; i < SnaxTcdmPorts ; i = i + 1) begin
+            snax_tcdm_rsp[0][i].p.data = i;
+            snax_tcdm_rsp[0][i].p_valid = 1'b0;
+        end
+        #100;
+
         // view results
     end
 

@@ -16,6 +16,17 @@ sim:/snax_gemm_tb/i_snax_gemm/cstate \
 sim:/snax_gemm_tb/i_snax_gemm/nstate
 add wave -position insertpoint  \
 sim:/snax_gemm_tb/i_snax_gemm/CSRs
+add wave -position insertpoint  \
+sim:/snax_gemm_tb/i_snax_gemm/io_start_do
+add wave -position insertpoint  \
+sim:/snax_gemm_tb/i_snax_gemm/io_a_io_in \
+sim:/snax_gemm_tb/i_snax_gemm/io_b_io_in \
+sim:/snax_gemm_tb/i_snax_gemm/io_data_out_valid \
+sim:/snax_gemm_tb/i_snax_gemm/io_c_io_out
+add wave -position insertpoint  \
+sim:/snax_gemm_tb/i_snax_gemm/io_data_in_valid
+add wave -position insertpoint  \
+sim:/snax_gemm_tb/i_snax_gemm/io_c_io_out_reg
 run
 run
-run
+run 1000ns
