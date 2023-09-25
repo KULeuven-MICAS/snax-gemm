@@ -4,11 +4,9 @@ import chisel3.util._
 import chisel3.experimental._
 // import chisel3.experimental.{chiselName,NoChiselNamePrefix}
 import chisel3.experimental.IntParam
-// import chisel3.experimental.verification.chiselName
 import chisel3.VecInit
 import chisel3.util.HasBlackBoxResource
 import scala.util.matching.Regex
-// import com.google.protobuf.UInt32Value
 import chisel3.util.MixedVec
 
 class GEMM_Cmd() extends Bundle {
@@ -18,9 +16,9 @@ class GEMM_Cmd() extends Bundle {
     val N = Bits(width = 8.W)
     val S = Bits(width = 1.W)
 
-    val Rm = Bits(width = C.W_ADDR.W)
-    val Rn = Bits(width = C.W_ADDR.W)
-    val Rd = Bits(width = C.W_ADDR.W)
+    val Rm = Bits(width = GEMMConstant.W_ADDR.W)
+    val Rn = Bits(width = GEMMConstant.W_ADDR.W)
+    val Rd = Bits(width = GEMMConstant.W_ADDR.W)
 
     val shift_direction = Bits(width = 1.W)
     val shift_number = Bits(width = 3.W)
@@ -89,6 +87,7 @@ class Tile extends Module{
     when((io.clear_valid === 1.B) && (io.in_control.gemm_done === 1.B || ShiftRegister(io.in_control.gemm_done,10,1.B) === 1.B)){
         accumulation_reg := 0.U
     }
+
     // when((io.clear_valid === 1.B)){
     //     accumulation_reg := 0.U
     // }    
@@ -125,8 +124,7 @@ class  GEMM_ControllerIO extends Bundle{
 class GEMM_Controller extends Module{
     val io = IO(new GEMM_ControllerIO())
 
-    // save instructure
-
+    // save instruction
     val check_start_do = RegInit(false.B)
     val M_reg = RegInit(0.U(8.W))    
     val N_reg = RegInit(0.U(8.W))    
@@ -139,26 +137,17 @@ class GEMM_Controller extends Module{
     val shift_direction_reg = RegInit(0.U(1.W)) 
     val shift_number_reg = RegInit(0.U(3.W))    
 
-    def MatrixByteIn = GEMMConstant.meshRow.U * GEMMConstant.meshCol.U * GEMMConstant.input.U / (C.W_DATA.U)
-    def MatrixByteOut =  GEMMConstant.meshRow.U * GEMMConstant.meshCol.U * GEMMConstant.output.U / (C.W_DATA.U)
-
-    // def IDLE = 0.U
-    // def COMP = 1.U
-    // def OUT  = 2.U
-    // def DONE = 3.U
+    def MatrixByteIn = GEMMConstant.meshRow.U * GEMMConstant.meshCol.U * GEMMConstant.input.U / (GEMMConstant.W_DATA.U)
+    def MatrixByteOut =  GEMMConstant.meshRow.U * GEMMConstant.meshCol.U * GEMMConstant.output.U / (GEMMConstant.W_DATA.U)
 
     val k_mul_done = Wire(Bool())
-    // val n_mul_done = Wire(Bool()) 
-    // val m_mul_done = Wire(Bool())   
 
     val sIDLE :: sFetch :: sCOMP :: sDONE :: Nil = Enum(4)
     val gemm_state_current = RegInit(sIDLE)
-    // val gemm_state_next = Wire(0.U(2.W))
 
     val k_mul_counter = RegInit(0.U(16.W))
     val n_mul_counter = RegInit(0.U(16.W))
     val m_mul_counter = RegInit(0.U(16.W)) 
-
 
     io.clear_valid := (S_reg === 1.U)
     io.accelerator_valid := (gemm_state_current === sCOMP)
@@ -180,8 +169,7 @@ class GEMM_Controller extends Module{
     k_mul_done := k_mul_counter === K_reg
     chisel3.dontTouch(gemm_state_current)
     //state transform
-    // gemm_state_current := gemm_state_next
-    //state 
+
     switch(gemm_state_current){
         is(sIDLE){
             when(io.start_do){
@@ -221,17 +209,6 @@ class GEMM_Controller extends Module{
             io.addr_in_valid := false.B
             k_mul_counter := 0.U
         }
-        // is(sFetch){
-            
-        // }
-        // is(sCOMP){
-        //     when(io.mesh_compute_done === 1.B){
-        //         k_mul_counter := k_mul_counter + 1.U
-        //     }
-        // }
-        // is(sDONE){
-        //     io.addr_in_valid := false.B
-        // }
     }
     io.data_out_valid := gemm_state_current === sDONE
     io.shift_direction := shift_direction_reg
@@ -334,7 +311,6 @@ class Gemm extends Module{
         }
         c_out_wire_2(r) := Cat(c_out_wire(r).reverse)
     }
-
 
     // data signal connect
     a_in_wire <> mesh.io.a_io_in
