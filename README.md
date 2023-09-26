@@ -1,5 +1,10 @@
-# Accelerator with a GEMM
-This accelerator is built to integrate into the SNAX core.
+# Integer GEMM Accelerator for SNAX
+This repository contains the RTL to build an 8-bit integer GEMM accelerator 
+to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). 
+It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manager core through SystemVerilog. 
+
+## Directory structure
+### chisel gemm
 
 ## Chisel environment
 ### install Java
@@ -21,8 +26,8 @@ sudo apt-get install sbt
 * download the Firtool from https://github.com/llvm/circt/releases/tag/firtool-1.42.0 and unzip it. The verson is 1.42.0.
 * Add the bin of Firrtl to the PATH
 
-## Chisle project
-Use this Chisel project to test the environmen is ok and start playing with Chisel. By defualt, you do a small test to Gemm and generate system verilog file for Gemm.
+## Run tests
+To run the gemm accelerator tests, use:
 ```
 cd chisel-project
 sbt test

@@ -6,8 +6,8 @@
 
 // verilog_lint: waive-start line-length
 // verilog_lint: waive-start no-trailing-spaces
-`include "type_def.svh"
-`include "reqrsp_pkg.sv"
+
+import riscv_instr::*;
 
 module snax_gemm # (
   parameter int unsigned DataWidth         = 64,
@@ -34,11 +34,13 @@ module snax_gemm # (
 
   // CSRs
   localparam reg_num = 5;
+  localparam csr_addr_offset = 32'h3c0;
   reg [31:0] CSRs [reg_num - 1:0];
   logic write_csr;
   logic read_csr;
   logic csr_read_done;
   logic csr_write_done;
+  logic [31:0] csr_addr;
 
   // CSR States
   typedef enum logic [1:0] {
@@ -49,56 +51,47 @@ module snax_gemm # (
 
   ctrl_csr_states_t csr_cstate, csr_nstate;
 
-  // Changing states
-  always_ff @ (posedge clk_i or negedge rst_ni) begin
-    if (!rst_ni) begin
-      csr_cstate <= IDLE;
-    end else begin
-      csr_cstate <= csr_nstate;
-    end
-  end
 
-  // Next state changes
-  always_comb begin
-    case(csr_cstate)
-      IDLE: begin
-        if (read_csr) begin
-          csr_nstate = READ;
-        end else if (write_csr) begin
-          csr_nstate = WRITE;
-        end else begin
-          csr_nstate = IDLE;
-        end
-      end 
-      READ: begin
-        if (csr_read_done) begin 
-          csr_nstate = IDLE; 
-        end else begin
-          csr_nstate = READ; 
-        end
-      end          
-      WRITE: begin
-        if (csr_write_done) begin 
-          csr_nstate = IDLE; 
-        end else begin
-          csr_nstate = WRITE; 
-        end
-      end
-      default: begin
-        csr_nstate = IDLE;
-      end
-    endcase
-  end
+  // 2 cycle to write data out
+  logic read_tcdm;
+  logic write_tcdm_1;
+  logic write_tcdm_2;
+  logic read_tcdm_done;
+  logic write_tcdm_done;
+  logic write_tcdm_done_1;
+  logic write_tcdm_done_2;
+  logic tcdm_not_ready;
+  logic [SnaxTcdmPorts - 1 : 0] snax_tcdm_rsp_i_p_valid;
+  logic [SnaxTcdmPorts - 1 : 0] snax_tcdm_req_o_q_valid;
+
+  // States
+  typedef enum logic [2:0] {
+    IDLE_GEMM,
+    READ_GEMM,
+    COMP_GEMM,
+    WRITE1_GEMM,
+    WRITE2_GEMM
+  } ctrl_states_t;
+
+  ctrl_states_t cstate, nstate;
 
   // write CSRs
   always_ff @ (posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
-      for (int i=0; i<reg_num; i++) begin
+      for (int i=0; i < reg_num; i++) begin
         CSRs[i] <= 32'b0;
       end     
     end else begin
-      if(csr_cstate == WRITE) begin
-        CSRs[snax_req_i.data_arga] <= snax_req_i.data_argb;
+      if(write_csr) begin
+        CSRs[csr_addr] <= snax_req_i.data_arga[31:0];
+      end 
+      else begin
+        if (write_tcdm_done_2 == 1'b1) begin
+          CSRs[4] <= 31'b1;
+        end
+        else begin
+          CSRs[4] <= 31'b0;          
+        end
       end
     end
   end
@@ -111,8 +104,8 @@ module snax_gemm # (
         snax_resp_o.error = 1'b0;
         snax_pvalid_o = 1'b0;        
     end else begin
-      if(csr_cstate == READ) begin
-        snax_resp_o.data = CSRs[snax_req_i.data_arga];
+      if(read_csr) begin
+        snax_resp_o.data = {32'b0,CSRs[csr_addr]};
         snax_resp_o.id = snax_req_i.id;
         snax_resp_o.error = 1'b0;
         snax_pvalid_o = 1'b1;
@@ -142,16 +135,14 @@ module snax_gemm # (
           read_csr = 1'b0;
         end
       endcase      
-    end
+    end   
     else begin
       read_csr = 1'b0;
       write_csr = 1'b0;
     end
   end
-
-  assign csr_read_done = snax_pvalid_o & snax_pready_i;
-  assign csr_write_done = csr_cstate == WRITE;
-  assign snax_qready_o = csr_cstate == IDLE;
+  assign snax_qready_o = 1'b1;
+  assign csr_addr = snax_req_i.data_argb - csr_addr_offset;
 
   // Gemm wires
   logic io_start_do;
@@ -162,6 +153,12 @@ module snax_gemm # (
   logic io_data_out_valid;
   logic [2047:0] io_c_io_out;
   reg [2047:0] io_c_io_out_reg;
+  reg [DataWidth - 1:0] req_write_data [SnaxTcdmPorts - 1:0] ;
+  reg [DataWidth - 1:0] req_write_data_test;
+  localparam half_half_c_addr = 1024 / 2 / 8;
+  localparam half_c_addr = 1024 / 8;
+  localparam half_half_c = 1024 / 2;
+  localparam half_c = 1024;
 
   Gemm inst_gemm(
     .clock(clk_i),	// <stdin>:9016:11
@@ -198,29 +195,6 @@ module snax_gemm # (
     end
   end
 
-  // 2 cycle to write data out
-  logic read_tcdm;
-  logic write_tcdm_1;
-  logic write_tcdm_2;
-  logic read_tcdm_done;
-  logic write_tcdm_done;
-  logic write_tcdm_done_1;
-  logic write_tcdm_done_2;
-  logic tcdm_not_ready;
-  logic [SnaxTcdmPorts - 1 : 0] snax_tcdm_rsp_i_p_valid;
-  logic [SnaxTcdmPorts - 1 : 0] snax_tcdm_req_o_q_valid;
-
-  // States
-  typedef enum logic [2:0] {
-    IDLE_GEMM,
-    READ_GEMM,
-    COMP_GEMM,
-    WRITE1_GEMM,
-    WRITE2_GEMM
-  } ctrl_states_t;
-
-  ctrl_states_t cstate, nstate;
-
   // Changing states
   always_ff @ (posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
@@ -241,11 +215,12 @@ module snax_gemm # (
         end
       end 
       READ_GEMM: begin
-        if (read_tcdm_done) begin 
-          nstate = COMP_GEMM; 
-        end else begin
-          nstate = READ_GEMM; 
-        end
+        // if (read_tcdm_done) begin 
+        //   nstate = COMP_GEMM; 
+        // end else begin
+        //   nstate = READ_GEMM; 
+        // end
+        nstate = COMP_GEMM;
       end   
       COMP_GEMM: begin
         if (io_data_out_valid) begin 
@@ -275,7 +250,7 @@ module snax_gemm # (
 
   end
 
-  assign io_start_do = snax_qvalid_i & snax_req_i.data_arga == 3 & snax_qready_o;
+  assign io_start_do = snax_qvalid_i & (csr_addr == 3) & snax_qready_o;
 
   // read data from TCDM and write data to TCDM
 
@@ -289,6 +264,14 @@ module snax_gemm # (
           snax_tcdm_req_o[i].q.data = {DataWidth{1'b0}};
           snax_tcdm_req_o[i].q.strb = {(DataWidth / 8){1'b0}};
           snax_tcdm_req_o[i].q.user = '0;
+
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q_valid = 1'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = 17'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.write = 1'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.amo = reqrsp_pkg::AMONone;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = {DataWidth{1'b0}};
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.strb = {(DataWidth / 8){1'b0}};
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.user = '0;          
         end
         else if(read_tcdm) begin
           snax_tcdm_req_o[i].q_valid = 1'b1;
@@ -317,27 +300,27 @@ module snax_gemm # (
           snax_tcdm_req_o[i].q.user = '0;
 
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q_valid = 1'b1;
-          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = CSRs[2] + i * 8 + 1024 / 2 / 8;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = CSRs[2] + i * 8 + half_half_c_addr;
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.write = 1'b1;
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.amo = reqrsp_pkg::AMONone;
-          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = io_c_io_out_reg[i * DataWidth + 1024 / 2 / 8 +: DataWidth];
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = io_c_io_out_reg[(i * DataWidth + half_half_c) +: DataWidth];
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.strb = {(DataWidth / 8){1'b1}};
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.user = '0;                    
         end  
         else if(write_tcdm_2) begin
           snax_tcdm_req_o[i].q_valid = 1'b1;
-          snax_tcdm_req_o[i].q.addr = CSRs[2] + i * 8 + 1024 / 8;
+          snax_tcdm_req_o[i].q.addr = CSRs[2] + i * 8 + half_c_addr;
           snax_tcdm_req_o[i].q.write = 1'b1;
           snax_tcdm_req_o[i].q.amo = reqrsp_pkg::AMONone;
-          snax_tcdm_req_o[i].q.data = io_c_io_out_reg[i * DataWidth + 1024 / 8 +: DataWidth];
+          snax_tcdm_req_o[i].q.data = io_c_io_out_reg[(i * DataWidth + half_c) +: DataWidth];
           snax_tcdm_req_o[i].q.strb = {(DataWidth / 8){1'b1}};
           snax_tcdm_req_o[i].q.user = '0;
 
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q_valid = 1'b1;
-          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = CSRs[2] + i * 8 + 1024 / 8 + 1024 / 2 / 8;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = CSRs[2] + i * 8 + half_c_addr + half_half_c_addr;
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.write = 1'b1;
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.amo = reqrsp_pkg::AMONone;
-          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = io_c_io_out_reg[i * DataWidth + 1024 / 2 / 8 + 1024 / 8 +: DataWidth];
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = io_c_io_out_reg[(i * DataWidth + half_c + half_half_c) +: DataWidth];
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.strb = {(DataWidth / 8){1'b1}};
           snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.user = '0;                    
         end              
@@ -348,10 +331,41 @@ module snax_gemm # (
           snax_tcdm_req_o[i].q.amo = reqrsp_pkg::AMONone;
           snax_tcdm_req_o[i].q.data = {DataWidth{1'b0}};
           snax_tcdm_req_o[i].q.strb = {(DataWidth / 8){1'b0}};
-          snax_tcdm_req_o[i].q.user = '0;               
+          snax_tcdm_req_o[i].q.user = '0;        
+
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q_valid = 1'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.addr = 17'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.write = 1'b0;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.amo = reqrsp_pkg::AMONone;
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.data = {DataWidth{1'b0}};
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.strb = {(DataWidth / 8){1'b0}};
+          snax_tcdm_req_o[i + SnaxTcdmPorts / 2].q.user = '0;                  
         end 
       end
   end 
+
+  always_comb begin
+    for (int i = 0; i < SnaxTcdmPorts / 2; i++) begin
+      if (!rst_ni) begin
+        req_write_data[i] = 0;
+        req_write_data[i + SnaxTcdmPorts / 2] = 0;
+      end
+      else if(write_tcdm_1) begin
+        req_write_data[i] = io_c_io_out_reg[i * DataWidth +: DataWidth];
+        req_write_data[i + SnaxTcdmPorts / 2] = io_c_io_out_reg[(i * DataWidth + half_half_c) +: DataWidth];       
+      end
+      else if(write_tcdm_2) begin
+        req_write_data[i] = io_c_io_out_reg[(i * DataWidth + half_c) +: DataWidth];
+        req_write_data[i + SnaxTcdmPorts / 2] = io_c_io_out_reg[(i * DataWidth + half_c + half_half_c) +: DataWidth];       
+      end
+      else begin
+        req_write_data[i] = 0;
+        req_write_data[i + SnaxTcdmPorts / 2] = 0;                
+      end
+    end
+  end
+  // assign req_write_data_test = io_c_io_out_reg['h40+64 : 'h40];
+  assign req_write_data_test = io_c_io_out_reg[2047 : 'h40];
 
   always_comb begin
     if (!rst_ni) begin
@@ -374,20 +388,6 @@ module snax_gemm # (
   always_comb begin
       for (int i = 0; i < SnaxTcdmPorts; i++) begin
         if(!rst_ni) begin
-          snax_tcdm_rsp_i[i].q_ready = 1'b0;
-        end
-        else if(tcdm_not_ready) begin
-          snax_tcdm_rsp_i[i].q_ready = 1'b0;
-        end
-        else begin
-          snax_tcdm_rsp_i[i].q_ready = 1'b1;                
-        end 
-      end
-  end 
-
-  always_comb begin
-      for (int i = 0; i < SnaxTcdmPorts; i++) begin
-        if(!rst_ni) begin
           snax_tcdm_rsp_i_p_valid[i] = 1'b0;
           snax_tcdm_req_o_q_valid[i] = 1'b0;
         end
@@ -398,8 +398,8 @@ module snax_gemm # (
       end
   end 
 
-  assign tcdm_not_ready = cstate == READ_GEMM; 
-  assign io_data_in_valid = &snax_tcdm_rsp_i_p_valid === 1'b1 ? 1'b1 : 1'b0;
+  assign tcdm_not_ready = ~io_data_in_valid; 
+  assign io_data_in_valid = (&snax_tcdm_rsp_i_p_valid) === 1'b1 ? 1'b1 : 1'b0;
   assign read_tcdm = cstate == READ_GEMM;
   assign write_tcdm_1 = cstate == WRITE1_GEMM;
   assign write_tcdm_2 = cstate == WRITE2_GEMM;

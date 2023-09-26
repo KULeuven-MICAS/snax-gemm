@@ -5,13 +5,11 @@ ThisBuild / version          := "0.1.0"
 ThisBuild / organization     := "%ORGANIZATION%"
 
 val chiselVersion = "5.0.0"
-// val chiselVersion = "3.5.6"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "%NAME%",
+    name := "chisel-gemm",
     libraryDependencies ++= Seq(
-      // "edu.berkeley.cs" %% "chisel3" % "3.2-SNAPSHOT",
       "org.chipsalliance" %% "chisel" % chiselVersion,
       "edu.berkeley.cs" %% "chiseltest" % "5.0.0" % "test"
     ),

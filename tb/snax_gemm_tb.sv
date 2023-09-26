@@ -92,6 +92,35 @@ module snax_gemm_tb;
         snax_qvalid = 1'b0;
         #(CYCLE_PERIOD * 10)
 
+        // read 3 csr
+        snax_qvalid = 1'b0;
+        snax_pready = 1'b1;
+        #(CYCLE_PERIOD * 2)
+
+        snax_qvalid = 1'b1;
+        snax_req.data_op = CSRRS;
+        snax_req.data_arga = 0;
+        snax_req.data_argb = 17'b1000_0000;
+        #(CYCLE_PERIOD)   
+        snax_qvalid = 1'b0;
+        #(CYCLE_PERIOD * 2)
+
+        snax_qvalid = 1'b1;
+        snax_req.data_op = CSRRS;
+        snax_req.data_arga = 1;
+        snax_req.data_argb = 17'b1000_0000 + 512;
+        #(CYCLE_PERIOD)   
+        snax_qvalid = 1'b0;
+        #(CYCLE_PERIOD * 2)
+
+        snax_qvalid = 1'b1;
+        snax_req.data_op = CSRRS;
+        snax_req.data_arga = 2;
+        snax_req.data_argb = 17'b1000_0000 + 512 + 512;
+        #(CYCLE_PERIOD)   
+        snax_qvalid = 1'b0;
+        #(CYCLE_PERIOD * 10)
+
         // write start signal
         snax_qvalid = 1'b1;
         snax_req.data_op = CSRRW;
