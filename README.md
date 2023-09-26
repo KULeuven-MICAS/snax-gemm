@@ -5,11 +5,11 @@ It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manag
 
 ## Directory structure
 ### chisel-gemm
-This directory contains the chisel src file and unit test of Gemm. We also need this `chisel-gemm` project to generate the system verilog file to be integrated into SNAX.
+This directory contains the chisel src file and unit test of Gemm. We also need this `chisel-gemm` project to generate the SystemVerilog file to be integrated into SNAX.
 ### src
 This directory contains the SystemVerilog controller for connecting the Gemm to the SNAX core.
 ### tb
-This directory contains the testbench for the system verilog version of Gemm and a simple testbench for Accelerator with the Gemm.
+This directory contains the testbench for the SystemVerilog version of Gemm and a simple testbench for Accelerator with the Gemm.
 ### dv
 This directory contains the design verification utils for running the testbench for Gemm and the Accelerator.
 
