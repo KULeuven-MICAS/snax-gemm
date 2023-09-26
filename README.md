@@ -29,9 +29,9 @@ sudo apt-get update
 sudo apt-get install sbt
 ```
 
-### Install Firrtl
+### Install Firtool
 * Download the Firtool from https://github.com/llvm/circt/releases/tag/firtool-1.42.0 and unzip it. The verson is 1.42.0.
-* Add the bin of Firrtl to the PATH
+* Add the bin of Firtool to the PATH
 
 ## Run tests
 To run the gemm accelerator tests, use:
