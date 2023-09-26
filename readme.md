@@ -21,8 +21,9 @@ sudo apt-get install sbt
 * download the Firtool from https://github.com/llvm/circt/releases/tag/firtool-1.42.0 and unzip it. The verson is 1.42.0.
 * Add the bin of Firrtl to the PATH
 
-## Chisle project
-Use this Chisel project to test the environmen is ok and start playing with Chisel. By defualt, you do a small test to Gemm and generate system verilog file for Gemm.
+## Run tests
+
+To run the gemm accelerator tests, use:
 ```
 cd chisel-project
 sbt test
