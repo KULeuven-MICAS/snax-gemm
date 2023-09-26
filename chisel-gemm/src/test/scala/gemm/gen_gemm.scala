@@ -1,6 +1,8 @@
 package gemm
 
 import chisel3._
+import org.scalatest.flatspec.AnyFlatSpec
+import chiseltest._
 
 object GemmGen extends App {
 
@@ -9,18 +11,10 @@ object GemmGen extends App {
 
 }
 
-import chisel3._
-import org.scalatest.flatspec.AnyFlatSpec
-import chiseltest._
-
 class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" in { test(new Gemm) .withAnnotations(Seq(WriteVcdAnnotation)) {
       dut => 
       dut.io.start_do.poke(1.U) 
-      dut.io.inst.M.poke(1.U) 
-      dut.io.inst.N.poke(1.U) 
-      dut.io.inst.K.poke(1.U) 
-      dut.io.inst.S.poke(0.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(1.U) 
       for(i <- 0 until 8){
@@ -47,10 +41,6 @@ class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
       dut.clock.step(10) 
 
       dut.io.start_do.poke(1.U) 
-      dut.io.inst.M.poke(1.U) 
-      dut.io.inst.N.poke(1.U) 
-      dut.io.inst.K.poke(1.U) 
-      dut.io.inst.S.poke(1.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(1.U) 
 
