@@ -14,7 +14,6 @@ object GemmGen extends App {
 class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" in { test(new Gemm) .withAnnotations(Seq(WriteVcdAnnotation)) {
       dut => 
-      dut.io.start_do.poke(1.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(1.U) 
       for(i <- 0 until 8){
@@ -23,15 +22,12 @@ class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
           dut.io.b_io_in.poke(1.U)       
         }
       }    
-      dut.io.start_do.poke(0.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(0.U) 
 
       dut.clock.step(10) 
       
-      dut.io.start_do.poke(1.U) 
       dut.clock.step() 
-      dut.io.start_do.poke(0.U) 
       dut.io.data_in_valid.poke(1.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(0.U) 
@@ -40,7 +36,6 @@ class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
 
       dut.clock.step(10) 
 
-      dut.io.start_do.poke(1.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(1.U) 
 
@@ -51,14 +46,12 @@ class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
         }
       }    
 
-      dut.io.start_do.poke(0.U) 
       dut.clock.step() 
       dut.io.data_in_valid.poke(0.U) 
 
       dut.clock.step(10) 
 
       dut.clock.step() 
-      dut.io.start_do.poke(1.U) 
       for(i <- 0 until 8){
         for(j <- 0 until 8){
           dut.io.a_io_in.poke(1.U) 
@@ -67,7 +60,6 @@ class GemmTest extends AnyFlatSpec with ChiselScalatestTester {
         }
       }    
       dut.clock.step() 
-      dut.io.start_do.poke(0.U) 
       dut.clock.step(10) 
       dut.io.data_in_valid.poke(1.U) 
 

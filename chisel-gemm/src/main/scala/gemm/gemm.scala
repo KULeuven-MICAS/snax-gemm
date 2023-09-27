@@ -32,35 +32,29 @@ class Tile extends Module{
     val mid_reg_vec = RegInit(VecInit(Seq.fill(4)(0.U(GEMMConstant.mul.W))))
     val ctrl_acc = RegInit(0.B)
     val chek_data_in_valid_reg = RegInit(0.B)
-    val chek_data_in_valid_reg_reg = RegInit(0.B)
-    
+
     chisel3.dontTouch(mul_add_result)
     
     //posedge
     chek_data_in_valid := io.in_control.data_in_valid
     chek_data_in_valid_reg := chek_data_in_valid
-    chek_data_in_valid_reg_reg := chek_data_in_valid_reg
-
     //stage1
     for( i <- 0 until GEMMConstant.meshRow){
         mul_add_result_vec_reg(i) := io.a_io_in(i) * io.b_io_in(i)
     }  
-    //stage2
-    for(j <- 0 until GEMMConstant.meshRow/4){
-        mid_reg_vec(j) := mul_add_result_vec_reg(j*4) + mul_add_result_vec_reg(j*4 + 1) + mul_add_result_vec_reg(j*4 + 2)+mul_add_result_vec_reg(j*4 + 3)
-    }
+
     //stage3  //out->valid
-    mul_add_result := mid_reg_vec.reduce((a:UInt,b:UInt)=>a+b)
-    when(chek_data_in_valid_reg === 1.B){
+    mul_add_result := mul_add_result_vec_reg.reduce((a:UInt,b:UInt)=>a+b)
+    when(chek_data_in_valid === 1.B){
         accumulation_reg := accumulation_reg + mul_add_result
     }
     //stage4   clear
-    when(chek_data_in_valid_reg_reg){
+    when(chek_data_in_valid_reg){
         accumulation_reg := 0.U
     }
 
     io.c_io_out := accumulation_reg
-    io.data_out_valid := chek_data_in_valid_reg_reg
+    io.data_out_valid := chek_data_in_valid_reg
 }
 
 class MeshIO extends Bundle{
@@ -91,8 +85,6 @@ class Mesh extends Module{
 }
 
 class  GemmIO extends Bundle{
-    val start_do = Input(Bool())
-
     val data_in_valid = Input(Bool())
     val a_io_in = Input(UInt((GEMMConstant.meshRow * GEMMConstant.meshCol * GEMMConstant.inputLen).W))
     val b_io_in = Input(UInt((GEMMConstant.meshRow * GEMMConstant.meshCol * GEMMConstant.inputLen).W))

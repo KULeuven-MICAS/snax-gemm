@@ -170,26 +170,11 @@ module snax_gemm # (
   Gemm inst_gemm(
     .clock(clk_i),	// <stdin>:9016:11
     .reset(!rst_ni),	// <stdin>:9017:11
-    .io_start_do(io_start_do),	// src/main/scala/gemm/gemm.scala:309:16
     .io_data_in_valid(io_data_in_valid),	// src/main/scala/gemm/gemm.scala:309:16
     .io_a_io_in(io_a_io_in),	// src/main/scala/gemm/gemm.scala:309:16
     .io_b_io_in(io_b_io_in),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_M(1),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_K(1),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_N(1),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_S(1'b1),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_Rm(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_Rn(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_Rd(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_shift_direction(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_inst_shift_number(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_done(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_addr_in_valid(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_addr_a_in(),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_addr_b_in(),	// src/main/scala/gemm/gemm.scala:309:16
     .io_data_out_valid(io_data_out_valid),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_c_io_out(io_c_io_out),	// src/main/scala/gemm/gemm.scala:309:16
-    .io_addr_c_out()	
+    .io_c_io_out(io_c_io_out)	// src/main/scala/gemm/gemm.scala:309:16
   );
 
   always_ff @ (posedge clk_i or negedge rst_ni) begin
