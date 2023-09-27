@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: SHL-0.51
 
 /// Package containing common req resp definitions.
-package reqrsp_pkg;
+package snax_reqrsp_pkg;
 
   /// Size field. Same semantic as AXI.
   typedef logic [2:0] size_t;
