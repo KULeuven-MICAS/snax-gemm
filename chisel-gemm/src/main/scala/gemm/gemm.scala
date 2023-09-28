@@ -96,7 +96,7 @@ class Gemm extends Module{
     // data partition
     val a_in_wire = Wire(Vec(GEMMConstant.meshRow,Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))))
     val b_in_wire = Wire(Vec(GEMMConstant.meshCol,Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))))
-    val c_out_wire = Wire(Vec(GEMMConstant.meshRow,Vec(GEMMConstant.meshCol, UInt(GEMMConstant.input.W))))
+    val c_out_wire = Wire(Vec(GEMMConstant.meshRow,Vec(GEMMConstant.meshCol, UInt(GEMMConstant.output.W))))
     val c_out_wire_2 = Wire(Vec(GEMMConstant.meshRow,UInt((GEMMConstant.meshCol * GEMMConstant.output).W)))
 
     for( r <- 0 until GEMMConstant.meshRow){
