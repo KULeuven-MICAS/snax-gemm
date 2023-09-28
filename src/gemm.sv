@@ -39,47 +39,47 @@
 module Tile(	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
   input         clock,	// <stdin>:4:11, :55:11, :106:11, :157:11, :208:11, :259:11, :310:11, :361:11, :412:11, :463:11, :514:11, :565:11, :616:11, :667:11, :718:11, :769:11, :820:11, :871:11, :922:11, :973:11, :1024:11, :1075:11, :1126:11, :1177:11, :1228:11, :1279:11, :1330:11, :1381:11, :1432:11, :1483:11, :1534:11, :1585:11, :1636:11, :1687:11, :1738:11, :1789:11, :1840:11, :1891:11, :1942:11, :1993:11, :2044:11, :2095:11, :2146:11, :2197:11, :2248:11, :2299:11, :2350:11, :2401:11, :2452:11, :2503:11, :2554:11, :2605:11, :2656:11, :2707:11, :2758:11, :2809:11, :2860:11, :2911:11, :2962:11, :3013:11, :3064:11, :3115:11, :3166:11, :3217:11
                 reset,	// <stdin>:5:11, :56:11, :107:11, :158:11, :209:11, :260:11, :311:11, :362:11, :413:11, :464:11, :515:11, :566:11, :617:11, :668:11, :719:11, :770:11, :821:11, :872:11, :923:11, :974:11, :1025:11, :1076:11, :1127:11, :1178:11, :1229:11, :1280:11, :1331:11, :1382:11, :1433:11, :1484:11, :1535:11, :1586:11, :1637:11, :1688:11, :1739:11, :1790:11, :1841:11, :1892:11, :1943:11, :1994:11, :2045:11, :2096:11, :2147:11, :2198:11, :2249:11, :2300:11, :2351:11, :2402:11, :2453:11, :2504:11, :2555:11, :2606:11, :2657:11, :2708:11, :2759:11, :2810:11, :2861:11, :2912:11, :2963:11, :3014:11, :3065:11, :3116:11, :3167:11, :3218:11
-  input  [7:0]  io_a_io_in_0,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_1,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_2,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_3,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_4,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_5,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_6,	// src/main/scala/gemm/gemm.scala:23:17
-                io_a_io_in_7,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_0,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_1,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_2,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_3,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_4,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_5,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_6,	// src/main/scala/gemm/gemm.scala:23:17
-                io_b_io_in_7,	// src/main/scala/gemm/gemm.scala:23:17
-  input         io_in_control_data_in_valid,	// src/main/scala/gemm/gemm.scala:23:17
-  output [31:0] io_c_io_out,	// src/main/scala/gemm/gemm.scala:23:17
-  output        io_data_out_valid	// src/main/scala/gemm/gemm.scala:23:17
+  input  [7:0]  io_a_io_in_0,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_1,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_2,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_3,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_4,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_5,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_6,	// src/main/scala/gemm/gemm.scala:26:17
+                io_a_io_in_7,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_0,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_1,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_2,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_3,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_4,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_5,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_6,	// src/main/scala/gemm/gemm.scala:26:17
+                io_b_io_in_7,	// src/main/scala/gemm/gemm.scala:26:17
+  input         io_in_control_data_in_valid,	// src/main/scala/gemm/gemm.scala:26:17
+  output [31:0] io_c_io_out,	// src/main/scala/gemm/gemm.scala:26:17
+  output        io_data_out_valid	// src/main/scala/gemm/gemm.scala:26:17
 );
 
-  reg  [31:0] accumulation_reg;	// src/main/scala/gemm/gemm.scala:25:35
-  reg         chek_data_in_valid;	// src/main/scala/gemm/gemm.scala:26:37
+  reg  [31:0] accumulation_reg;	// src/main/scala/gemm/gemm.scala:28:35
+  reg         chek_data_in_valid;	// src/main/scala/gemm/gemm.scala:29:37
   wire [15:0] mul_add_result =
     {8'h0, io_a_io_in_0} * {8'h0, io_b_io_in_0} + {8'h0, io_a_io_in_1}
     * {8'h0, io_b_io_in_1} + {8'h0, io_a_io_in_2} * {8'h0, io_b_io_in_2}
     + {8'h0, io_a_io_in_3} * {8'h0, io_b_io_in_3} + {8'h0, io_a_io_in_4}
     * {8'h0, io_b_io_in_4} + {8'h0, io_a_io_in_5} * {8'h0, io_b_io_in_5}
     + {8'h0, io_a_io_in_6} * {8'h0, io_b_io_in_6} + {8'h0, io_a_io_in_7}
-    * {8'h0, io_b_io_in_7};	// src/main/scala/gemm/gemm.scala:27:30, :35:52, :38:71
+    * {8'h0, io_b_io_in_7};	// src/main/scala/gemm/gemm.scala:30:30, :38:52, :41:71
   always @(posedge clock) begin	// <stdin>:4:11, :55:11, :106:11, :157:11, :208:11, :259:11, :310:11, :361:11, :412:11, :463:11, :514:11, :565:11, :616:11, :667:11, :718:11, :769:11, :820:11, :871:11, :922:11, :973:11, :1024:11, :1075:11, :1126:11, :1177:11, :1228:11, :1279:11, :1330:11, :1381:11, :1432:11, :1483:11, :1534:11, :1585:11, :1636:11, :1687:11, :1738:11, :1789:11, :1840:11, :1891:11, :1942:11, :1993:11, :2044:11, :2095:11, :2146:11, :2197:11, :2248:11, :2299:11, :2350:11, :2401:11, :2452:11, :2503:11, :2554:11, :2605:11, :2656:11, :2707:11, :2758:11, :2809:11, :2860:11, :2911:11, :2962:11, :3013:11, :3064:11, :3115:11, :3166:11, :3217:11
     if (reset) begin	// <stdin>:4:11, :55:11, :106:11, :157:11, :208:11, :259:11, :310:11, :361:11, :412:11, :463:11, :514:11, :565:11, :616:11, :667:11, :718:11, :769:11, :820:11, :871:11, :922:11, :973:11, :1024:11, :1075:11, :1126:11, :1177:11, :1228:11, :1279:11, :1330:11, :1381:11, :1432:11, :1483:11, :1534:11, :1585:11, :1636:11, :1687:11, :1738:11, :1789:11, :1840:11, :1891:11, :1942:11, :1993:11, :2044:11, :2095:11, :2146:11, :2197:11, :2248:11, :2299:11, :2350:11, :2401:11, :2452:11, :2503:11, :2554:11, :2605:11, :2656:11, :2707:11, :2758:11, :2809:11, :2860:11, :2911:11, :2962:11, :3013:11, :3064:11, :3115:11, :3166:11, :3217:11
-      accumulation_reg <= 32'h0;	// src/main/scala/gemm/gemm.scala:25:35
-      chek_data_in_valid <= 1'h0;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:26:37
+      accumulation_reg <= 32'h0;	// src/main/scala/gemm/gemm.scala:28:35
+      chek_data_in_valid <= 1'h0;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:29:37
     end
     else begin	// <stdin>:4:11, :55:11, :106:11, :157:11, :208:11, :259:11, :310:11, :361:11, :412:11, :463:11, :514:11, :565:11, :616:11, :667:11, :718:11, :769:11, :820:11, :871:11, :922:11, :973:11, :1024:11, :1075:11, :1126:11, :1177:11, :1228:11, :1279:11, :1330:11, :1381:11, :1432:11, :1483:11, :1534:11, :1585:11, :1636:11, :1687:11, :1738:11, :1789:11, :1840:11, :1891:11, :1942:11, :1993:11, :2044:11, :2095:11, :2146:11, :2197:11, :2248:11, :2299:11, :2350:11, :2401:11, :2452:11, :2503:11, :2554:11, :2605:11, :2656:11, :2707:11, :2758:11, :2809:11, :2860:11, :2911:11, :2962:11, :3013:11, :3064:11, :3115:11, :3166:11, :3217:11
-      if (chek_data_in_valid)	// src/main/scala/gemm/gemm.scala:26:37
-        accumulation_reg <= 32'h0;	// src/main/scala/gemm/gemm.scala:25:35
-      else if (io_in_control_data_in_valid)	// src/main/scala/gemm/gemm.scala:23:17
-        accumulation_reg <= {16'h0, mul_add_result};	// src/main/scala/gemm/gemm.scala:25:35, :27:30, :40:26
-      chek_data_in_valid <= io_in_control_data_in_valid;	// src/main/scala/gemm/gemm.scala:26:37
+      if (chek_data_in_valid)	// src/main/scala/gemm/gemm.scala:29:37
+        accumulation_reg <= 32'h0;	// src/main/scala/gemm/gemm.scala:28:35
+      else if (io_in_control_data_in_valid)	// src/main/scala/gemm/gemm.scala:26:17
+        accumulation_reg <= {16'h0, mul_add_result};	// src/main/scala/gemm/gemm.scala:28:35, :30:30, :38:35, :43:26
+      chek_data_in_valid <= io_in_control_data_in_valid;	// src/main/scala/gemm/gemm.scala:29:37
     end
   end // always @(posedge)
   `ifndef SYNTHESIS	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
@@ -95,218 +95,218 @@ module Tile(	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:1
         for (logic [1:0] i = 2'h0; i < 2'h2; i += 2'h1) begin
           _RANDOM[i[0]] = `RANDOM;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
         end	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
-        accumulation_reg = _RANDOM[1'h0];	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:25:35
-        chek_data_in_valid = _RANDOM[1'h1][0];	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:26:37
+        accumulation_reg = _RANDOM[1'h0];	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:28:35
+        chek_data_in_valid = _RANDOM[1'h1][0];	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:29:37
       `endif // RANDOMIZE_REG_INIT
     end // initial
     `ifdef FIRRTL_AFTER_INITIAL	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
       `FIRRTL_AFTER_INITIAL	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10
     `endif // FIRRTL_AFTER_INITIAL
   `endif // not def SYNTHESIS
-  assign io_c_io_out = accumulation_reg;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:25:35
-  assign io_data_out_valid = chek_data_in_valid;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:26:37
+  assign io_c_io_out = accumulation_reg;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:28:35
+  assign io_data_out_valid = chek_data_in_valid;	// <stdin>:3:10, :54:10, :105:10, :156:10, :207:10, :258:10, :309:10, :360:10, :411:10, :462:10, :513:10, :564:10, :615:10, :666:10, :717:10, :768:10, :819:10, :870:10, :921:10, :972:10, :1023:10, :1074:10, :1125:10, :1176:10, :1227:10, :1278:10, :1329:10, :1380:10, :1431:10, :1482:10, :1533:10, :1584:10, :1635:10, :1686:10, :1737:10, :1788:10, :1839:10, :1890:10, :1941:10, :1992:10, :2043:10, :2094:10, :2145:10, :2196:10, :2247:10, :2298:10, :2349:10, :2400:10, :2451:10, :2502:10, :2553:10, :2604:10, :2655:10, :2706:10, :2757:10, :2808:10, :2859:10, :2910:10, :2961:10, :3012:10, :3063:10, :3114:10, :3165:10, :3216:10, src/main/scala/gemm/gemm.scala:29:37
 endmodule
 
 module Mesh(	// <stdin>:3267:10
   input         clock,	// <stdin>:3268:11
                 reset,	// <stdin>:3269:11
-  input  [7:0]  io_a_io_in_0_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_0_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_1_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_2_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_3_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_4_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_5_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_6_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_a_io_in_7_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_0_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_1_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_2_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_3_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_4_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_5_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_6_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_b_io_in_7_7,	// src/main/scala/gemm/gemm.scala:63:16
-  input         io_in_control_data_in_valid,	// src/main/scala/gemm/gemm.scala:63:16
-  output [31:0] io_c_io_out_0_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_0_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_1_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_2_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_3_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_4_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_5_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_6_7,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_0,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_1,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_2,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_3,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_4,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_5,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_6,	// src/main/scala/gemm/gemm.scala:63:16
-                io_c_io_out_7_7,	// src/main/scala/gemm/gemm.scala:63:16
-  output        io_data_out_valid	// src/main/scala/gemm/gemm.scala:63:16
+  input  [7:0]  io_a_io_in_0_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_0_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_1_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_2_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_3_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_4_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_5_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_6_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_a_io_in_7_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_0_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_1_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_2_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_3_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_4_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_5_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_6_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_b_io_in_7_7,	// src/main/scala/gemm/gemm.scala:64:16
+  input         io_in_control_data_in_valid,	// src/main/scala/gemm/gemm.scala:64:16
+  output [31:0] io_c_io_out_0_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_0_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_1_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_2_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_3_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_4_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_5_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_6_7,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_0,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_1,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_2,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_3,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_4,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_5,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_6,	// src/main/scala/gemm/gemm.scala:64:16
+                io_c_io_out_7_7,	// src/main/scala/gemm/gemm.scala:64:16
+  output        io_data_out_valid	// src/main/scala/gemm/gemm.scala:64:16
 );
 
-  Tile mesh_0_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -329,7 +329,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_0),
     .io_data_out_valid           (io_data_out_valid)
   );
-  Tile mesh_0_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -352,7 +352,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -375,7 +375,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -398,7 +398,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -421,7 +421,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -444,7 +444,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -467,7 +467,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_0_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_0_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_0_0),
@@ -490,7 +490,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_0_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -513,7 +513,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -536,7 +536,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -559,7 +559,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -582,7 +582,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -605,7 +605,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -628,7 +628,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -651,7 +651,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_1_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_1_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_1_0),
@@ -674,7 +674,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_1_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -697,7 +697,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -720,7 +720,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -743,7 +743,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -766,7 +766,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -789,7 +789,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -812,7 +812,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -835,7 +835,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_2_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_2_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_2_0),
@@ -858,7 +858,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_2_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -881,7 +881,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -904,7 +904,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -927,7 +927,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -950,7 +950,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -973,7 +973,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -996,7 +996,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -1019,7 +1019,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_3_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_3_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_3_0),
@@ -1042,7 +1042,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_3_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1065,7 +1065,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1088,7 +1088,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1111,7 +1111,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1134,7 +1134,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1157,7 +1157,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1180,7 +1180,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1203,7 +1203,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_4_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_4_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_4_0),
@@ -1226,7 +1226,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_4_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1249,7 +1249,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1272,7 +1272,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1295,7 +1295,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1318,7 +1318,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1341,7 +1341,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1364,7 +1364,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1387,7 +1387,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_5_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_5_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_5_0),
@@ -1410,7 +1410,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_5_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1433,7 +1433,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1456,7 +1456,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1479,7 +1479,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1502,7 +1502,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1525,7 +1525,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1548,7 +1548,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1571,7 +1571,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_6_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_6_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_6_0),
@@ -1594,7 +1594,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_6_7),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_0 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_0 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1617,7 +1617,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_0),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_1 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_1 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1640,7 +1640,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_1),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_2 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_2 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1663,7 +1663,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_2),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_3 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_3 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1686,7 +1686,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_3),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_4 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_4 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1709,7 +1709,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_4),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_5 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_5 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1732,7 +1732,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_5),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_6 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_6 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1755,7 +1755,7 @@ module Mesh(	// <stdin>:3267:10
     .io_c_io_out                 (io_c_io_out_7_6),
     .io_data_out_valid           (/* unused */)
   );
-  Tile mesh_7_7 (	// src/main/scala/gemm/gemm.scala:67:74
+  Tile mesh_7_7 (	// src/main/scala/gemm/gemm.scala:68:74
     .clock                       (clock),
     .reset                       (reset),
     .io_a_io_in_0                (io_a_io_in_7_0),
@@ -1921,70 +1921,70 @@ module Gemm(	// <stdin>:3722:10
     .io_a_io_in_7_5              (io_a_io_in[495:488]),	// src/main/scala/gemm/gemm.scala:104:42
     .io_a_io_in_7_6              (io_a_io_in[503:496]),	// src/main/scala/gemm/gemm.scala:104:42
     .io_a_io_in_7_7              (io_a_io_in[511:504]),	// src/main/scala/gemm/gemm.scala:104:42
-    .io_b_io_in_0_0              (io_b_io_in[7:0]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_1              (io_b_io_in[15:8]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_2              (io_b_io_in[23:16]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_3              (io_b_io_in[31:24]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_4              (io_b_io_in[39:32]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_5              (io_b_io_in[47:40]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_6              (io_b_io_in[55:48]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_0_7              (io_b_io_in[63:56]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_0              (io_b_io_in[71:64]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_1              (io_b_io_in[79:72]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_2              (io_b_io_in[87:80]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_3              (io_b_io_in[95:88]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_4              (io_b_io_in[103:96]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_5              (io_b_io_in[111:104]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_6              (io_b_io_in[119:112]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_1_7              (io_b_io_in[127:120]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_0              (io_b_io_in[135:128]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_1              (io_b_io_in[143:136]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_2              (io_b_io_in[151:144]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_3              (io_b_io_in[159:152]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_4              (io_b_io_in[167:160]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_5              (io_b_io_in[175:168]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_6              (io_b_io_in[183:176]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_2_7              (io_b_io_in[191:184]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_0              (io_b_io_in[199:192]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_1              (io_b_io_in[207:200]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_2              (io_b_io_in[215:208]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_3              (io_b_io_in[223:216]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_4              (io_b_io_in[231:224]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_5              (io_b_io_in[239:232]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_6              (io_b_io_in[247:240]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_3_7              (io_b_io_in[255:248]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_0              (io_b_io_in[263:256]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_1              (io_b_io_in[271:264]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_2              (io_b_io_in[279:272]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_3              (io_b_io_in[287:280]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_4              (io_b_io_in[295:288]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_5              (io_b_io_in[303:296]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_6              (io_b_io_in[311:304]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_4_7              (io_b_io_in[319:312]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_0              (io_b_io_in[327:320]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_1              (io_b_io_in[335:328]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_2              (io_b_io_in[343:336]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_3              (io_b_io_in[351:344]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_4              (io_b_io_in[359:352]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_5              (io_b_io_in[367:360]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_6              (io_b_io_in[375:368]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_5_7              (io_b_io_in[383:376]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_0              (io_b_io_in[391:384]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_1              (io_b_io_in[399:392]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_2              (io_b_io_in[407:400]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_3              (io_b_io_in[415:408]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_4              (io_b_io_in[423:416]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_5              (io_b_io_in[431:424]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_6              (io_b_io_in[439:432]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_6_7              (io_b_io_in[447:440]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_0              (io_b_io_in[455:448]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_1              (io_b_io_in[463:456]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_2              (io_b_io_in[471:464]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_3              (io_b_io_in[479:472]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_4              (io_b_io_in[487:480]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_5              (io_b_io_in[495:488]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_6              (io_b_io_in[503:496]),	// src/main/scala/gemm/gemm.scala:110:42
-    .io_b_io_in_7_7              (io_b_io_in[511:504]),	// src/main/scala/gemm/gemm.scala:110:42
+    .io_b_io_in_0_0              (io_b_io_in[7:0]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_1              (io_b_io_in[15:8]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_2              (io_b_io_in[23:16]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_3              (io_b_io_in[31:24]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_4              (io_b_io_in[39:32]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_5              (io_b_io_in[47:40]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_6              (io_b_io_in[55:48]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_0_7              (io_b_io_in[63:56]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_0              (io_b_io_in[71:64]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_1              (io_b_io_in[79:72]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_2              (io_b_io_in[87:80]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_3              (io_b_io_in[95:88]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_4              (io_b_io_in[103:96]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_5              (io_b_io_in[111:104]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_6              (io_b_io_in[119:112]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_1_7              (io_b_io_in[127:120]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_0              (io_b_io_in[135:128]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_1              (io_b_io_in[143:136]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_2              (io_b_io_in[151:144]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_3              (io_b_io_in[159:152]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_4              (io_b_io_in[167:160]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_5              (io_b_io_in[175:168]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_6              (io_b_io_in[183:176]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_2_7              (io_b_io_in[191:184]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_0              (io_b_io_in[199:192]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_1              (io_b_io_in[207:200]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_2              (io_b_io_in[215:208]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_3              (io_b_io_in[223:216]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_4              (io_b_io_in[231:224]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_5              (io_b_io_in[239:232]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_6              (io_b_io_in[247:240]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_3_7              (io_b_io_in[255:248]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_0              (io_b_io_in[263:256]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_1              (io_b_io_in[271:264]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_2              (io_b_io_in[279:272]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_3              (io_b_io_in[287:280]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_4              (io_b_io_in[295:288]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_5              (io_b_io_in[303:296]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_6              (io_b_io_in[311:304]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_4_7              (io_b_io_in[319:312]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_0              (io_b_io_in[327:320]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_1              (io_b_io_in[335:328]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_2              (io_b_io_in[343:336]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_3              (io_b_io_in[351:344]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_4              (io_b_io_in[359:352]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_5              (io_b_io_in[367:360]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_6              (io_b_io_in[375:368]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_5_7              (io_b_io_in[383:376]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_0              (io_b_io_in[391:384]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_1              (io_b_io_in[399:392]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_2              (io_b_io_in[407:400]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_3              (io_b_io_in[415:408]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_4              (io_b_io_in[423:416]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_5              (io_b_io_in[431:424]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_6              (io_b_io_in[439:432]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_6_7              (io_b_io_in[447:440]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_0              (io_b_io_in[455:448]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_1              (io_b_io_in[463:456]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_2              (io_b_io_in[471:464]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_3              (io_b_io_in[479:472]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_4              (io_b_io_in[487:480]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_5              (io_b_io_in[495:488]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_6              (io_b_io_in[503:496]),	// src/main/scala/gemm/gemm.scala:105:42
+    .io_b_io_in_7_7              (io_b_io_in[511:504]),	// src/main/scala/gemm/gemm.scala:105:42
     .io_in_control_data_in_valid (io_data_in_valid),
     .io_c_io_out_0_0             (_mesh_io_c_io_out_0_0),
     .io_c_io_out_0_1             (_mesh_io_c_io_out_0_1),
@@ -2053,77 +2053,69 @@ module Gemm(	// <stdin>:3722:10
     .io_data_out_valid           (io_data_out_valid)
   );
   assign io_c_io_out =
-    {192'h0,
-     _mesh_io_c_io_out_7_7[7:0],
-     _mesh_io_c_io_out_7_6[7:0],
-     _mesh_io_c_io_out_7_5[7:0],
-     _mesh_io_c_io_out_7_4[7:0],
-     _mesh_io_c_io_out_7_3[7:0],
-     _mesh_io_c_io_out_7_2[7:0],
-     _mesh_io_c_io_out_7_1[7:0],
-     _mesh_io_c_io_out_7_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_6_7[7:0],
-     _mesh_io_c_io_out_6_6[7:0],
-     _mesh_io_c_io_out_6_5[7:0],
-     _mesh_io_c_io_out_6_4[7:0],
-     _mesh_io_c_io_out_6_3[7:0],
-     _mesh_io_c_io_out_6_2[7:0],
-     _mesh_io_c_io_out_6_1[7:0],
-     _mesh_io_c_io_out_6_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_5_7[7:0],
-     _mesh_io_c_io_out_5_6[7:0],
-     _mesh_io_c_io_out_5_5[7:0],
-     _mesh_io_c_io_out_5_4[7:0],
-     _mesh_io_c_io_out_5_3[7:0],
-     _mesh_io_c_io_out_5_2[7:0],
-     _mesh_io_c_io_out_5_1[7:0],
-     _mesh_io_c_io_out_5_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_4_7[7:0],
-     _mesh_io_c_io_out_4_6[7:0],
-     _mesh_io_c_io_out_4_5[7:0],
-     _mesh_io_c_io_out_4_4[7:0],
-     _mesh_io_c_io_out_4_3[7:0],
-     _mesh_io_c_io_out_4_2[7:0],
-     _mesh_io_c_io_out_4_1[7:0],
-     _mesh_io_c_io_out_4_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_3_7[7:0],
-     _mesh_io_c_io_out_3_6[7:0],
-     _mesh_io_c_io_out_3_5[7:0],
-     _mesh_io_c_io_out_3_4[7:0],
-     _mesh_io_c_io_out_3_3[7:0],
-     _mesh_io_c_io_out_3_2[7:0],
-     _mesh_io_c_io_out_3_1[7:0],
-     _mesh_io_c_io_out_3_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_2_7[7:0],
-     _mesh_io_c_io_out_2_6[7:0],
-     _mesh_io_c_io_out_2_5[7:0],
-     _mesh_io_c_io_out_2_4[7:0],
-     _mesh_io_c_io_out_2_3[7:0],
-     _mesh_io_c_io_out_2_2[7:0],
-     _mesh_io_c_io_out_2_1[7:0],
-     _mesh_io_c_io_out_2_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_1_7[7:0],
-     _mesh_io_c_io_out_1_6[7:0],
-     _mesh_io_c_io_out_1_5[7:0],
-     _mesh_io_c_io_out_1_4[7:0],
-     _mesh_io_c_io_out_1_3[7:0],
-     _mesh_io_c_io_out_1_2[7:0],
-     _mesh_io_c_io_out_1_1[7:0],
-     _mesh_io_c_io_out_1_0[7:0],
-     192'h0,
-     _mesh_io_c_io_out_0_7[7:0],
-     _mesh_io_c_io_out_0_6[7:0],
-     _mesh_io_c_io_out_0_5[7:0],
-     _mesh_io_c_io_out_0_4[7:0],
-     _mesh_io_c_io_out_0_3[7:0],
-     _mesh_io_c_io_out_0_2[7:0],
-     _mesh_io_c_io_out_0_1[7:0],
-     _mesh_io_c_io_out_0_0[7:0]};	// <stdin>:3722:10, src/main/scala/gemm/gemm.scala:94:22, :116:30, :118:25, :124:23
+    {_mesh_io_c_io_out_7_7,
+     _mesh_io_c_io_out_7_6,
+     _mesh_io_c_io_out_7_5,
+     _mesh_io_c_io_out_7_4,
+     _mesh_io_c_io_out_7_3,
+     _mesh_io_c_io_out_7_2,
+     _mesh_io_c_io_out_7_1,
+     _mesh_io_c_io_out_7_0,
+     _mesh_io_c_io_out_6_7,
+     _mesh_io_c_io_out_6_6,
+     _mesh_io_c_io_out_6_5,
+     _mesh_io_c_io_out_6_4,
+     _mesh_io_c_io_out_6_3,
+     _mesh_io_c_io_out_6_2,
+     _mesh_io_c_io_out_6_1,
+     _mesh_io_c_io_out_6_0,
+     _mesh_io_c_io_out_5_7,
+     _mesh_io_c_io_out_5_6,
+     _mesh_io_c_io_out_5_5,
+     _mesh_io_c_io_out_5_4,
+     _mesh_io_c_io_out_5_3,
+     _mesh_io_c_io_out_5_2,
+     _mesh_io_c_io_out_5_1,
+     _mesh_io_c_io_out_5_0,
+     _mesh_io_c_io_out_4_7,
+     _mesh_io_c_io_out_4_6,
+     _mesh_io_c_io_out_4_5,
+     _mesh_io_c_io_out_4_4,
+     _mesh_io_c_io_out_4_3,
+     _mesh_io_c_io_out_4_2,
+     _mesh_io_c_io_out_4_1,
+     _mesh_io_c_io_out_4_0,
+     _mesh_io_c_io_out_3_7,
+     _mesh_io_c_io_out_3_6,
+     _mesh_io_c_io_out_3_5,
+     _mesh_io_c_io_out_3_4,
+     _mesh_io_c_io_out_3_3,
+     _mesh_io_c_io_out_3_2,
+     _mesh_io_c_io_out_3_1,
+     _mesh_io_c_io_out_3_0,
+     _mesh_io_c_io_out_2_7,
+     _mesh_io_c_io_out_2_6,
+     _mesh_io_c_io_out_2_5,
+     _mesh_io_c_io_out_2_4,
+     _mesh_io_c_io_out_2_3,
+     _mesh_io_c_io_out_2_2,
+     _mesh_io_c_io_out_2_1,
+     _mesh_io_c_io_out_2_0,
+     _mesh_io_c_io_out_1_7,
+     _mesh_io_c_io_out_1_6,
+     _mesh_io_c_io_out_1_5,
+     _mesh_io_c_io_out_1_4,
+     _mesh_io_c_io_out_1_3,
+     _mesh_io_c_io_out_1_2,
+     _mesh_io_c_io_out_1_1,
+     _mesh_io_c_io_out_1_0,
+     _mesh_io_c_io_out_0_7,
+     _mesh_io_c_io_out_0_6,
+     _mesh_io_c_io_out_0_5,
+     _mesh_io_c_io_out_0_4,
+     _mesh_io_c_io_out_0_3,
+     _mesh_io_c_io_out_0_2,
+     _mesh_io_c_io_out_0_1,
+     _mesh_io_c_io_out_0_0};	// <stdin>:3722:10, src/main/scala/gemm/gemm.scala:94:22, :115:23
 endmodule
 
