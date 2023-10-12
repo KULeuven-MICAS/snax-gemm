@@ -1,4 +1,4 @@
-name: CI
+name: Unit Test
 on:
   push:
     branches:
@@ -26,9 +26,6 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
           cache: sbt
-
-      - name: Run the project
-        run: sbt run
 
       - name: Run the unit tests
         run: sbt test
