@@ -6,7 +6,7 @@ jobs:
     name: Build and Run
     strategy:
       matrix:
-        java-version: [11]
+        java-version: [17]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout current branch (full)
