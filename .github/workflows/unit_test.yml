@@ -1,11 +1,5 @@
 name: Unit Test
-on:
-  push:
-    branches:
-      - main
-    tags:
-      - '*'
-  pull_request:
+on: [push, pull_request]
   
 jobs: 
   run:
@@ -26,6 +20,18 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
           cache: sbt
+
+      - name: check format
+        run: sbt scalafmtCheck
+
+      - name: Setup Firtool
+        run: wget -q -O - https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz | tar -zx | echo "$(pwd)/firrtl-bin-ubuntu-20.04/firtool-1.42.0/bin" >> $GITHUB_PATH 
+
+      - name: Check PATH
+        run: echo $GITHUB_PATH
+
+      - name: Check Firtool version
+        run: firtool -version
 
       - name: Run the unit tests
         run: sbt test
