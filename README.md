@@ -1,19 +1,45 @@
 # Integer GEMM Accelerator for SNAX
-This repository contains the RTL to build an 8-bit integer GEMM accelerator 
-to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). 
+This repository contains the RTL to build an 8-bit integer GEMM (General Matrix Multiply) accelerator 
+to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). This repository contains the chisel sources and unit tests for the GEMM accelerator.
 It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manager core through SystemVerilog. 
 
-## Directory structure
-### chisel-gemm
-This directory contains the chisel src file and unit test of Gemm. We also need this `chisel-gemm` project to generate the SystemVerilog file to be integrated into SNAX.
-### src
-This directory contains the SystemVerilog controller for connecting the Gemm to the SNAX core.
-### tb
-This directory contains the testbench for the SystemVerilog version of Gemm and a simple testbench for Accelerator with the Gemm.
-### dv
-This directory contains the design verification utils for running the testbench for Gemm and the Accelerator.
 
-## Chisel environment
+## Microarchitecture
+The microarchitecture of the GEMM accelerator is shown below. The GEMM array has meshRow row and meshCol column tiles. Each tile implements a tileSize vector dot product.
+![](./docs/microarch.png)
+
+## Functional description
+This repository contains three GEMM versions: Base GEMM, Large GEMM, and Batch Large GEMM.
+### Base GEMM
+Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below.
+| Parameter | Meaning |
+| - | -|
+| input | Input matrix data width (integer) |
+| output | Output matrix data width (integer) |
+| accumulate | Accumulator data width (integer) |
+| meshRow | The row number of the GEMM array |
+| meshCol | The column number of the GEMM array |
+| tileSize | The tile size of each tile |
+
+The size of matrix A is (meshRow, tileSize) and the size of matrix B is (tileSize, meshCol). The size of result matrix C is (meshRow, meshCol). To get the right results, matrix A should be arranged in row-major order and matrix B should be arranged in column-major order.
+![](./docs/datalayout_mem.png)
+
+Each row of the GEMM array takes in the corresponding row of matrix A, eg., all the tiles in row ith takes in the ith row of matrix A. And each column of the GEMM array takes in the corresponding column of matrix B, eg., all the tiles in column jth take in the jth column of matrix B.
+
+![](./docs/datalayout.png)
+
+The base GEMM also has an accumulation option. If the signal 
+
+The Base GEMM function definition pseudocode is shown below.
+```
+bool gemm(signed byte *A,signed byte *B, int * C, bool accumulate)
+```
+
+## Unit test
+This repository also contains some unit tests for each version of GEMM to do the numerical test. The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. Then these matrices and configurations are fed into the GEMM accelerator. After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
+
+## Quickstart
+Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
 ### Install Java
 ```
 sudo apt install openjdk-11-jre-headless

@@ -7,7 +7,7 @@ object GEMMConstant {
   def input = 8
   def mul = input * 2
   def output = input * 4
-  def acc = input * 4
+  def accumulate = input * 4
   def tileSize = 8
   def meshRow = 8
   def meshCol = 8
