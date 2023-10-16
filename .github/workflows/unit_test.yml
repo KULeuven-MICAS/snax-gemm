@@ -26,6 +26,7 @@ jobs:
           wget https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz
           tar -xvzf firrtl-bin-ubuntu-20.04.tar.gz 
           export PATH="$PWD/firtool-1.42.0/bin:$PATH" 
+          echo $PATH 
           sbt test
 
       - name: Check PATH
