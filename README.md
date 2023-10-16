@@ -3,7 +3,7 @@ This repository contains the RTL to build an 8-bit integer GEMM (General Matrix 
 to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). This repository contains the chisel src file and unit test of the GEMM accelerator.
 It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manager core through SystemVerilog. 
 
-## Microarchiecture
+## Microarchitecture
 The microarchitecture of the GEMM accelerator is shown below. The GEMM array has meshRow row and meshCol column tiles. Each tile implements a tileSize vector dot product.
 ![](./docs/microarch.png)
 
