@@ -60,7 +60,7 @@ bool batchstridelargegemm(int B, int M, int K, int N, int strideA, int strideB, 
 ```
 
 ## Unit test
-This repository also contains some unit tests for each version of GEMM to do the numerical test. The unit tests are also written in Chisel. Firstly, the random input matrixes and random size configurations are generated. Then these matrixes and configurations are input into the GEMM accelerator. After the computation, the output result of the GEMM accelerator will be compared with the golden model.
+This repository also contains some unit tests for each version of GEMM to do the numerical test. The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. Then these matrices and configurations are fed into the GEMM accelerator. After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
 
 ## Quick Start
 Following this quick start to set up the Chsiel environment and run the unit test of the GEMM accelerator.
