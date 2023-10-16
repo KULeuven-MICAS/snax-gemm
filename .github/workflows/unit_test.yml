@@ -22,10 +22,10 @@ jobs:
           cache: sbt
 
       - name: Setup Firtool
-        run: wget https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz && tar -xvzf firrtl-bin-ubuntu-20.04.tar.gz && export PATH="$(pwd)/firrtl-bin-ubuntu-20.04/firtool-1.42.0/bin:$PATH" 
+        run: wget https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz && tar -xvzf firrtl-bin-ubuntu-20.04.tar.gz && export PATH="$(pwd)/firtool-1.42.0/bin:$PATH" 
 
       - name: Check PATH
-        run: echo $PATH | ls
+        run: echo $PATH 
 
       - name: Check Firtool version
         run: firtool -version
