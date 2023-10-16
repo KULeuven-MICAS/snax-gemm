@@ -34,7 +34,9 @@ bool gemm(signed byte *A,signed byte *B, int * C)
 
 ### Large GEMM
 The Large GEMM is built on the Base GEMM. It takes in the M, K, and N configurations.
-In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). The GEMM accelerator uses [Block matrix multiplication](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. Below is an example data layout in memory for M = 2, K = 2, and N = 2. 
+In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). 
+
+The GEMM accelerator uses [Block matrix multiplication](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. Below is an example data layout in memory for M = 2, K = 2, and N = 2. 
 ![](./docs/block_matrix_mul.png)
 
 The Large GEMM function definition pseudocode is shown below.
