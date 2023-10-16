@@ -51,18 +51,18 @@ class GemmArrayRandomTest
           val RandomBigBus_A = RandomBigBuses._1
           val RandomBigBus_B = RandomBigBuses._2
 
-          // Invoke data_in_valid to send the test data
-          dut.io.data_in_valid.poke(1.U)
-          dut.io.data.a_io_in.poke(RandomBigBus_A)
-          dut.io.data.b_io_in.poke(RandomBigBus_B)
+          // Invoke data_valid_i to send the test data
+          dut.io.data_valid_i.poke(1.U)
+          dut.io.data.a_i.poke(RandomBigBus_A)
+          dut.io.data.b_i.poke(RandomBigBus_B)
 
           dut.clock.step()
-          dut.io.data_in_valid.poke(0.U)
-          /* Wait for data_out_valid assert, then take the result */
-          while (dut.io.data_out_valid.peekBoolean()) {
+          dut.io.data_valid_i.poke(0.U)
+          /* Wait for data_valid_o assert, then take the result */
+          while (dut.io.data_valid_o.peekBoolean()) {
             dut.clock.step()
           }
-          val results = dut.io.data.c_io_out.peek()
+          val results = dut.io.data.c_o.peek()
           /* Translate the big bus from Gemm to int array for comparison */
           val results_array = MatrixLibBase.BigBus2Matrix(
             GEMMConstant.meshRow,
@@ -102,58 +102,58 @@ class GemmArrayBaseTest extends AnyFlatSpec with ChiselScalatestTester {
     test(new GemmArray)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step()
-        dut.io.data_in_valid.poke(1.U)
+        dut.io.data_valid_i.poke(1.U)
         for (i <- 0 until 8) {
           for (j <- 0 until 8) {
-            dut.io.data.a_io_in.poke(1.U)
-            dut.io.data.b_io_in.poke(1.U)
+            dut.io.data.a_i.poke(1.U)
+            dut.io.data.b_i.poke(1.U)
           }
         }
         dut.clock.step()
-        dut.io.data_in_valid.poke(0.U)
+        dut.io.data_valid_i.poke(0.U)
 
         dut.clock.step(10)
 
         dut.clock.step()
-        dut.io.data_in_valid.poke(1.U)
+        dut.io.data_valid_i.poke(1.U)
         dut.clock.step()
-        dut.io.data_in_valid.poke(0.U)
+        dut.io.data_valid_i.poke(0.U)
         dut.clock.step()
         dut.clock.step()
 
         dut.clock.step(10)
 
         dut.clock.step()
-        dut.io.data_in_valid.poke(1.U)
-        dut.io.accumulate.poke(1)
+        dut.io.data_valid_i.poke(1.U)
+        dut.io.accumulate_i.poke(1)
 
         for (i <- 0 until 8) {
           for (j <- 0 until 8) {
-            dut.io.data.a_io_in.poke(1.U)
-            dut.io.data.b_io_in.poke(1.U)
-          }
-        }
-
-        dut.clock.step()
-        dut.io.data_in_valid.poke(0.U)
-
-        dut.clock.step(10)
-
-        dut.clock.step()
-        for (i <- 0 until 8) {
-          for (j <- 0 until 8) {
-            dut.io.data.a_io_in.poke(1.U)
-            dut.io.data.b_io_in.poke(1.U)
-
+            dut.io.data.a_i.poke(1.U)
+            dut.io.data.b_i.poke(1.U)
           }
         }
 
         dut.clock.step()
+        dut.io.data_valid_i.poke(0.U)
+
         dut.clock.step(10)
-        dut.io.data_in_valid.poke(1.U)
 
         dut.clock.step()
-        dut.io.data_in_valid.poke(0.U)
+        for (i <- 0 until 8) {
+          for (j <- 0 until 8) {
+            dut.io.data.a_i.poke(1.U)
+            dut.io.data.b_i.poke(1.U)
+
+          }
+        }
+
+        dut.clock.step()
+        dut.clock.step(10)
+        dut.io.data_valid_i.poke(1.U)
+
+        dut.clock.step()
+        dut.io.data_valid_i.poke(0.U)
         dut.clock.step(10)
 
         emitVerilog(
