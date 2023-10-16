@@ -31,9 +31,9 @@ class Tile extends Module {
   val result_reg = RegInit(0.S(GEMMConstant.accumulate.W))
   val chek_data_in_valid_reg = RegInit(0.B)
   val mul_add_result_vec = Wire(
-    Vec(GEMMConstant.tileSize, SInt(GEMMConstant.accumulate.W))
+    Vec(GEMMConstant.tileSize, SInt(GEMMConstant.mul.W))
   )
-  val mul_add_result = Wire(SInt(GEMMConstant.mul.W))
+  val mul_add_result = Wire(SInt(GEMMConstant.accumulate.W))
 
   chisel3.dontTouch(mul_add_result)
 
