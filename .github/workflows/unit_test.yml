@@ -22,7 +22,7 @@ jobs:
           cache: sbt
 
       - name: Setup Firtool
-        run: wget -q -O - https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz | tar -zx | echo "$(pwd)/firrtl-bin-ubuntu-20.04/firtool-1.42.0/bin" >> $GITHUB_PATH 
+        run: wget -q -O - https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz | tar -zx | export PATH="$(pwd)/firrtl-bin-ubuntu-20.04/firtool-1.42.0/bin:$PATH" 
 
       - name: Check PATH
         run: echo $GITHUB_PATH
