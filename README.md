@@ -1,6 +1,6 @@
 # Integer GEMM Accelerator for SNAX
 This repository contains the RTL to build an 8-bit integer GEMM (General Matrix Multiply) accelerator 
-to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). This repository contains the chisel src file and unit test of the GEMM accelerator.
+to integrate into the [SNAX core](https://github.com/KULeuven-micas/snitch_cluster). This repository contains the chisel sources and unit tests for the GEMM accelerator.
 It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manager core through SystemVerilog. 
 
 ## Microarchitecture
