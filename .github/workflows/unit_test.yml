@@ -1,4 +1,4 @@
-name: Check format
+name: Unit Test
 on:
   push:
     branches: [ "main" ]
@@ -6,7 +6,7 @@ on:
   
 jobs: 
   run:
-    name: Build and Run
+    name: Build and Test
     strategy:
       matrix:
         java-version: [17]
@@ -24,5 +24,11 @@ jobs:
           java-version: ${{ matrix.java-version }}
           cache: sbt
 
-      - name: check format
-        run: sbt scalafmtCheck
+      - name: Setup Firtool
+        run: |-
+          wget https://github.com/llvm/circt/releases/download/firtool-1.42.0/firrtl-bin-ubuntu-20.04.tar.gz
+          tar -xvzf firrtl-bin-ubuntu-20.04.tar.gz 
+          echo "$PWD/firtool-1.42.0/bin" >> $GITHUB_PATH          
+
+      - name: Run the unit tests
+        run: sbt test
