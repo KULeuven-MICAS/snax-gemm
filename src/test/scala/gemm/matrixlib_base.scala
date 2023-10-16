@@ -4,7 +4,7 @@ import chisel3._
 import scala.math.BigInt
 
 // Scala math matrix multiplication libray for Gemm verification
-object MatrixlibBase {
+object MatrixLibBase {
   // This function generates two random data matrix. The size of matrix is (meshRow, tileSize) and (tileSize, meshCol)
   // The data type is signed integer 8 (which is Byte is Scala).
   // The matrixes data is flatten to one dimension to be compatible with memory data layout.
@@ -73,7 +73,7 @@ object MatrixlibBase {
 
   // Translate the Scala matrix to Scala BigInt for inputing the Scala matrix to big Chisel bus
   // The matrix data type is Byte
-  def Matrix2Bigbuses(
+  def Matrix2BigBuses(
       meshRow: Int,
       tileSize: Int,
       meshCol: Int,

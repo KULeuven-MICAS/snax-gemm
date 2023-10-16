@@ -28,7 +28,7 @@ Each row of the GEMM array takes in the corresponding row of matrix A, eg., all 
 
 ![](./docs/datalayout.png)
 
-The base GEMM also has an accumulation option. If the signal 
+The base GEMM also has an accumulation option. If the signal `accumulate` is one, then the accumulator register will store current result. If the  signal `accumulate` is zero, then the accumulator register will clear itself.
 
 The Base GEMM function definition pseudocode is shown below.
 ```
