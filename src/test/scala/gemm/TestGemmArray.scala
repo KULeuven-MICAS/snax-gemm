@@ -18,7 +18,7 @@ class GemmArrayRandomTest
   "DUT" should "pass" in {
     test(new GemmArray)
       .withAnnotations(
-        Seq(WriteVcdAnnotation, VerilatorBackendAnnotation)
+        Seq(WriteVcdAnnotation)
       ) { dut =>
         def RandomTest() = {
           /* Generate Random Integer 8 data (from -128 to 127) */
