@@ -47,9 +47,7 @@ class Tile extends Module {
   }
 
   // Sum of element-wise multiply
-  mul_add_result := mul_add_result_vec.reduce((a, b) =>
-    (a.asSInt + b.asSInt)
-  )
+  mul_add_result := mul_add_result_vec.reduce((a, b) => (a.asSInt + b.asSInt))
 
   when(io.control_i.data_valid_i === 1.B) {
     result_reg := accumulation_reg + mul_add_result
@@ -117,7 +115,6 @@ class Mesh extends Module {
   io.data_valid_o := mesh(0)(0).io.data_valid_o
 }
 
-
 class GemmDataIO extends Bundle {
   val a_i = Input(
     UInt(
@@ -135,7 +132,6 @@ class GemmDataIO extends Bundle {
     )
   )
 }
-
 
 // Gemm IO definition
 class GemmArrayIO extends Bundle {
