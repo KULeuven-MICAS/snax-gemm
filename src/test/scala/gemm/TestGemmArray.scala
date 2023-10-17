@@ -6,7 +6,6 @@ import chiseltest._
 import scala.math.BigInt
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.Tag
-import GemmArray
 
 // Add tags to filter some unncessary test for fast unit test
 object Unnecessary extends Tag("Unnecessary")
