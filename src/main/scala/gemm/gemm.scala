@@ -37,7 +37,7 @@ class Tile extends Module {
 
   chisel3.dontTouch(mul_add_result)
 
-  chek_data_in_valid_reg := io.control_i.data_valid_i
+  check_data_in_valid_reg := io.control_i.data_valid_i
 
   // Element-wise multiply
   for (i <- 0 until GEMMConstant.tileSize) {
@@ -65,7 +65,7 @@ class Tile extends Module {
   }
 
   io.c_o := result_reg
-  io.data_valid_o := chek_data_in_valid_reg
+  io.data_valid_o := check_data_in_valid_reg
 }
 
 // Mesh IO definition, an extended version of Tile IO
