@@ -31,11 +31,14 @@ The base GEMM also has an accumulation option. If the signal `accumulate` is one
 
 The Base GEMM function definition pseudocode is shown below.
 ```
-bool gemm(signed byte *A,signed byte *B, int * C, bool accumulate)
+bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
 ```
 
 ## Unit test
-This repository also contains some unit tests for each version of GEMM to do the numerical test. The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. Then these matrices and configurations are fed into the GEMM accelerator. After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
+This repository also contains some unit tests for each version of GEMM. 
+The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. 
+Then these matrices and configurations are fed into the GEMM accelerator. 
+After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
 
 ## Quickstart
 Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
