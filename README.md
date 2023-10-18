@@ -40,6 +40,8 @@ The unit tests are also written in Chisel. Firstly, random input matrices and ra
 Then these matrices and configurations are fed into the GEMM accelerator. 
 After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
 
+In current unit test, we only test the GEMM with input datatype as int8 and output data type as int32. The GEMM array size is also fixed.
+
 ## Quickstart
 Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
 ### Install Java
