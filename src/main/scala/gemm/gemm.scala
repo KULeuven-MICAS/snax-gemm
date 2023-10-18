@@ -3,7 +3,7 @@ import chisel3._
 import chisel3.util._
 import chisel3.VecInit
 
-// Control signals for Gemm. Cuurently, we only have data_valid_i
+// Control signals for Gemm. Currently, we only have data_valid_i
 class TileControl extends Bundle {
   val data_valid_i = Input(Bool())
   val accumulate_i = Input(Bool())
@@ -29,7 +29,7 @@ class Tile extends Module {
 
   val accumulation_reg = RegInit(0.S(GEMMConstant.accumulate.W))
   val result_reg = RegInit(0.S(GEMMConstant.accumulate.W))
-  val chek_data_in_valid_reg = RegInit(0.B)
+  val check_data_in_valid_reg = RegInit(0.B)
   val mul_add_result_vec = Wire(
     Vec(GEMMConstant.tileSize, SInt(GEMMConstant.mul.W))
   )

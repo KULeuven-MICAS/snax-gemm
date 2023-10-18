@@ -160,7 +160,7 @@ object MatrixLibBase {
   }
 
   // Matrix multiplication with one dimension Array[Byte] data type
-  def MarixMul_1D(
+  def MatrixMul_1D(
       meshRow: Int,
       tileSize: Int,
       meshCol: Int,
@@ -186,7 +186,7 @@ object MatrixLibBase {
   }
 
   // Matrix multiplication with 2 dimension Array[Array[Byte]] data type
-  def MarixMul_2D(
+  def MatrixMul_2D(
       meshRow: Int,
       tileSize: Int,
       meshCol: Int,
