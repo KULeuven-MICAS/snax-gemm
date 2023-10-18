@@ -185,24 +185,5 @@ object MatrixLibBase {
     golden
   }
 
-  // Matrix multiplication with 2 dimension Array[Array[Byte]] data type
-  def MatrixMul_2D(
-      meshRow: Int,
-      tileSize: Int,
-      meshCol: Int,
-      A: Array[Array[Byte]],
-      B: Array[Array[Byte]]
-  ) = {
-    val golden = Array.ofDim[Int](meshRow, meshCol)
-    for (i <- 0 until meshRow) {
-      for (j <- 0 until meshCol) {
-        golden(i)(j) = 0
-        for (k <- 0 until tileSize) {
-          golden(i)(j) = golden(i)(j) + A(i)(k) * B(k)(j)
-        }
-      }
-    }
-    golden
-  }
 
 }
