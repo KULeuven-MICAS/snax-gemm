@@ -32,7 +32,7 @@ class GemmArrayRandomTest
           val random_matrix_B = RandomMatrixs._2
 
           // Generate golden result data for verification
-          val golden_array = MatrixLibBase.MarixMul_1D(
+          val golden_array = MatrixLibBase.MatrixMul_1D(
             GEMMConstant.meshRow,
             GEMMConstant.tileSize,
             GEMMConstant.meshCol,
