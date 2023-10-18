@@ -185,5 +185,4 @@ object MatrixLibBase {
     golden
   }
 
-
 }
