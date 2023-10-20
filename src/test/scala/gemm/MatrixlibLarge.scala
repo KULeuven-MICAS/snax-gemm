@@ -5,11 +5,11 @@ import scala.math.BigInt
 
 // Scala math submatrix multiplication libray for large Gemm verification
 // Some functions are based on the MatrixLibBase
-object MatrixlibLarge {
+object MatrixLibLarge {
 
   // Generate random M, K, N for testing the large Gemm
   // The test matrix are (M * meshRow, K * tileSize) and (K * tileSize, N * meshCol)
-  def genRandSizeTest() = {
+  def GenRandSizeTest() = {
     val rand = new scala.util.Random
     val M = rand.between(1, 10)
     val K = rand.between(1, 10)
@@ -20,9 +20,9 @@ object MatrixlibLarge {
   // Generate the random test matrix with a size of (M * meshRow, K * tileSize) and (K * tileSize, N * meshCol)
   def GenLargeMatrix(M: Int, K: Int, N: Int) = {
     MatrixLibBase.GenRandomMatrix(
-      GEMMConstant.meshRow * M,
-      GEMMConstant.tileSize * K,
-      GEMMConstant.meshCol * N
+      GemmConstant.meshRow * M,
+      GemmConstant.tileSize * K,
+      GemmConstant.meshCol * N
     )
   }
 
@@ -31,8 +31,7 @@ object MatrixlibLarge {
   def MatrixArray2BigBus(
       meshRow: Int,
       meshCol: Int,
-      A: Array[Byte],
-      Trans: Boolean
+      A: Array[Byte]
   ) = {
 
     var flattenedUInt_A = ""
@@ -98,14 +97,13 @@ object MatrixlibLarge {
     for (i <- 0 until M) {
       for (j <- 0 until K) {
         val submatrx_A = A.slice(
-          (i * K + j) * GEMMConstant.meshRow * GEMMConstant.tileSize,
-          (i * K + j + 1) * GEMMConstant.meshRow * GEMMConstant.tileSize
+          (i * K + j) * GemmConstant.meshRow * GemmConstant.tileSize,
+          (i * K + j + 1) * GemmConstant.meshRow * GemmConstant.tileSize
         )
         split_A(i * K + j) = MatrixArray2BigBus(
-          GEMMConstant.meshRow,
-          GEMMConstant.tileSize,
-          submatrx_A,
-          false
+          GemmConstant.meshRow,
+          GemmConstant.tileSize,
+          submatrx_A
         )
       }
     }
@@ -113,14 +111,13 @@ object MatrixlibLarge {
     for (i <- 0 until K) {
       for (j <- 0 until N) {
         val submatrx_B = B.slice(
-          (i * N + j) * GEMMConstant.tileSize * GEMMConstant.meshCol,
-          (i * N + j + 1) * GEMMConstant.tileSize * GEMMConstant.meshCol
+          (i * N + j) * GemmConstant.tileSize * GemmConstant.meshCol,
+          (i * N + j + 1) * GemmConstant.tileSize * GemmConstant.meshCol
         )
         split_B(i * N + j) = MatrixArray2BigBus(
-          GEMMConstant.tileSize,
-          GEMMConstant.meshCol,
-          submatrx_B,
-          false
+          GemmConstant.tileSize,
+          GemmConstant.meshCol,
+          submatrx_B
         )
       }
     }
@@ -140,13 +137,13 @@ object MatrixlibLarge {
 
     val golden =
       Array.ofDim[Int](
-        M * N * GEMMConstant.meshRow * GEMMConstant.meshCol
+        M * N * GemmConstant.meshRow * GemmConstant.meshCol
       )
     val golden_split_mat = Array.ofDim[BigInt](M * N)
 
     var submatrx_temp =
       Array.ofDim[Int](
-        GEMMConstant.meshRow * GEMMConstant.meshCol
+        GemmConstant.meshRow * GemmConstant.meshCol
       )
 
     for (i <- 0 until M) {
@@ -154,42 +151,42 @@ object MatrixlibLarge {
         for (k <- 0 until K) {
           var submatrx_temp1 =
             Array.ofDim[Int](
-              GEMMConstant.meshRow * GEMMConstant.meshCol
+              GemmConstant.meshRow * GemmConstant.meshCol
             )
           submatrx_temp1 = MatrixLibBase.MatrixMul_1D(
-            GEMMConstant.meshRow,
-            GEMMConstant.tileSize,
-            GEMMConstant.meshCol,
+            GemmConstant.meshRow,
+            GemmConstant.tileSize,
+            GemmConstant.meshCol,
             A.slice(
-              (i * K + k) * GEMMConstant.meshRow * GEMMConstant.tileSize,
-              (i * K + k + 1) * GEMMConstant.meshRow * GEMMConstant.tileSize
+              (i * K + k) * GemmConstant.meshRow * GemmConstant.tileSize,
+              (i * K + k + 1) * GemmConstant.meshRow * GemmConstant.tileSize
             ),
             B.slice(
-              (k + j * K) * GEMMConstant.tileSize * GEMMConstant.meshCol,
-              (k + j * K + 1) * GEMMConstant.tileSize * GEMMConstant.meshCol
+              (k + j * K) * GemmConstant.tileSize * GemmConstant.meshCol,
+              (k + j * K + 1) * GemmConstant.tileSize * GemmConstant.meshCol
             )
           )
           submatrx_temp = golden
             .slice(
-              (i * N + j) * GEMMConstant.meshRow * GEMMConstant.meshCol,
-              (i * N + j + 1) * GEMMConstant.meshRow * GEMMConstant.meshCol
+              (i * N + j) * GemmConstant.meshRow * GemmConstant.meshCol,
+              (i * N + j + 1) * GemmConstant.meshRow * GemmConstant.meshCol
             )
             .zip(submatrx_temp1)
             .map { case (a, b) => a + b }
-          for (t <- 0 until GEMMConstant.meshRow * GEMMConstant.meshCol) {
+          for (t <- 0 until GemmConstant.meshRow * GemmConstant.meshCol) {
             golden(
-              (i * N + j) * GEMMConstant.meshRow * GEMMConstant.meshCol + t
+              (i * N + j) * GemmConstant.meshRow * GemmConstant.meshCol + t
             ) = submatrx_temp(t)
           }
         }
 
         golden_split_mat(i * N + j) = MatrixArray2BigBus(
-          GEMMConstant.meshRow,
-          GEMMConstant.meshCol,
+          GemmConstant.meshRow,
+          GemmConstant.meshCol,
           golden
             .slice(
-              (i * N + j) * GEMMConstant.meshRow * GEMMConstant.meshCol,
-              (i * N + j + 1) * GEMMConstant.meshRow * GEMMConstant.meshCol
+              (i * N + j) * GemmConstant.meshRow * GemmConstant.meshCol,
+              (i * N + j + 1) * GemmConstant.meshRow * GemmConstant.meshCol
             ),
           false
         )

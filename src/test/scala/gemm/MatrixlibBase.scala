@@ -85,8 +85,8 @@ object MatrixLibBase {
     var flattenedUInt_B = ""
     var intValue = 0
 
-    /* PrintMatrixByte_1D(GEMMConstant.meshCol,GEMMConstant.tileSize,B) */
-    /* PrintMatrixByte_1D(GEMMConstant.tileSize,GEMMConstant.meshCol,B_trans) */
+    /* PrintMatrixByte_1D(GemmConstant.meshCol,GemmConstant.tileSize,B) */
+    /* PrintMatrixByte_1D(GemmConstant.tileSize,GemmConstant.meshCol,B_trans) */
 
     for (i <- 0 until meshRow) {
       for (k <- 0 until tileSize) {

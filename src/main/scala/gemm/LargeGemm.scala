@@ -4,25 +4,25 @@ import chisel3.util._
 
 // The LargeGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README
 class LargeGemmControllerIO extends Bundle {
-  val M_in = Input(UInt(8.W))
-  val K_in = Input(UInt(8.W))
-  val N_in = Input(UInt(8.W))
-  val start_do = Input(Bool())
+  val M_i = Input(UInt(8.W))
+  val K_i = Input(UInt(8.W))
+  val N_i = Input(UInt(8.W))
+  val start_do_i = Input(Bool())
   val data_valid_o = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val addr_a_in = Input(UInt(32.W))
-  val addr_b_in = Input(UInt(32.W))
-  val addr_c_in = Input(UInt(32.W))
+  val ptr_addr_a_i = Input(UInt(32.W))
+  val ptr_addr_b_i = Input(UInt(32.W))
+  val ptr_addr_c_i = Input(UInt(32.W))
 
   val gemm_read_valid = Output(Bool())
   val gemm_write_valid = Output(Bool())
 
-  val addr_a_out = Output(UInt(32.W))
-  val addr_b_out = Output(UInt(32.W))
-  val addr_c_out = Output(UInt(32.W))
+  val addr_a_o = Output(UInt(32.W))
+  val addr_b_o = Output(UInt(32.W))
+  val addr_c_o = Output(UInt(32.W))
 
-  val gemm_busy = Output(Bool())
+  val busy_o = Output(Bool())
   val accumulate = Output(Bool())
 }
 
@@ -53,7 +53,7 @@ class LargeGemmController extends Module {
   val write_counter = RegInit(0.U(8.W))
   val accumulate_counter = RegInit(0.U(8.W))
 
-  // Statemeny declaration
+  // State declaration
   val sIDLE :: sREAD :: sREAD_DONE :: Nil = Enum(3)
   val cstate = RegInit(sIDLE)
   val nstate = WireInit(sIDLE)
@@ -64,7 +64,7 @@ class LargeGemmController extends Module {
   // Next state changes
   switch(cstate) {
     is(sIDLE) {
-      when(io.start_do) {
+      when(io.start_do_i) {
         nstate := sREAD
       }.otherwise {
         nstate := sIDLE
@@ -87,10 +87,10 @@ class LargeGemmController extends Module {
   }
 
   // Store the configurations
-  when(io.start_do && !io.gemm_busy) {
-    M := io.M_in
-    N := io.N_in
-    K := io.K_in
+  when(io.start_do_i && !io.busy_o) {
+    M := io.M_i
+    N := io.N_i
+    K := io.K_i
   }.elsewhen(cstate === sIDLE) {
     M := 0.U
     N := 0.U
@@ -99,7 +99,7 @@ class LargeGemmController extends Module {
 
   // K read counter
   when(
-    (io.start_do === 1.B) && K_read_counter =/= (io.K_in - 1.U)
+    (io.start_do_i === 1.B) && K_read_counter =/= (io.K_i - 1.U)
   ) {
     K_read_counter := K_read_counter + 1.U
   }.elsewhen(
@@ -118,7 +118,7 @@ class LargeGemmController extends Module {
   ) {
     N_read_counter := N_read_counter + 1.U
   }.elsewhen(
-    (io.start_do === 1.B) && K_read_counter === (io.K_in - 1.U) && N_read_counter =/= (io.N_in - 1.U) && io.K_in =/= 1.U
+    (io.start_do_i === 1.B) && K_read_counter === (io.K_i - 1.U) && N_read_counter =/= (io.N_i - 1.U) && io.K_i =/= 1.U
   ) {
     N_read_counter := N_read_counter + 1.U
   }.elsewhen(
@@ -126,7 +126,7 @@ class LargeGemmController extends Module {
   ) {
     N_read_counter := N_read_counter + 1.U
   }.elsewhen(
-    (io.start_do === 1.B) && io.K_in === 1.U && N_read_counter =/= (io.N_in - 1.U)
+    (io.start_do_i === 1.B) && io.K_i === 1.U && N_read_counter =/= (io.N_i - 1.U)
   ) {
     N_read_counter := N_read_counter + 1.U
   }.elsewhen(
@@ -137,19 +137,19 @@ class LargeGemmController extends Module {
 
   // M read counter
   when(
-    ((io.start_do === 1.B) || (io.data_valid_i === 1.B && cstate === sREAD)) && K_read_counter === (K - 1.U) && N_read_counter === (N - 1.U) && M_read_counter =/= (M - 1.U) && K =/= 1.U && N =/= 1.U
+    ((io.start_do_i === 1.B) || (io.data_valid_i === 1.B && cstate === sREAD)) && K_read_counter === (K - 1.U) && N_read_counter === (N - 1.U) && M_read_counter =/= (M - 1.U) && K =/= 1.U && N =/= 1.U
   ) {
     M_read_counter := M_read_counter + 1.U
   }.elsewhen(
-    ((io.start_do === 1.B && io.K_in === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && K === 1.U)) && N_read_counter === (N - 1.U) && M_read_counter =/= (M - 1.U) && N =/= 1.U
+    ((io.start_do_i === 1.B && io.K_i === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && K === 1.U)) && N_read_counter === (N - 1.U) && M_read_counter =/= (M - 1.U) && N =/= 1.U
   ) {
     M_read_counter := M_read_counter + 1.U
   }.elsewhen(
-    ((io.start_do === 1.B && io.N_in === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && N === 1.U)) && K_read_counter === (K - 1.U) && M_read_counter =/= (M - 1.U) && K =/= 1.U
+    ((io.start_do_i === 1.B && io.N_i === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && N === 1.U)) && K_read_counter === (K - 1.U) && M_read_counter =/= (M - 1.U) && K =/= 1.U
   ) {
     M_read_counter := M_read_counter + 1.U
   }.elsewhen(
-    ((io.start_do === 1.B && io.K_in === 1.U && io.N_in === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && K === 1.U && N === 1.U)) && M_read_counter =/= (M - 1.U)
+    ((io.start_do_i === 1.B && io.K_i === 1.U && io.N_i === 1.U) || (io.data_valid_i === 1.B && cstate === sREAD && K === 1.U && N === 1.U)) && M_read_counter =/= (M - 1.U)
   ) {
     M_read_counter := M_read_counter + 1.U
   }.elsewhen(
@@ -254,41 +254,41 @@ class LargeGemmController extends Module {
 
   // Intermediate or output control signals generation according to the counters
   read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U))
-  io.gemm_read_valid := (io.start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
+  io.gemm_read_valid := (io.start_do_i === 1.B) || (io.data_valid_i && cstate === sREAD)
   io.gemm_write_valid := (write_counter === K) && cstate =/= sIDLE
 
   gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U))
-  io.gemm_busy := (cstate =/= sIDLE)
+  io.busy_o := (cstate =/= sIDLE)
   io.accumulate := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
   // Address generation
-  io.addr_a_out := io.addr_a_in + (GEMMConstant.InputMatrixBaseAddrA.U) * (M_read_counter * K + K_read_counter)
-  io.addr_b_out := io.addr_b_in + (GEMMConstant.InputMatrixBaseAddrB.U) * (N_read_counter * K + K_read_counter)
-  io.addr_c_out := io.addr_c_in + (GEMMConstant.OnputMatrixBaseAddrC.U) * (M_write_counter * N + N_write_counter)
+  io.addr_a_o := io.ptr_addr_a_i + (GemmConstant.baseAddrIncrementA.U) * (M_read_counter * K + K_read_counter)
+  io.addr_b_o := io.ptr_addr_b_i + (GemmConstant.baseAddrIncrementB.U) * (N_read_counter * K + K_read_counter)
+  io.addr_c_o := io.ptr_addr_c_i + (GemmConstant.baseAddrIncrementC.U) * (M_write_counter * N + N_write_counter)
 
 }
 
 // The LargeGemm's control port declaration. Detailed explanation of these ports can be found in the README
 class LargeGemmCtrlIO extends Bundle {
-  val M_in = Input(UInt(8.W))
-  val K_in = Input(UInt(8.W))
-  val N_in = Input(UInt(8.W))
+  val M_i = Input(UInt(8.W))
+  val K_i = Input(UInt(8.W))
+  val N_i = Input(UInt(8.W))
 
-  val start_do = Input(Bool())
+  val start_do_i = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val addr_a_in = Input(UInt(32.W))
-  val addr_b_in = Input(UInt(32.W))
-  val addr_c_in = Input(UInt(32.W))
+  val ptr_addr_a_i = Input(UInt(32.W))
+  val ptr_addr_b_i = Input(UInt(32.W))
+  val ptr_addr_c_i = Input(UInt(32.W))
 
   val gemm_read_valid = Output(Bool())
   val gemm_write_valid = Output(Bool())
 
-  val addr_a_out = Output(UInt(32.W))
-  val addr_b_out = Output(UInt(32.W))
-  val addr_c_out = Output(UInt(32.W))
+  val addr_a_o = Output(UInt(32.W))
+  val addr_b_o = Output(UInt(32.W))
+  val addr_c_o = Output(UInt(32.W))
 
-  val gemm_busy = Output(Bool())
+  val busy_o = Output(Bool())
 }
 
 // LargeGemmIO definition
@@ -307,20 +307,20 @@ class LargeGemm extends Module {
   val gemm_array = Module(new GemmArray())
   val controller = Module(new LargeGemmController())
 
-  controller.io.M_in <> io.ctrl.M_in
-  controller.io.K_in <> io.ctrl.K_in
-  controller.io.N_in <> io.ctrl.N_in
-  controller.io.start_do <> io.ctrl.start_do
+  controller.io.M_i <> io.ctrl.M_i
+  controller.io.K_i <> io.ctrl.K_i
+  controller.io.N_i <> io.ctrl.N_i
+  controller.io.start_do_i <> io.ctrl.start_do_i
   controller.io.data_valid_i <> io.ctrl.data_valid_i
-  controller.io.addr_a_in <> io.ctrl.addr_a_in
-  controller.io.addr_b_in <> io.ctrl.addr_b_in
-  controller.io.addr_c_in <> io.ctrl.addr_c_in
+  controller.io.ptr_addr_a_i <> io.ctrl.ptr_addr_a_i
+  controller.io.ptr_addr_b_i <> io.ctrl.ptr_addr_b_i
+  controller.io.ptr_addr_c_i <> io.ctrl.ptr_addr_c_i
   controller.io.gemm_read_valid <> io.ctrl.gemm_read_valid
   controller.io.gemm_write_valid <> io.ctrl.gemm_write_valid
-  controller.io.addr_a_out <> io.ctrl.addr_a_out
-  controller.io.addr_b_out <> io.ctrl.addr_b_out
-  controller.io.addr_c_out <> io.ctrl.addr_c_out
-  controller.io.gemm_busy <> io.ctrl.gemm_busy
+  controller.io.addr_a_o <> io.ctrl.addr_a_o
+  controller.io.addr_b_o <> io.ctrl.addr_b_o
+  controller.io.addr_c_o <> io.ctrl.addr_c_o
+  controller.io.busy_o <> io.ctrl.busy_o
   controller.io.data_valid_o := gemm_array.io.data_valid_o
 
   gemm_array.io.data.a_i <> io.data.a_i

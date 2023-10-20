@@ -8,14 +8,14 @@ The microarchitecture of the GEMM accelerator is shown below. The GEMM array has
 ![](./docs/microarch.png)
 
 ## Functional description
-<!-- This repository contains three GEMM versions: Base GEMM, Large GEMM, and Batch Large GEMM. -->
+<!-- This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Block GEMM. -->
 ### Base GEMM
-Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the Parameter.scala file.
+Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
 | Parameter | Meaning |
 | - | -|
-| input | Input matrix data width (integer) |
-| output | Output matrix data width (integer) |
-| accumulate | Accumulator data width (integer) |
+| dataWidthA | Input matrix data width (integer) |
+| dataWidthC | Output matrix data width (integer) |
+| dataWidthAccum | Accumulator data width (integer) |
 | meshRow | The row number of the GEMM array |
 | meshCol | The column number of the GEMM array |
 | tileSize | The tile size of each tile |
@@ -34,32 +34,32 @@ The Base GEMM function definition pseudocode is shown below.
 bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
 ```
 
-### Large GEMM
+### Block GEMM
 The Large GEMM is built on the Base GEMM. It takes in the M, K, and N configurations.
 In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). The GEMM accelerator uses Block matrix multiplication [](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. In the current version, these data should be stored in memory in a continuous address style. Below is an example data layout in memory for M = 2, K = 2, and N = 2. The address of martix A, B and C should also be gave.
 ![](./docs/block_matrix_mul.png)
 
 The Large GEMM function definition pseudocode is shown below.
 ```
-bool largegemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
+bool largeGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 ```
 #### Ports
 | Signals | Width | Dir | Discription |
 | - | - | - | - |
-| M_in | 8 | In | The M size setting |
-| K_in | 8 | In | The K size setting |
-| N_in | 8 | In | The N size setting |
-| addr_a_in | 32 | In | The address of the matrix A. It points to the first data element of matrix A.|
-| addr_b_in | 32 | In | The address of the matrix B. It points to the first data element of matrix B.|
-| addr_c_in | 32 | In | The address of the matrix C. It points to the first data element of matrix C.|
-| start_do | 1 | In |  Start do signal. When this `start_do` signal asserts, all the configuration signals (M_in, K_in, N_in, addr_a_in, addr_b_in and addr_c_in) should be ready| 
+| M_i | 8 | In | The M size setting |
+| K_i | 8 | In | The K size setting |
+| N_i | 8 | In | The N size setting |
+| ptr_addr_a_i | 32 | In | The address of the matrix A. It points to the first data element of matrix A.|
+| ptr_addr_b_i | 32 | In | The address of the matrix B. It points to the first data element of matrix B.|
+| ptr_addr_c_i | 32 | In | The address of the matrix C. It points to the first data element of matrix C.|
+| start_do_i | 1 | In |  Start do signal. When this `start_do_i` signal asserts, all the configuration signals (M_i, K_i, N_i, ptr_addr_a_i, ptr_addr_b_i and ptr_addr_c_i) should be ready| 
 | data_valid_i | 1 | In | Input data valid signal|
-| addr_a_out | 32 | Out | The address of the sub-matrix of A. It points to the first data element of the sub-matrix of A. |
-| addr_b_out | 32 | Out | The address of the sub-matrix of B. It points to the first data element of the sub-matrix of B |
-| addr_c_out | 32 | Out | The address of the sub-matrix of C. It points to the first data element of the sub-matrix of C. |
-| gemm_busy | 1 | Out | Indicating if Large Gemm is busy. When `gemm_busy` assert, the Large Gemm doesn't take in any new `start_do` signal or configuration.|
-| a_i | meshRow * tileSize * input | In | A big bus containing all the data element of the input (sub-)matrix A |
-| b_i | tileSize * meshCol * input | In | A big bus containing all the data element of the input (sub-)matrix B |
+| addr_a_o | 32 | Out | The address of the sub-matrix of A. It points to the first data element of the sub-matrix of A. |
+| addr_b_o | 32 | Out | The address of the sub-matrix of B. It points to the first data element of the sub-matrix of B |
+| addr_c_o | 32 | Out | The address of the sub-matrix of C. It points to the first data element of the sub-matrix of C. |
+| busy_o | 1 | Out | Indicating if Large Gemm is busy. When `busy_o` assert, the Large Gemm doesn't take in any new `start_do_i` signal or configuration.|
+| data_a_i | meshRow * tileSize * input | In | A big bus containing all the data element of the input (sub-)matrix A |
+| data_b_i | tileSize * meshCol * input | In | A big bus containing all the data element of the input (sub-)matrix B |
 | c_o | meshRow * meshCol * output | Out | A big bus containing all the data element of the input (sub-)matrix C |
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 

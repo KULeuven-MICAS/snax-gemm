@@ -2,21 +2,22 @@ package gemm
 import chisel3._
 import chisel3.util._
 
-object GEMMConstant {
-  def input = 8
-  def mul = input * 4
-  def output = input * 4
-  def accumulate = input * 4
+object GemmConstant {
+  def dataWidthA = 8
+  def dataWidthB = 8
+  def dataWidthMul = dataWidthA * 4
+  def dataWidthC = dataWidthA * 4
+  def dataWidthAccum = dataWidthA * 4
   def tileSize = 8
   def meshRow = 8
   def meshCol = 8
 
   def DataWidthPerAddr = 8
-  def InputMatrixBaseAddrA =
-    input * meshRow * tileSize / DataWidthPerAddr
-  def InputMatrixBaseAddrB =
-    input * meshCol * tileSize / DataWidthPerAddr
-  def OnputMatrixBaseAddrC =
-    output * meshRow * meshCol / DataWidthPerAddr
+  def baseAddrIncrementA =
+    dataWidthA * meshRow * tileSize / DataWidthPerAddr
+  def baseAddrIncrementB =
+    dataWidthB * meshCol * tileSize / DataWidthPerAddr
+  def baseAddrIncrementC =
+    dataWidthC * meshRow * meshCol / DataWidthPerAddr
 
 }

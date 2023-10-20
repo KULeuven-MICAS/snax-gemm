@@ -11,13 +11,13 @@ class TileControl extends Bundle {
 
 // Tile IO definition
 class TileIO extends Bundle {
-  val a_i = Input(
-    Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+  val data_a_i = Input(
+    Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthA.W))
   )
-  val b_i = Input(
-    Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+  val data_b_i = Input(
+    Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
   )
-  val c_o = Output(SInt(GEMMConstant.output.W))
+  val c_o = Output(SInt(GemmConstant.dataWidthC.W))
   val control_i = Input(new TileControl())
   val data_valid_o = Output(Bool())
 }
@@ -27,21 +27,21 @@ class TileIO extends Bundle {
 class Tile extends Module {
   val io = IO(new TileIO())
 
-  val accumulation_reg = RegInit(0.S(GEMMConstant.accumulate.W))
-  val result_reg = RegInit(0.S(GEMMConstant.accumulate.W))
+  val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
+  val result_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val check_data_in_valid_reg = RegInit(0.B)
   val mul_add_result_vec = Wire(
-    Vec(GEMMConstant.tileSize, SInt(GEMMConstant.mul.W))
+    Vec(GemmConstant.tileSize, SInt(GemmConstant.dataWidthMul.W))
   )
-  val mul_add_result = Wire(SInt(GEMMConstant.accumulate.W))
+  val mul_add_result = Wire(SInt(GemmConstant.dataWidthAccum.W))
 
   chisel3.dontTouch(mul_add_result)
 
   check_data_in_valid_reg := io.control_i.data_valid_i
 
   // Element-wise multiply
-  for (i <- 0 until GEMMConstant.tileSize) {
-    mul_add_result_vec(i) := io.a_i(i).asSInt * io.b_i(i).asSInt
+  for (i <- 0 until GemmConstant.tileSize) {
+    mul_add_result_vec(i) := io.data_a_i(i).asSInt * io.data_b_i(i).asSInt
   }
 
   // Sum of element-wise multiply
@@ -68,22 +68,22 @@ class Tile extends Module {
 
 // Mesh IO definition, an extended version of Tile IO
 class MeshIO extends Bundle {
-  val a_i = Input(
+  val data_a_i = Input(
     Vec(
-      GEMMConstant.meshRow,
-      Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+      GemmConstant.meshRow,
+      Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthA.W))
     )
   )
-  val b_i = Input(
+  val data_b_i = Input(
     Vec(
-      GEMMConstant.meshCol,
-      Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+      GemmConstant.meshCol,
+      Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
     )
   )
   val c_o = Output(
     (Vec(
-      GEMMConstant.meshRow,
-      Vec(GEMMConstant.meshCol, SInt(GEMMConstant.output.W))
+      GemmConstant.meshRow,
+      Vec(GemmConstant.meshCol, SInt(GemmConstant.dataWidthC.W))
     ))
   )
   val control_i = Input(new TileControl())
@@ -98,15 +98,15 @@ class Mesh extends Module {
   chisel3.dontTouch(io)
 
   val mesh =
-    Seq.fill(GEMMConstant.meshRow, GEMMConstant.meshCol)(
+    Seq.fill(GemmConstant.meshRow, GemmConstant.meshCol)(
       Module(new Tile())
     )
 
-  for (r <- 0 until GEMMConstant.meshRow) {
-    for (c <- 0 until GEMMConstant.meshCol) {
+  for (r <- 0 until GemmConstant.meshRow) {
+    for (c <- 0 until GemmConstant.meshCol) {
       mesh(r)(c).io.control_i <> io.control_i
-      mesh(r)(c).io.a_i <> io.a_i(r)
-      mesh(r)(c).io.b_i <> io.b_i(c)
+      mesh(r)(c).io.data_a_i <> io.data_a_i(r)
+      mesh(r)(c).io.data_b_i <> io.data_b_i(c)
       io.c_o(r)(c) := mesh(r)(c).io.c_o
     }
   }
@@ -116,17 +116,17 @@ class Mesh extends Module {
 class GemmDataIO extends Bundle {
   val a_i = Input(
     UInt(
-      (GEMMConstant.meshRow * GEMMConstant.tileSize * GEMMConstant.input).W
+      (GemmConstant.meshRow * GemmConstant.tileSize * GemmConstant.dataWidthA).W
     )
   )
   val b_i = Input(
     UInt(
-      (GEMMConstant.tileSize * GEMMConstant.meshCol * GEMMConstant.input).W
+      (GemmConstant.tileSize * GemmConstant.meshCol * GemmConstant.dataWidthB).W
     )
   )
   val c_o = Output(
     UInt(
-      (GEMMConstant.meshRow * GEMMConstant.meshCol * GEMMConstant.output).W
+      (GemmConstant.meshRow * GemmConstant.meshCol * GemmConstant.dataWidthC).W
     )
   )
 }
@@ -149,58 +149,58 @@ class GemmArray extends Module {
   // define wires for data partition
   val a_in_wire = Wire(
     Vec(
-      GEMMConstant.meshRow,
-      Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+      GemmConstant.meshRow,
+      Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthA.W))
     )
   )
   val b_in_wire = Wire(
     Vec(
-      GEMMConstant.meshCol,
-      Vec(GEMMConstant.tileSize, UInt(GEMMConstant.input.W))
+      GemmConstant.meshCol,
+      Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
     )
   )
   val c_out_wire = Wire(
     Vec(
-      GEMMConstant.meshRow,
-      Vec(GEMMConstant.meshCol, SInt(GEMMConstant.output.W))
+      GemmConstant.meshRow,
+      Vec(GemmConstant.meshCol, SInt(GemmConstant.dataWidthC.W))
     )
   )
   val c_out_wire_2 = Wire(
     Vec(
-      GEMMConstant.meshRow,
-      UInt((GEMMConstant.meshCol * GEMMConstant.output).W)
+      GemmConstant.meshRow,
+      UInt((GemmConstant.meshCol * GemmConstant.dataWidthC).W)
     )
   )
 
   // data partition
-  for (r <- 0 until GEMMConstant.meshRow) {
-    for (c <- 0 until GEMMConstant.tileSize) {
+  for (r <- 0 until GemmConstant.meshRow) {
+    for (c <- 0 until GemmConstant.tileSize) {
       a_in_wire(r)(c) := io.data.a_i(
-        (r * GEMMConstant.tileSize + c + 1) * GEMMConstant.input - 1,
-        (r * GEMMConstant.tileSize + c) * GEMMConstant.input
+        (r * GemmConstant.tileSize + c + 1) * GemmConstant.dataWidthA - 1,
+        (r * GemmConstant.tileSize + c) * GemmConstant.dataWidthA
       )
     }
   }
 
-  for (r <- 0 until GEMMConstant.meshCol) {
-    for (c <- 0 until GEMMConstant.tileSize) {
+  for (r <- 0 until GemmConstant.meshCol) {
+    for (c <- 0 until GemmConstant.tileSize) {
       b_in_wire(r)(c) := io.data.b_i(
-        (r * GEMMConstant.tileSize + c + 1) * GEMMConstant.input - 1,
-        (r * GEMMConstant.tileSize + c) * GEMMConstant.input
+        (r * GemmConstant.tileSize + c + 1) * GemmConstant.dataWidthB - 1,
+        (r * GemmConstant.tileSize + c) * GemmConstant.dataWidthB
       )
     }
   }
 
-  for (r <- 0 until GEMMConstant.meshRow) {
-    for (c <- 0 until GEMMConstant.meshCol) {
+  for (r <- 0 until GemmConstant.meshRow) {
+    for (c <- 0 until GemmConstant.meshCol) {
       c_out_wire(r)(c) := mesh.io.c_o(r)(c)
     }
     c_out_wire_2(r) := Cat(c_out_wire(r).reverse)
   }
 
   // data and control signal connect
-  a_in_wire <> mesh.io.a_i
-  b_in_wire <> mesh.io.b_i
+  a_in_wire <> mesh.io.data_a_i
+  b_in_wire <> mesh.io.data_b_i
   io.data.c_o := Cat(c_out_wire_2.reverse)
 
   mesh.io.control_i.data_valid_i := io.data_valid_i

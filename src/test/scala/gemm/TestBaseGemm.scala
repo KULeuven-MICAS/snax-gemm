@@ -24,27 +24,27 @@ class GemmArrayRandomTest
           /* Generate Random Integer 8 data (from -128 to 127) */
           val RandomMatrixs =
             MatrixLibBase.GenRandomMatrix(
-              GEMMConstant.meshRow,
-              GEMMConstant.tileSize,
-              GEMMConstant.meshCol
+              GemmConstant.meshRow,
+              GemmConstant.tileSize,
+              GemmConstant.meshCol
             )
           val random_matrix_A = RandomMatrixs._1
           val random_matrix_B = RandomMatrixs._2
 
           // Generate golden result data for verification
           val golden_array = MatrixLibBase.MatrixMul_1D(
-            GEMMConstant.meshRow,
-            GEMMConstant.tileSize,
-            GEMMConstant.meshCol,
+            GemmConstant.meshRow,
+            GemmConstant.tileSize,
+            GemmConstant.meshCol,
             random_matrix_A,
             random_matrix_B
           )
           /* Translate data array to big bus for Gemm module input */
           val RandomBigBuses =
             MatrixLibBase.Matrix2BigBuses(
-              GEMMConstant.meshRow,
-              GEMMConstant.tileSize,
-              GEMMConstant.meshCol,
+              GemmConstant.meshRow,
+              GemmConstant.tileSize,
+              GemmConstant.meshCol,
               random_matrix_A,
               random_matrix_B
             )
@@ -65,13 +65,13 @@ class GemmArrayRandomTest
           val results = dut.io.data.c_o.peek()
           /* Translate the big bus from Gemm to int array for comparison */
           val results_array = MatrixLibBase.BigBus2Matrix(
-            GEMMConstant.meshRow,
-            GEMMConstant.meshCol,
+            GemmConstant.meshRow,
+            GemmConstant.meshCol,
             results
           )
           // Check the reuslts
           MatrixLibBase.CheckResults(
-            GEMMConstant.meshRow * GEMMConstant.meshCol,
+            GemmConstant.meshRow * GemmConstant.meshCol,
             results_array,
             golden_array
           )
