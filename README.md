@@ -10,7 +10,7 @@ The microarchitecture of the GEMM accelerator is shown below. The GEMM array has
 ## Functional description
 <!-- This repository contains three GEMM versions: Base GEMM, Large GEMM, and Batch Large GEMM. -->
 ### Base GEMM
-Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below.
+Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the Parameter.scala file.
 | Parameter | Meaning |
 | - | -|
 | input | Input matrix data width (integer) |
@@ -34,6 +34,33 @@ The Base GEMM function definition pseudocode is shown below.
 bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
 ```
 
+### Large GEMM
+The Large GEMM is built on the Base GEMM. It takes in the M, K, and N configurations.
+In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). The GEMM accelerator uses Block matrix multiplication [](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. In the current version, these data should be stored in memory in a continuous address style. Below is an example data layout in memory for M = 2, K = 2, and N = 2. The address of martix A, B and C should also be gave.
+![](./docs/block_matrix_mul.png)
+
+The Large GEMM function definition pseudocode is shown below.
+```
+bool largegemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
+```
+#### Ports
+| Signals | Width | Dir | Discription |
+| - | - | - | - |
+| M_in | 8 | In | The M size setting |
+| K_in | 8 | In | The K size setting |
+| N_in | 8 | In | The N size setting |
+| addr_a_in | 32 | In | The address of the matrix A. It points to the first data element of matrix A.|
+| addr_b_in | 32 | In | The address of the matrix B. It points to the first data element of matrix B.|
+| addr_c_in | 32 | In | The address of the matrix C. It points to the first data element of matrix C.|
+| start_do | 1 | In |  Start do signal. When this `start_do` signal asserts, all the configuration signals (M_in, K_in, N_in, addr_a_in, addr_b_in and addr_c_in) should be ready| 
+| data_valid_i | 1 | In | Input data valid signal|
+| addr_a_out | 32 | Out | The address of the sub-matrix of A. It points to the first data element of the sub-matrix of A. |
+| addr_b_out | 32 | Out | The address of the sub-matrix of B. It points to the first data element of the sub-matrix of B |
+| addr_c_out | 32 | Out | The address of the sub-matrix of C. It points to the first data element of the sub-matrix of C. |
+| gemm_busy | 1 | Out | Indicating if Large Gemm is busy. When `gemm_busy` assert, the Large Gemm doesn't take in any new `start_do` signal or configuration.|
+| a_i | meshRow * tileSize * input | In | A big bus containing all the data element of the input (sub-)matrix A |
+| b_i | tileSize * meshCol * input | In | A big bus containing all the data element of the input (sub-)matrix B |
+| c_o | meshRow * meshCol * output | Out | A big bus containing all the data element of the input (sub-)matrix C |
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
 The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. 
@@ -66,6 +93,5 @@ sudo apt-get install sbt
 ## Run tests
 To run the gemm accelerator tests, use:
 ```
-cd chisel-project
 sbt test
 ``` 
