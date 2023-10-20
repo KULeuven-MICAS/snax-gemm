@@ -11,9 +11,9 @@ object MatrixlibLarge {
   // The test matrix are (M * meshRow, K * tileSize) and (K * tileSize, N * meshCol)
   def genRandSizeTest() = {
     val rand = new scala.util.Random
-    val M    = rand.between(1, 10)
-    val K    = rand.between(1, 10)
-    val N    = rand.between(1, 10)
+    val M = rand.between(1, 10)
+    val K = rand.between(1, 10)
+    val N = rand.between(1, 10)
     (M, K, N)
   }
 
@@ -36,7 +36,7 @@ object MatrixlibLarge {
   ) = {
 
     var flattenedUInt_A = ""
-    var intValue        = 0
+    var intValue = 0
 
     for (i <- 0 until meshRow) {
       for (j <- 0 until meshCol) {
@@ -63,7 +63,7 @@ object MatrixlibLarge {
   ) = {
 
     var flattenedUInt_A = ""
-    var intValue: Int   = 0
+    var intValue: Int = 0
 
     // println("padding to 8!")
 
@@ -138,7 +138,7 @@ object MatrixlibLarge {
       B: Array[Byte]
   ): Array[BigInt] = {
 
-    val golden           =
+    val golden =
       Array.ofDim[Int](
         M * N * GEMMConstant.meshRow * GEMMConstant.meshCol
       )

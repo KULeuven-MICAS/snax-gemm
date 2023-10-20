@@ -2,27 +2,27 @@ package gemm
 import chisel3._
 import chisel3.util._
 
-// The LargeGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README 
+// The LargeGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README
 class LargeGemmControllerIO extends Bundle {
-  val M_in           = Input(UInt(8.W))
-  val K_in           = Input(UInt(8.W))
-  val N_in           = Input(UInt(8.W))
-  val start_do       = Input(Bool())
+  val M_in = Input(UInt(8.W))
+  val K_in = Input(UInt(8.W))
+  val N_in = Input(UInt(8.W))
+  val start_do = Input(Bool())
   val data_valid_o = Input(Bool())
-  val data_valid_i  = Input(Bool())
+  val data_valid_i = Input(Bool())
 
   val addr_a_in = Input(UInt(32.W))
   val addr_b_in = Input(UInt(32.W))
   val addr_c_in = Input(UInt(32.W))
 
-  val gemm_read_valid  = Output(Bool())
+  val gemm_read_valid = Output(Bool())
   val gemm_write_valid = Output(Bool())
 
   val addr_a_out = Output(UInt(32.W))
   val addr_b_out = Output(UInt(32.W))
   val addr_c_out = Output(UInt(32.W))
 
-  val gemm_busy  = Output(Bool())
+  val gemm_busy = Output(Bool())
   val accumulate = Output(Bool())
 }
 
@@ -48,15 +48,15 @@ class LargeGemmController extends Module {
   val K_write_counter = RegInit(0.U(8.W))
 
   val read_tcdm_done = WireInit(false.B)
-  val gemm_done      = WireInit(false.B)
+  val gemm_done = WireInit(false.B)
 
-  val write_counter      = RegInit(0.U(8.W))
+  val write_counter = RegInit(0.U(8.W))
   val accumulate_counter = RegInit(0.U(8.W))
 
   // Statemeny declaration
   val sIDLE :: sREAD :: sREAD_DONE :: Nil = Enum(3)
-  val cstate                              = RegInit(sIDLE)
-  val nstate                              = WireInit(sIDLE)
+  val cstate = RegInit(sIDLE)
+  val nstate = WireInit(sIDLE)
 
   // Changing states
   cstate := nstate
@@ -253,12 +253,12 @@ class LargeGemmController extends Module {
   )
 
   // Intermediate or output control signals generation according to the counters
-  read_tcdm_done      := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U))
-  io.gemm_read_valid  := (io.start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
+  read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U))
+  io.gemm_read_valid := (io.start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
   io.gemm_write_valid := (write_counter === K) && cstate =/= sIDLE
 
-  gemm_done     := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U))
-  io.gemm_busy  := (cstate =/= sIDLE)
+  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U))
+  io.gemm_busy := (cstate =/= sIDLE)
   io.accumulate := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
   // Address generation
@@ -268,27 +268,27 @@ class LargeGemmController extends Module {
 
 }
 
-// The LargeGemm's control port declaration. Detailed explanation of these ports can be found in the README 
+// The LargeGemm's control port declaration. Detailed explanation of these ports can be found in the README
 class LargeGemmCtrlIO extends Bundle {
   val M_in = Input(UInt(8.W))
   val K_in = Input(UInt(8.W))
   val N_in = Input(UInt(8.W))
 
-  val start_do      = Input(Bool())
+  val start_do = Input(Bool())
   val data_valid_i = Input(Bool())
 
   val addr_a_in = Input(UInt(32.W))
   val addr_b_in = Input(UInt(32.W))
   val addr_c_in = Input(UInt(32.W))
 
-  val gemm_read_valid  = Output(Bool())
+  val gemm_read_valid = Output(Bool())
   val gemm_write_valid = Output(Bool())
 
   val addr_a_out = Output(UInt(32.W))
   val addr_b_out = Output(UInt(32.W))
   val addr_c_out = Output(UInt(32.W))
 
-  val gemm_busy  = Output(Bool())
+  val gemm_busy = Output(Bool())
 }
 
 // LargeGemmIO definition
@@ -297,9 +297,9 @@ class LargeGemmIO extends Bundle {
   val ctrl = new LargeGemmCtrlIO()
 }
 
-// LargeGemm module. 
-// In this module, a GemmArray is generated to do the computation and 
-// a controller is generated to generate the control signals for 
+// LargeGemm module.
+// In this module, a GemmArray is generated to do the computation and
+// a controller is generated to generate the control signals for
 // read/write reqeust and related address
 class LargeGemm extends Module {
   val io = IO(new LargeGemmIO())
@@ -328,5 +328,5 @@ class LargeGemm extends Module {
   io.data.c_o <> RegNext(gemm_array.io.data.c_o)
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
-  gemm_array.io.accumulate_i    := controller.io.accumulate
+  gemm_array.io.accumulate_i := controller.io.accumulate
 }

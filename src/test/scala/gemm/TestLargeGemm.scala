@@ -12,16 +12,16 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
         // large gemm test generation function
         def LargeGemmRandomTets() = {
           // Randomly generate the size of the input matrices
-          val (size_M, size_K, size_N)                   = MatrixlibLarge.genRandSizeTest()
+          val (size_M, size_K, size_N) = MatrixlibLarge.genRandSizeTest()
           // Randomly generation of input matrices
-          val (matrix_A, matrix_B)                       =
+          val (matrix_A, matrix_B) =
             MatrixlibLarge.GenLargeMatrix(
               size_M,
               size_K,
               size_N
             )
-            // Convert the sub-matrices to a big bus 
-          val (split_matrix_A, split_matrix_B)           =
+          // Convert the sub-matrices to a big bus
+          val (split_matrix_A, split_matrix_B) =
             MatrixlibLarge.SpliteLargeMatrx(
               size_M,
               size_K,
@@ -29,9 +29,9 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
               matrix_A,
               matrix_B
             )
-          val split_matrix_C                             =
+          val split_matrix_C =
             Array.ofDim[BigInt](size_M * size_N)
-            // Random generation of the matrices start address
+          // Random generation of the matrices start address
           val (start_addr_A, start_addr_B, start_addr_C) =
             MatrixlibLarge.genRandSizeTest()
           // Generation of golden result in Scala
