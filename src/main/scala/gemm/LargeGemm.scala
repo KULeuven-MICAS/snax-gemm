@@ -15,15 +15,15 @@ class LargeGemmControllerIO extends Bundle {
   val ptr_addr_b_i = Input(UInt(32.W))
   val ptr_addr_c_i = Input(UInt(32.W))
 
-  val gemm_read_valid = Output(Bool())
-  val gemm_write_valid = Output(Bool())
+  val gemm_read_valid_o = Output(Bool())
+  val gemm_write_valid_o = Output(Bool())
 
   val addr_a_o = Output(UInt(32.W))
   val addr_b_o = Output(UInt(32.W))
   val addr_c_o = Output(UInt(32.W))
 
   val busy_o = Output(Bool())
-  val accumulate = Output(Bool())
+  val accumulate_i = Output(Bool())
 }
 
 // LargeGemmController module. This module takes in the configurations and gives out read/write valid signals and the right addresses of the sub-matrices.
@@ -254,12 +254,12 @@ class LargeGemmController extends Module {
 
   // Intermediate or output control signals generation according to the counters
   read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U))
-  io.gemm_read_valid := (io.start_do_i === 1.B) || (io.data_valid_i && cstate === sREAD)
-  io.gemm_write_valid := (write_counter === K) && cstate =/= sIDLE
+  io.gemm_read_valid_o := (io.start_do_i === 1.B) || (io.data_valid_i && cstate === sREAD)
+  io.gemm_write_valid_o := (write_counter === K) && cstate =/= sIDLE
 
   gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U))
   io.busy_o := (cstate =/= sIDLE)
-  io.accumulate := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
+  io.accumulate_i := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
   // Address generation
   io.addr_a_o := io.ptr_addr_a_i + (GemmConstant.baseAddrIncrementA.U) * (M_read_counter * K + K_read_counter)
@@ -281,8 +281,8 @@ class LargeGemmCtrlIO extends Bundle {
   val ptr_addr_b_i = Input(UInt(32.W))
   val ptr_addr_c_i = Input(UInt(32.W))
 
-  val gemm_read_valid = Output(Bool())
-  val gemm_write_valid = Output(Bool())
+  val gemm_read_valid_o = Output(Bool())
+  val gemm_write_valid_o = Output(Bool())
 
   val addr_a_o = Output(UInt(32.W))
   val addr_b_o = Output(UInt(32.W))
@@ -315,8 +315,8 @@ class LargeGemm extends Module {
   controller.io.ptr_addr_a_i <> io.ctrl.ptr_addr_a_i
   controller.io.ptr_addr_b_i <> io.ctrl.ptr_addr_b_i
   controller.io.ptr_addr_c_i <> io.ctrl.ptr_addr_c_i
-  controller.io.gemm_read_valid <> io.ctrl.gemm_read_valid
-  controller.io.gemm_write_valid <> io.ctrl.gemm_write_valid
+  controller.io.gemm_read_valid_o <> io.ctrl.gemm_read_valid_o
+  controller.io.gemm_write_valid_o <> io.ctrl.gemm_write_valid_o
   controller.io.addr_a_o <> io.ctrl.addr_a_o
   controller.io.addr_b_o <> io.ctrl.addr_b_o
   controller.io.addr_c_o <> io.ctrl.addr_c_o
@@ -328,5 +328,5 @@ class LargeGemm extends Module {
   io.data.c_o <> RegNext(gemm_array.io.data.c_o)
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
-  gemm_array.io.accumulate_i := controller.io.accumulate
+  gemm_array.io.accumulate_i := controller.io.accumulate_i
 }

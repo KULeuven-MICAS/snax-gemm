@@ -45,9 +45,9 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
               matrix_B
             )
 
-          // If the gemm_write_valid is asserted, take out the c_o data for check
+          // If the gemm_write_valid_o is asserted, take out the c_o data for check
           def CheckOutput() = {
-            if (dut.io.ctrl.gemm_write_valid.peekBoolean()) {
+            if (dut.io.ctrl.gemm_write_valid_o.peekBoolean()) {
               val addr_slide_C = (dut.io.ctrl.addr_c_o
                 .peekInt() - start_addr_C) / GemmConstant.baseAddrIncrementC
               split_matrix_C(addr_slide_C.toInt) = dut.io.data.c_o.peekInt()
@@ -59,7 +59,7 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
           dut.io.ctrl.start_do_i.poke(false.B)
           dut.clock.step(5)
           dut.io.ctrl.start_do_i.poke(true.B)
-          
+
           dut.io.ctrl.M_i.poke(size_M)
           dut.io.ctrl.K_i.poke(size_K)
           dut.io.ctrl.N_i.poke(size_N)
@@ -68,8 +68,8 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
           dut.io.ctrl.ptr_addr_b_i.poke(start_addr_B)
           dut.io.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-          // If gemm_read_valid is asserted, give the right data_a_i and b_in data according to the address
-          while (dut.io.ctrl.gemm_read_valid.peekBoolean()) {
+          // If gemm_read_valid_o is asserted, give the right data_a_i and b_in data according to the address
+          while (dut.io.ctrl.gemm_read_valid_o.peekBoolean()) {
             val addr_slide_A = (dut.io.ctrl.addr_a_o
               .peekInt() - start_addr_A) / GemmConstant.baseAddrIncrementA
             val addr_slide_B = (dut.io.ctrl.addr_b_o
