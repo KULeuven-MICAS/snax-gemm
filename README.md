@@ -34,14 +34,14 @@ The Base GEMM function definition pseudocode is shown below.
 bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
 ```
 
-### lock GEMM
+### Block GEMM
 The Block GEMM is built with the Base GEMM. It takes in the M, K, and N configurations.
 In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). The GEMM accelerator uses Block matrix multiplication [](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. In the current version, these data should be stored in memory in a continuous address style. Below is an example data layout in memory for M = 2, K = 2, and N = 2. The address of martix A, B and C should also be gave.
 ![](./docs/block_matrix_mul.png)
 
 The Block GEMM function definition pseudocode is shown below.
 ```
-bool largeGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
+bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 ```
 #### Ports
 | Signals | Width | Dir | Discription |
@@ -57,7 +57,7 @@ bool largeGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 | addr_a_o | 32 | Out | The address of the sub-matrix of A. It points to the first data element of the sub-matrix of A. |
 | addr_b_o | 32 | Out | The address of the sub-matrix of B. It points to the first data element of the sub-matrix of B |
 | addr_c_o | 32 | Out | The address of the sub-matrix of C. It points to the first data element of the sub-matrix of C. |
-| busy_o | 1 | Out | Indicating if Large Gemm is busy. When `busy_o` assert, the Large Gemm doesn't take in any new `start_do_i` signal or configuration.|
+| busy_o | 1 | Out | Indicating if Block Gemm is busy. When `busy_o` assert, the Block Gemm doesn't take in any new `start_do_i` signal or configuration.|
 | data_a_i | meshRow * tileSize * input | In | A big bus containing all the data element of the input (sub-)matrix A |
 | data_b_i | tileSize * meshCol * input | In | A big bus containing all the data element of the input (sub-)matrix B |
 | c_o | meshRow * meshCol * output | Out | A big bus containing all the data element of the input (sub-)matrix C |
