@@ -29,7 +29,7 @@ class Tile extends Module {
 
   val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val result_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
-  val check_data_in_valid_reg = RegInit(0.B)
+  val check_data_i_valid_reg = RegInit(0.B)
   val mul_add_result_vec = Wire(
     Vec(GemmConstant.tileSize, SInt(GemmConstant.dataWidthMul.W))
   )
@@ -37,7 +37,7 @@ class Tile extends Module {
 
   chisel3.dontTouch(mul_add_result)
 
-  check_data_in_valid_reg := io.control_i.data_valid_i
+  check_data_i_valid_reg := io.control_i.data_valid_i
 
   // Element-wise multiply
   for (i <- 0 until GemmConstant.tileSize) {
@@ -63,7 +63,7 @@ class Tile extends Module {
   }
 
   io.c_o := result_reg
-  io.data_valid_o := check_data_in_valid_reg
+  io.data_valid_o := check_data_i_valid_reg
 }
 
 // Mesh IO definition, an extended version of Tile IO
@@ -147,13 +147,13 @@ class GemmArray extends Module {
   val mesh = Module(new Mesh())
 
   // define wires for data partition
-  val a_in_wire = Wire(
+  val a_i_wire = Wire(
     Vec(
       GemmConstant.meshRow,
       Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthA.W))
     )
   )
-  val b_in_wire = Wire(
+  val b_i_wire = Wire(
     Vec(
       GemmConstant.meshCol,
       Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
@@ -175,7 +175,7 @@ class GemmArray extends Module {
   // data partition
   for (r <- 0 until GemmConstant.meshRow) {
     for (c <- 0 until GemmConstant.tileSize) {
-      a_in_wire(r)(c) := io.data.a_i(
+      a_i_wire(r)(c) := io.data.a_i(
         (r * GemmConstant.tileSize + c + 1) * GemmConstant.dataWidthA - 1,
         (r * GemmConstant.tileSize + c) * GemmConstant.dataWidthA
       )
@@ -184,7 +184,7 @@ class GemmArray extends Module {
 
   for (r <- 0 until GemmConstant.meshCol) {
     for (c <- 0 until GemmConstant.tileSize) {
-      b_in_wire(r)(c) := io.data.b_i(
+      b_i_wire(r)(c) := io.data.b_i(
         (r * GemmConstant.tileSize + c + 1) * GemmConstant.dataWidthB - 1,
         (r * GemmConstant.tileSize + c) * GemmConstant.dataWidthB
       )
@@ -199,8 +199,8 @@ class GemmArray extends Module {
   }
 
   // data and control signal connect
-  a_in_wire <> mesh.io.data_a_i
-  b_in_wire <> mesh.io.data_b_i
+  a_i_wire <> mesh.io.data_a_i
+  b_i_wire <> mesh.io.data_b_i
   io.data.c_o := Cat(c_out_wire_2.reverse)
 
   mesh.io.control_i.data_valid_i := io.data_valid_i

@@ -68,7 +68,7 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
           dut.io.ctrl.ptr_addr_b_i.poke(start_addr_B)
           dut.io.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-          // If gemm_read_valid_o is asserted, give the right data_a_i and b_in data according to the address
+          // If gemm_read_valid_o is asserted, give the right data_a_i and b_i data according to the address
           while (dut.io.ctrl.gemm_read_valid_o.peekBoolean()) {
             val addr_slide_A = (dut.io.ctrl.addr_a_o
               .peekInt() - start_addr_A) / GemmConstant.baseAddrIncrementA
