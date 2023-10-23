@@ -118,7 +118,7 @@ class LargeGemmRandomTest extends AnyFlatSpec with ChiselScalatestTester {
   }
 }
 
-// Simple large Gemm test to see if the control signals work well
+// Simple large Gemm test to see if the control signals and Gemm work well
 class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new LargeGemm)
@@ -130,14 +130,18 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.io.data.a_i.poke(1.U)
         dut.io.data.b_i.poke(1.U)
 
+        // Setting the M = 2, K = 2, and N = 2
         dut.io.ctrl.start_do_i.poke(true.B)
         dut.io.ctrl.M_i.poke(2)
         dut.io.ctrl.K_i.poke(2)
         dut.io.ctrl.N_i.poke(2)
+        // Setting the ptr_addr_a_i = 2, ptr_addr_b_i = 3, and ptr_addr_c_i = 4
         dut.io.ctrl.ptr_addr_a_i.poke(2)
         dut.io.ctrl.ptr_addr_b_i.poke(3)
         dut.io.ctrl.ptr_addr_c_i.poke(4)
 
+        // Orchestrating the data_valid_i to see if the Gemm works well under different situations
+        // Checking the output manually
         dut.clock.step(1)
         dut.io.ctrl.start_do_i.poke(false.B)
         dut.clock.step(2)
@@ -155,6 +159,8 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step(5)
 
+        // Below is similar: setting different M, K and N configurations as well as the different address pointers     
+        // Also orchestrating the data_valid_i
         dut.clock.step()
         dut.clock.step(5)
         dut.io.ctrl.start_do_i.poke(false.B)
@@ -187,6 +193,8 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step(5)
 
+        // Test the corner cases with one of the configuration of M, K and N is 1
+        // to see if the the Gemm still works well
         dut.io.ctrl.start_do_i.poke(false.B)
         dut.io.ctrl.data_valid_i.poke(false.B)
         dut.clock.step(1)
@@ -264,13 +272,17 @@ class LargeGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.clock.step(5)
 
         dut.io.start_do_i.poke(true.B)
+        // Setting the M = 2, K = 2, and N = 2
         dut.io.M_i.poke(2)
         dut.io.K_i.poke(2)
         dut.io.N_i.poke(2)
+        // Setting the ptr_addr_a_i = 2, ptr_addr_b_i = 3, and ptr_addr_c_i = 4
         dut.io.ptr_addr_a_i.poke(2)
         dut.io.ptr_addr_b_i.poke(3)
         dut.io.ptr_addr_c_i.poke(4)
 
+        // Orchestrating the data_valid_i to see if the Gemm works well under different situations
+        // Checking the output addresses and read/write valid signal manually
         dut.clock.step(1)
         dut.io.start_do_i.poke(false.B)
         dut.clock.step(2)
@@ -292,6 +304,8 @@ class LargeGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step(5)
 
+        // Test the corner cases with one of the configuration of M, K and N is 1
+        // to see if the the controller still works well
         dut.io.start_do_i.poke(false.B)
         dut.io.data_valid_i.poke(false.B)
         dut.clock.step(1)
