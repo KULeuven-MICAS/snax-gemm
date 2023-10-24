@@ -21,4 +21,7 @@ object GemmConstant {
   def baseAddrIncrementC =
     dataWidthC * meshRow * meshCol / dataWidthPerAddr
 
+  def TCDMWritePorts = 8.U
+  def idealTCDMWritePorts = 32.U
+
 }

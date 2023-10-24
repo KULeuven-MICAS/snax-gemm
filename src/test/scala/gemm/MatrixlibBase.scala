@@ -154,7 +154,7 @@ object MatrixLibBase {
       B: Array[BigInt]
   ) = {
     for (i <- 0 until Len) {
-      // println(A(i), B(i))
+      println(A(i), B(i))
       assert(A(i) == B(i))
     }
   }
