@@ -36,7 +36,11 @@ bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
 
 ### Block GEMM
 The Block GEMM is built with the Base GEMM. It takes in the M, K, and N configurations.
-In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). The GEMM accelerator uses Block matrix multiplication [](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) method to implement matrix multiplication in which the matrix sizes are much larger than the physical GEMM array. To get the right results, matrixes should have the right layout in memory. In the current version, these data should be stored in memory in a continuous address style. Below is an example data layout in memory for M = 2, K = 2, and N = 2. The address of martix A, B and C should also be gave.
+In this case, the size of matrix A is (M * meshRow, K * tileSize) and the size of matrix B is (K * tileSize, N * meshCol). The size of result matrix C is (M * meshRow, N * meshCol). 
+
+The GEMM accelerator uses the [Block matrix multiplication method](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) to implement matrix multiplication in which the matrix sizes are larger than the physical GEMM array. 
+
+To get the right results, matrixes should have the right layout in memory. In the current version, these data should be stored in memory in a continuous address style. Below is an example data layout in memory for M = 2, K = 2, and N = 2. The address of martix A, B and C should also be given.
 ![](./docs/block_matrix_mul.png)
 
 The Block GEMM function definition pseudocode is shown below.
@@ -44,7 +48,7 @@ The Block GEMM function definition pseudocode is shown below.
 bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 ```
 #### Ports
-| Signals | Width | Dir | Discription |
+| Signals | Width | Dir | Description |
 | - | - | - | - |
 | M_i | 8 | In | The M size setting |
 | K_i | 8 | In | The K size setting |

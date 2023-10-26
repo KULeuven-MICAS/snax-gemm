@@ -84,7 +84,7 @@ object MatrixLibLarge {
 
   // Translate the large input matrixes to submatrixes for inputing to Chisel module and golden result generation
   // The matrixes are arranged according to submatrix multiplication rules
-  def SpliteLargeMatrx(
+  def SplitLargeMatrx(
       M: Int,
       K: Int,
       N: Int,
