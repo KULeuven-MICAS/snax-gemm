@@ -3,22 +3,22 @@ package gemm
 import chisel3._
 import scala.math.BigInt
 
-// Scala math submatrix multiplication libray for large Gemm verification
+// Scala math submatrix multiplication libray for Block Gemm verification
 // Some functions are based on the MatrixLibBase
-object MatrixLibLarge {
+object MatrixLibBlock {
 
-  // Generate random M, K, N for testing the large Gemm
+  // Generate random M, K, N for testing the Block Gemm
   // The test matrix are (M * meshRow, K * tileSize) and (K * tileSize, N * meshCol)
   def GenRandSizeTest() = {
     val rand = new scala.util.Random
-    val M = rand.between(1, 10)
-    val K = rand.between(1, 10)
-    val N = rand.between(1, 10)
+    val M = rand.between(1, TestParameters.MatrixLibBlock_random_M_range)
+    val K = rand.between(1, TestParameters.MatrixLibBlock_random_K_range)
+    val N = rand.between(1, TestParameters.MatrixLibBlock_random_N_range)
     (M, K, N)
   }
 
   // Generate the random test matrix with a size of (M * meshRow, K * tileSize) and (K * tileSize, N * meshCol)
-  def GenLargeMatrix(M: Int, K: Int, N: Int) = {
+  def GenBlockMatrix(M: Int, K: Int, N: Int) = {
     MatrixLibBase.GenRandomMatrix(
       GemmConstant.meshRow * M,
       GemmConstant.tileSize * K,
@@ -64,8 +64,6 @@ object MatrixLibLarge {
     var flattenedUInt_A = ""
     var intValue: Int = 0
 
-    // println("padding to 8!")
-
     for (i <- 0 until meshRow) {
       for (j <- 0 until meshCol) {
         if (A(i * meshCol + j) < 0) {
@@ -84,7 +82,7 @@ object MatrixLibLarge {
 
   // Translate the large input matrixes to submatrixes for inputing to Chisel module and golden result generation
   // The matrixes are arranged according to submatrix multiplication rules
-  def SplitLargeMatrx(
+  def SplitBlockMatrix(
       M: Int,
       K: Int,
       N: Int,
@@ -125,9 +123,9 @@ object MatrixLibLarge {
     (split_A, split_B)
   }
 
-  // Large matrix multiplication implementation according to submatrix multiplication rule
+  // Block matrix multiplication implementation according to submatrix multiplication rule
   // The matrix A and matrix B also needs to have a right data layout according to the submatrix multiplication rule
-  def LargeMarixMul_1D(
+  def BlockMarixMul_1D(
       M: Int,
       K: Int,
       N: Int,

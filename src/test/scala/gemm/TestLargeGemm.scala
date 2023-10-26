@@ -4,8 +4,9 @@ import chisel3._
 import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
-trait AbstractLargeGemmtest {
-  def LargeGemmRandomTets[T <: LargeGemm](
+trait AbstractBlockGemmtest {
+  // Block gemm test generation function
+  def BlockGemmRandomTets[T <: BlockGemm](
       dut: T,
       size_M: Int,
       size_K: Int,
@@ -15,14 +16,15 @@ trait AbstractLargeGemmtest {
     // val (size_M, size_K, size_N) = (2,2,2)
     // Randomly generation of input matrices
     val (matrix_A, matrix_B) =
-      MatrixLibLarge.GenLargeMatrix(
+      MatrixLibBlock.GenBlockMatrix(
         size_M,
         size_K,
         size_N
       )
+
     // Convert the sub-matrices to a big bus
     val (split_matrix_A, split_matrix_B) =
-      MatrixLibLarge.SplitLargeMatrx(
+      MatrixLibBlock.SplitBlockMatrix(
         size_M,
         size_K,
         size_N,
@@ -31,12 +33,14 @@ trait AbstractLargeGemmtest {
       )
     val split_matrix_C =
       Array.ofDim[BigInt](size_M * size_N)
+
     // Random generation of the matrices start address
     val (start_addr_A, start_addr_B, start_addr_C) =
-      MatrixLibLarge.GenRandSizeTest()
+      MatrixLibBlock.GenRandSizeTest()
+
     // Generation of golden result in Scala
     val golden_array =
-      MatrixLibLarge.LargeMarixMul_1D(
+      MatrixLibBlock.BlockMarixMul_1D(
         size_M,
         size_K,
         size_N,
@@ -49,12 +53,12 @@ trait AbstractLargeGemmtest {
       if (dut.io.ctrl.gemm_write_valid_o.peekBoolean()) {
         val addr_slide_C = (dut.io.ctrl.addr_c_o
           .peekInt() - start_addr_C) / GemmConstant.baseAddrIncrementC
-        println("write", addr_slide_C)
+        // println("write", addr_slide_C)
         split_matrix_C(addr_slide_C.toInt) = dut.io.data.c_o.peekInt()
       }
     }
 
-    // Give the large gemm configuration
+    // Give the Block gemm configuration
     dut.clock.step(5)
     dut.io.ctrl.start_do_i.poke(false.B)
     dut.clock.step(5)
@@ -67,6 +71,7 @@ trait AbstractLargeGemmtest {
     dut.io.ctrl.ptr_addr_a_i.poke(start_addr_A)
     dut.io.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.ctrl.ptr_addr_c_i.poke(start_addr_C)
+
     dut.clock.step(1)
     dut.io.ctrl.start_do_i.poke(false.B)
 
@@ -76,7 +81,7 @@ trait AbstractLargeGemmtest {
         .peekInt() - start_addr_A) / GemmConstant.baseAddrIncrementA
       val addr_slide_B = (dut.io.ctrl.addr_b_o
         .peekInt() - start_addr_B) / GemmConstant.baseAddrIncrementB
-      println("read", addr_slide_A, addr_slide_B)
+      // println("read", addr_slide_A, addr_slide_B)
 
       dut.clock.step(1)
       dut.io.ctrl.data_valid_i.poke(true.B)
@@ -84,6 +89,7 @@ trait AbstractLargeGemmtest {
         .poke(split_matrix_A(addr_slide_A.toInt))
       dut.io.data.b_i
         .poke(split_matrix_B(addr_slide_B.toInt))
+
       CheckOutput()
     }
 
@@ -96,6 +102,7 @@ trait AbstractLargeGemmtest {
     }
 
     dut.clock.step(5)
+
     // Compare the output data with the golden model
     MatrixLibBase.CheckResults(
       size_M * size_N,
@@ -105,27 +112,25 @@ trait AbstractLargeGemmtest {
   }
 
 }
+
 // Random size of input matrices and Integer 8 data test and check with the results of largd Gemm with golden model
-class LargeGemmRandomTest
+class BlockGemmRandomTest
     extends AnyFlatSpec
     with ChiselScalatestTester
-    with AbstractLargeGemmtest {
+    with AbstractBlockGemmtest {
   "DUT" should "pass" in {
-    test(new LargeGemm)
+    test(new BlockGemm)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
-        // large gemm test generation function
-
         dut.clock.step()
-        val TestLoop = 2
 
-        for (i <- 0 until TestLoop) {
+        for (i <- 0 until TestParameters.BlockGemmRandomTest_TestLoop) {
           // Randomly generate the size of the input matrices
-          val (size_M, size_K, size_N) = MatrixLibLarge.GenRandSizeTest()
-          LargeGemmRandomTets(dut, size_M, size_K, size_N)
+          val (size_M, size_K, size_N) = MatrixLibBlock.GenRandSizeTest()
+          BlockGemmRandomTets(dut, size_M, size_K, size_N)
         }
 
         emitVerilog(
-          new (LargeGemm),
+          new (BlockGemm),
           Array("--target-dir", "generated/gemm")
         )
 
@@ -133,27 +138,28 @@ class LargeGemmRandomTest
   }
 }
 
-class LargeGemmCornerCaseTest
+// Corner case test for Block Gemm to see if the Block Gemm works well in extreme configurations
+class BlockGemmCornerCaseTest
     extends AnyFlatSpec
     with ChiselScalatestTester
-    with AbstractLargeGemmtest {
+    with AbstractBlockGemmtest {
   "DUT" should "pass" in {
-    test(new LargeGemm)
+    test(new BlockGemm)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step(5)
-        LargeGemmRandomTets(dut, 1, 1, 1)
-        LargeGemmRandomTets(dut, 1, 4, 1)
-        LargeGemmRandomTets(dut, 1, 1, 4)
-        LargeGemmRandomTets(dut, 4, 1, 1)
-        LargeGemmRandomTets(dut, 2, 2, 2)
+        BlockGemmRandomTets(dut, 1, 1, 1)
+        BlockGemmRandomTets(dut, 1, 4, 1)
+        BlockGemmRandomTets(dut, 1, 1, 4)
+        BlockGemmRandomTets(dut, 4, 1, 1)
+        BlockGemmRandomTets(dut, 2, 2, 2)
       }
   }
 }
 
-// Simple large Gemm test to see if the control signals work well
-class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
+// Simple Block Gemm test to see if the control signals work well
+class BlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
-    test(new LargeGemm)
+    test(new BlockGemm)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step()
         dut.clock.step(5)
@@ -191,7 +197,7 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step(5)
 
-        // Below is similar: setting different M, K and N configurations as well as the different address pointers     
+        // Below is similar: setting different M, K and N configurations as well as the different address pointers
         // Also orchestrating the data_valid_i
         dut.clock.step()
         dut.clock.step(5)
@@ -225,8 +231,8 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step(5)
 
-        // Test the corner cases with one of the configuration of M, K and N is 1
-        // to see if the the Gemm still works well
+        // Below, we test the corner cases with one of the configuration of M, K and N is 1
+        // to see if the the Gemm still works well and these test also help to find bug
         dut.io.ctrl.start_do_i.poke(false.B)
         dut.io.ctrl.data_valid_i.poke(false.B)
         dut.clock.step(1)
@@ -285,7 +291,7 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.clock.step(5)
 
         emitVerilog(
-          new (LargeGemm),
+          new (BlockGemm),
           Array("--target-dir", "generated/gemm")
         )
 
@@ -293,10 +299,10 @@ class LargeGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   }
 }
 
-// simple test to see if the LargeGemmController work well with manual configuration
-class LargeGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
+// Simple test to see if the BlockGemmController work well with manual configuration
+class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
-    test(new LargeGemmController)
+    test(new BlockGemmController)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step(5)
         dut.io.start_do_i.poke(false.B)
@@ -337,7 +343,8 @@ class LargeGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.clock.step(5)
 
         // Test the corner cases with one of the configuration of M, K and N is 1
-        // to see if the the controller still works well
+        // to see if the the controller still works well and these test also help to find bug
+        // with different delay of data_valid_i assert to simulate the delay of real memeory respond
         dut.io.start_do_i.poke(false.B)
         dut.io.data_valid_i.poke(false.B)
         dut.clock.step(1)
@@ -423,7 +430,7 @@ class LargeGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.clock.step(5)
 
         emitVerilog(
-          new (LargeGemmController),
+          new (BlockGemmController),
           Array("--target-dir", "generated/gemm")
         )
 

@@ -2,8 +2,8 @@ package gemm
 import chisel3._
 import chisel3.util._
 
-// The LargeGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README
-class LargeGemmControllerIO extends Bundle {
+// The BlockGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README
+class BlockGemmControllerIO extends Bundle {
   val M_i = Input(UInt(8.W))
   val K_i = Input(UInt(8.W))
   val N_i = Input(UInt(8.W))
@@ -26,12 +26,13 @@ class LargeGemmControllerIO extends Bundle {
   val accumulate_i = Output(Bool())
 }
 
-// LargeGemmController module. This module takes in the configurations and gives out read/write valid signals and the right addresses of the sub-matrices.
-class LargeGemmController extends Module {
-  lazy val io = IO(new LargeGemmControllerIO())
+// BlockGemmController module. This module takes in the configurations and gives out read/write valid signals and the right addresses of the sub-matrices.
+class BlockGemmController extends Module {
+  lazy val io = IO(new BlockGemmControllerIO())
 
   val start_do = RegInit(false.B)
 
+  // Regsiters to store the configurations
   val M = RegInit(0.U(8.W))
   val K = RegInit(0.U(8.W))
   val N = RegInit(0.U(8.W))
@@ -40,7 +41,12 @@ class LargeGemmController extends Module {
   val ptr_addr_b = RegInit(0.U(32.W))
   val ptr_addr_c = RegInit(0.U(32.W))
 
-  // Counters for tracing the block matrix multiplication and generating the right addresses
+  // Counters for tracing the block matrix multiplication
+  val read_counter = RegInit(0.U(24.W))
+  val write_counter = RegInit(0.U(24.W))
+  val write_counter_next = RegInit(0.U(24.W))
+
+  // Counters for generating the right addresses
   val M_read_counter = WireInit(0.U(8.W))
   val N_read_counter = WireInit(0.U(8.W))
   val K_read_counter = WireInit(0.U(8.W))
@@ -49,15 +55,12 @@ class LargeGemmController extends Module {
   val N_write_counter = WireInit(0.U(8.W))
   val K_write_counter = WireInit(0.U(8.W))
 
-  val read_tcdm_done = WireInit(false.B)
-  val gemm_done = WireInit(false.B)
-
-  val read_counter = RegInit(0.U(24.W))
-  val write_counter = RegInit(0.U(24.W))
-  val write_counter_next = RegInit(0.U(24.W))
-
+  // Counters for write valid and accumulate signal generation
   val write_valid_counter = RegInit(0.U(8.W))
   val accumulate_counter = RegInit(0.U(8.W))
+
+  val read_tcdm_done = WireInit(false.B)
+  val gemm_done = WireInit(false.B)
 
   // State declaration
   val sIDLE :: sREAD :: sREAD_DONE :: Nil = Enum(3)
@@ -67,7 +70,7 @@ class LargeGemmController extends Module {
   // Changing states
   cstate := nstate
 
-  // Next state changes
+  // Next state changes accoring to three key signals: io.start_do_i, read_tcdm_done and gemm_done
   switch(cstate) {
     is(sIDLE) {
       when(io.start_do_i) {
@@ -92,7 +95,7 @@ class LargeGemmController extends Module {
     }
   }
 
-  // Store the configurations
+  // Store the configurations when io.start_do_i && !io.busy_o
   when(io.start_do_i && !io.busy_o) {
     M := io.M_i
     N := io.N_i
@@ -109,12 +112,14 @@ class LargeGemmController extends Module {
     ptr_addr_c := 0.U
   }
 
+  // Store the start_do_i signal when io.start_do_i && !io.busy_o for the first read valid
   when(io.start_do_i && !io.busy_o) {
     start_do := true.B
   }.otherwise {
     start_do := false.B
   }
 
+  // Read counter increment according to the start_do and io.data_valid_i
   when(start_do) {
     read_counter := read_counter + 1.U
   }.elsewhen(read_counter === M * N * K) {
@@ -125,18 +130,24 @@ class LargeGemmController extends Module {
     read_counter := 0.U
   }
 
+  // Write counter next increment according to the io.data_valid_o
   when(io.data_valid_o) {
     write_counter_next := write_counter_next + 1.U
   }.elsewhen(cstate === sIDLE) {
     write_counter_next := 0.U
   }
 
+  // Write counter update write_counter_next from according to the io.data_valid_o
+  // We need write_counter and write_counter_next beacuse
+  // when io.data_valid_o for K cycle, then we can give a real io.gemm_write_valid_o valid in next cycle,
+  // but the write address is generated accoridng to the previous cycle write_counter_next
   when(io.data_valid_o) {
     write_counter := write_counter_next
   }.elsewhen(cstate === sIDLE) {
     write_counter := 0.U
   }
 
+  // Counters for generating the right addresses for block matrix multiplication
   M_read_counter := read_counter / (K * N)
   K_read_counter := (read_counter % (K * N)) % K
   N_read_counter := (read_counter % (K * N)) / K
@@ -175,13 +186,13 @@ class LargeGemmController extends Module {
 
   // Intermediate or output control signals generation according to the counters
   read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && io.gemm_read_valid_o
+  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && io.gemm_write_valid_o
 
   io.gemm_read_valid_o := (start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
   io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
-
-  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && io.gemm_write_valid_o
-  io.busy_o := (cstate =/= sIDLE)
   io.accumulate_i := (accumulate_counter =/= K - 1.U && (io.data_valid_i === 1.B))
+
+  io.busy_o := (cstate =/= sIDLE)
 
   // Address generation
   io.addr_a_o := ptr_addr_a + (GemmConstant.baseAddrIncrementA.U) * (M_read_counter * K + K_read_counter)
@@ -190,8 +201,8 @@ class LargeGemmController extends Module {
 
 }
 
-// The LargeGemm's control port declaration. Detailed explanation of these ports can be found in the README
-class LargeGemmCtrlIO extends Bundle {
+// The BlockGemm's control port declaration. Detailed explanation of these ports can be found in the README
+class BlockGemmCtrlIO extends Bundle {
   val M_i = Input(UInt(8.W))
   val K_i = Input(UInt(8.W))
   val N_i = Input(UInt(8.W))
@@ -213,21 +224,21 @@ class LargeGemmCtrlIO extends Bundle {
   val busy_o = Output(Bool())
 }
 
-// LargeGemmIO definition
-class LargeGemmIO extends Bundle {
+// BlockGemmIO definition
+class BlockGemmIO extends Bundle {
   val data = new GemmDataIO()
-  val ctrl = new LargeGemmCtrlIO()
+  val ctrl = new BlockGemmCtrlIO()
 }
 
-// LargeGemm module.
+// BlockGemm module.
 // In this module, a GemmArray is generated to do the computation and
 // a controller is generated to generate the control signals for
 // read/write reqeust and related address
-class LargeGemm extends Module {
-  lazy val io = IO(new LargeGemmIO())
+class BlockGemm extends Module {
+  lazy val io = IO(new BlockGemmIO())
 
   val gemm_array = Module(new GemmArray())
-  lazy val controller = Module(new LargeGemmController())
+  lazy val controller = Module(new BlockGemmController())
 
   controller.io.M_i <> io.ctrl.M_i
   controller.io.K_i <> io.ctrl.K_i
