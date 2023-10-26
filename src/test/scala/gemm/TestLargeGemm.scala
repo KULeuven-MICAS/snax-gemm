@@ -22,7 +22,7 @@ trait AbstractLargeGemmtest {
       )
     // Convert the sub-matrices to a big bus
     val (split_matrix_A, split_matrix_B) =
-      MatrixLibLarge.SpliteLargeMatrx(
+      MatrixLibLarge.SplitLargeMatrx(
         size_M,
         size_K,
         size_N,
