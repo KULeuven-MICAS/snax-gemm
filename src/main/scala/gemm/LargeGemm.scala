@@ -175,11 +175,11 @@ class LargeGemmController extends Module {
 
   // Intermediate or output control signals generation according to the counters
   read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && io.gemm_read_valid_o
+  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && io.gemm_write_valid_o
 
   io.gemm_read_valid_o := (start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
   io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
 
-  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && io.gemm_write_valid_o
   io.busy_o := (cstate =/= sIDLE)
   io.accumulate_i := (accumulate_counter =/= K - 1.U && (io.data_valid_i === 1.B))
 
@@ -229,25 +229,25 @@ class LargeGemm extends Module {
   val gemm_array = Module(new GemmArray())
   lazy val controller = Module(new LargeGemmController())
 
-  controller.io.M_i <> io.ctrl.M_i
-  controller.io.K_i <> io.ctrl.K_i
-  controller.io.N_i <> io.ctrl.N_i
-  controller.io.start_do_i <> io.ctrl.start_do_i
-  controller.io.data_valid_i <> io.ctrl.data_valid_i
-  controller.io.ptr_addr_a_i <> io.ctrl.ptr_addr_a_i
-  controller.io.ptr_addr_b_i <> io.ctrl.ptr_addr_b_i
-  controller.io.ptr_addr_c_i <> io.ctrl.ptr_addr_c_i
-  controller.io.gemm_read_valid_o <> io.ctrl.gemm_read_valid_o
-  controller.io.gemm_write_valid_o <> io.ctrl.gemm_write_valid_o
-  controller.io.addr_a_o <> io.ctrl.addr_a_o
-  controller.io.addr_b_o <> io.ctrl.addr_b_o
-  controller.io.addr_c_o <> io.ctrl.addr_c_o
-  controller.io.busy_o <> io.ctrl.busy_o
+  controller.io.M_i := io.ctrl.M_i
+  controller.io.K_i := io.ctrl.K_i
+  controller.io.N_i := io.ctrl.N_i
+  controller.io.start_do_i := io.ctrl.start_do_i
+  controller.io.data_valid_i := io.ctrl.data_valid_i
+  controller.io.ptr_addr_a_i := io.ctrl.ptr_addr_a_i
+  controller.io.ptr_addr_b_i := io.ctrl.ptr_addr_b_i
+  controller.io.ptr_addr_c_i := io.ctrl.ptr_addr_c_i
+  controller.io.gemm_read_valid_o := io.ctrl.gemm_read_valid_o
+  controller.io.gemm_write_valid_o := io.ctrl.gemm_write_valid_o
+  controller.io.addr_a_o := io.ctrl.addr_a_o
+  controller.io.addr_b_o := io.ctrl.addr_b_o
+  controller.io.addr_c_o := io.ctrl.addr_c_o
+  controller.io.busy_o := io.ctrl.busy_o
   controller.io.data_valid_o := gemm_array.io.data_valid_o
 
-  gemm_array.io.data.a_i <> io.data.a_i
-  gemm_array.io.data.b_i <> io.data.b_i
-  io.data.c_o <> RegNext(gemm_array.io.data.c_o)
+  gemm_array.io.data.a_i := io.data.a_i
+  gemm_array.io.data.b_i := io.data.b_i
+  io.data.c_o := RegNext(gemm_array.io.data.c_o)
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
   gemm_array.io.accumulate_i := controller.io.accumulate_i
