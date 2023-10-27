@@ -4,6 +4,7 @@ import chisel3._
 import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
+// A trait with basic gemm test function to be used in different test
 trait AbstractBlockGemmtest {
   // Block gemm test generation function
   def BlockGemmRandomTets[T <: BlockGemm](
@@ -13,7 +14,6 @@ trait AbstractBlockGemmtest {
       size_N: Int
   ) = {
 
-    // val (size_M, size_K, size_N) = (2,2,2)
     // Randomly generation of input matrices
     val (matrix_A, matrix_B) =
       MatrixLibBlock.GenBlockMatrix(
@@ -75,7 +75,7 @@ trait AbstractBlockGemmtest {
     dut.clock.step(1)
     dut.io.ctrl.start_do_i.poke(false.B)
 
-    // If gemm_read_valid_o is asserted, give the right data_a_i and b_in data according to the address
+    // If gemm_read_valid_o is asserted, give the right a_i and b_i data according to the address
     while (dut.io.ctrl.gemm_read_valid_o.peekBoolean()) {
       val addr_slide_A = (dut.io.ctrl.addr_a_o
         .peekInt() - start_addr_A) / GemmConstant.baseAddrIncrementA
@@ -113,7 +113,7 @@ trait AbstractBlockGemmtest {
 
 }
 
-// Random size of input matrices and Integer 8 data test and check with the results of largd Gemm with golden model
+// Random size of input matrices and Integer 8 data test and check with the results of Block Gemm with golden model
 class BlockGemmRandomTest
     extends AnyFlatSpec
     with ChiselScalatestTester
