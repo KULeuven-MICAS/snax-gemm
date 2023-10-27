@@ -63,6 +63,7 @@ class BlockGemmController extends Module {
   val gemm_done = WireInit(false.B)
 
   // State declaration
+  // sREAD_DONE state means all the read requests are sent, Gemm only waits for the responds
   val sIDLE :: sREAD :: sREAD_DONE :: Nil = Enum(3)
   val cstate = RegInit(sIDLE)
   val nstate = WireInit(sIDLE)
