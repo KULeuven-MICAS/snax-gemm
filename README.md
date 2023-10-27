@@ -39,7 +39,7 @@ The Block GEMM is built with the Base GEMM.
 The GEMM accelerator uses the [Block matrix multiplication method](https://en.wikipedia.org/wiki/Block_matrix#Block_matrix_multiplication) to implement matrix multiplication in which the matrix sizes are larger than the physical GEMM array. 
 
 It takes in the M, K, and N configurations as the size of the block gemm. 
-In this case, the size of matrix A is (M' = M * meshRow, K' = K * tileSize) and the size of matrix B is (K' = K * tileSize, N' = N * meshCol). The size of result matrix C is (M' = M * meshRow, N' = N * meshCol) as shown below.
+In this case, the size of matrix A is (`M' = M * meshRow`, `K' = K * tileSize`) and the size of matrix B is (`K' = K * tileSize`, `N' = N * meshCol`). The size of result matrix C is (`M' = M * meshRow, N' = N * meshCol`) as shown below.
 
 ![](./docs/general_mm.png)
 
