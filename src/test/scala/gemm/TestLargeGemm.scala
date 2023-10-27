@@ -303,7 +303,7 @@ class BlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 // In this test, the M, K, N are setted mannually to see the behavior of the Block Gemm and to check if the control signals works well
 // Testing what if the start_do_i is asserted when the Block Gemm is busy
 // And also orchestrating the data_valid_i to see if the Gemm works well under different situations
-// Finnaly checking the output manually in the waveform
+// Finaly checking the output manually in the waveform
 class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new BlockGemmController)
