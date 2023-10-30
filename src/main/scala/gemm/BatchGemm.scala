@@ -2,7 +2,7 @@ package gemm
 import chisel3._
 import chisel3.util._
 
-// BatchGemmControllerIO 's port declaration. 
+// BatchGemmControllerIO 's port declaration.
 // Detailed explanation of these ports can be found in the README.
 // BatchGemmControllerIO inherits from BlockGemmControllerIO
 class BatchGemmControllerIO extends BlockGemmControllerIO {
@@ -16,7 +16,7 @@ class BatchGemmControllerIO extends BlockGemmControllerIO {
 
 }
 
-// BatchGemmController module. This module takes in the configurations 
+// BatchGemmController module. This module takes in the configurations
 // and gives out read/write valid signals and the right addresses of the sub-matrices in each batch.
 // BatchGemmController inherits from BlockGemmController
 class BatchGemmController extends BlockGemmController {
@@ -120,7 +120,7 @@ class BatchGemmController extends BlockGemmController {
   io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * StrideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
 }
 
-// The BatchGemm's control port declaration. 
+// The BatchGemm's control port declaration.
 // Detailed explanation of these ports can be found in the README
 // BatchGemmCtrlIO inherits BlockGemmCtrlIO
 class BatchGemmCtrlIO extends BlockGemmCtrlIO {

@@ -28,14 +28,12 @@ object MatrixLibBatch {
   // Generate the random size and the random batch number
   def genRandSizeandBatchTest() = {
     val rand = new scala.util.Random
-    def MatrixLibBatch_random_B_range = 5
-    def MatrixLibBatch_random_M_range = 5
-    def MatrixLibBatch_random_K_range = 5
-    def MatrixLibBatch_random_N_range = 5
-    val B = rand.between(1, MatrixLibBatch_random_B_range)
-    val M = rand.between(1, MatrixLibBatch_random_M_range)
-    val K = rand.between(1, MatrixLibBatch_random_K_range)
-    val N = rand.between(1, MatrixLibBatch_random_N_range)
+
+    val B = rand.between(1, TestParameters.MatrixLibBatch_random_B_range)
+    val M = rand.between(1, TestParameters.MatrixLibBatch_random_M_range)
+    val K = rand.between(1, TestParameters.MatrixLibBatch_random_K_range)
+    val N = rand.between(1, TestParameters.MatrixLibBatch_random_N_range)
+
     (B, M, K, N)
   }
 
@@ -135,7 +133,7 @@ trait AbstractBatchGemmtest {
         size_N
       )
     // println(matrix_A.size, matrix_B.size)
-    
+
     // Convert the sub-matrices to a big bus
     val (split_matrix_A, split_matrix_B) =
       MatrixLibBatch.SpliteBatchBlockMatrx(
@@ -147,7 +145,7 @@ trait AbstractBatchGemmtest {
         matrix_B
       )
     val split_matrix_C = Array.ofDim[BigInt](size_Batch, size_M * size_N)
-    
+
     // Random generation of the matrices start address and strides
     val (start_addr_A, start_addr_B, start_addr_C) =
       MatrixLibBlock.GenRandSizeTest()
@@ -292,7 +290,6 @@ trait AbstractBatchGemmtest {
 
 }
 
-
 // Random size of input matrices and Integer 8 data test and check with the results of Batch Gemm with golden model
 class BatchGemmRandomTest
     extends AnyFlatSpec
@@ -302,9 +299,8 @@ class BatchGemmRandomTest
     test(new BatchGemm)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step()
-        val BatchGemmRandomTest_TestLoop = 2
 
-        for (i <- 0 until BatchGemmRandomTest_TestLoop) {
+        for (i <- 0 until TestParameters.BatchGemmRandomTest_TestLoop) {
           // Randomly generate the batch number and size of the input matrices
           val (size_Batch, size_M, size_K, size_N) =
             MatrixLibBatch.genRandSizeandBatchTest()
@@ -381,10 +377,10 @@ class BatchGemmCornerCaseTest
 }
 
 // Simple Batch Gemm test to see if the control signals work well before random data test for debug purpose
-// In this test, the B, M, K, N are setted mannually to see the behavior of the Batch Gemm and to check if the control signals works well
+// In this test, the B, M, K, N are set manually to see the behavior of the Batch Gemm and to check if the control signals works well
 // Testing what if the start_do_i is asserted when the Batch Gemm is busy
 // And also orchestrating the data_valid_i to see if the Gemm works well under different situations
-// Finnaly checking the output manually in the waveform
+// Finally checking the output manually in the waveform
 class BatchGemmTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" in {
     test(new BatchGemm)
