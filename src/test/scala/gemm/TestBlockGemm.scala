@@ -1,8 +1,11 @@
+import gemm.MatrixLibBlock
+import gemm.MatrixLibBase
 package gemm
 
 import chisel3._
 import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
+import {BlockGemm, BlockGemmController}
 
 // A trait with basic gemm test function to be used in different test
 trait AbstractBlockGemmtest {
