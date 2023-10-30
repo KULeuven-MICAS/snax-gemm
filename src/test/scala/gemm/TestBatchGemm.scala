@@ -136,7 +136,7 @@ trait AbstractBatchGemmtest {
 
     // Convert the sub-matrices to a big bus
     val (split_matrix_A, split_matrix_B) =
-      MatrixLibBatch.SpliteBatchBlockMatrx(
+      MatrixLibBatch.SplitBatchBlockMatrx(
         size_Batch,
         size_M,
         size_K,
