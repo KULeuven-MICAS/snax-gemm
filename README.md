@@ -25,11 +25,13 @@ The size of matrix A is (meshRow, tileSize) and the size of matrix B is (tileSiz
 
 ![](./docs/datalayout_mem.png)
 
-Each row of the GEMM array takes in the corresponding row of matrix A, eg., all the tiles in row ith takes in the ith row of matrix A. And each column of the GEMM array takes in the corresponding column of matrix B, eg., all the tiles in column jth take in the jth column of matrix B. This process is shown in the figure below in detail.
+Each row of the GEMM array takes in the corresponding row of matrix A, i.e., all the tiles in the ith row take in the ith row of matrix A. And each column of the GEMM array takes in the corresponding column of matrix B, i.e., all the tiles in the jth column take in the jth column of matrix B. This process is shown in the figure below in detail.
 
 ![](./docs/datalayout.png)
 
-The base GEMM also has an accumulation option. If the signal `accumulate` is one, then the accumulator register will store the current result. If the signal `accumulate` is zero, then the accumulator register will clear itself.
+The base GEMM also has an accumulation option. If the signal `accumulate` is one, then the accumulator register will retain it's current result. If the signal `accumulate` is zero, then the accumulator register will clear itself.
+This option is useful for using the base GEMM for software-managed block matrix multiplication.
+
 
 The Base GEMM function definition pseudocode is shown below.
 ```
@@ -46,7 +48,7 @@ In this case, the size of matrix A is (`M' = M * meshRow`, `K' = K * tileSize`) 
 ![](./docs/general_mm.png)
 
 #### Computation analysis
-Take a Block Gemm with hardware parmaters: `meshRow == tileSize == meshCol == 8` as an example, the `M, K, and N` should be configured as `4, 2, and 3` respectively if we want to do the block matrix multiplication with `C(32,24) = A(32,16) * B(16,24), M’ = 32, K’ = 16, N’ = 24`. The block matrix multiplication is illustrated in the picture below. With: 
+Take a Block Gemm with hardware parameters: `meshRow == tileSize == meshCol == 8` as an example, the `M, K, and N` should be configured as `4, 2, and 3` respectively if we want to do the block matrix multiplication with `C(32,24) = A(32,16) * B(16,24), M’ = 32, K’ = 16, N’ = 24`. The block matrix multiplication is illustrated in the picture below. With: 
 * M<sub>u</sub> (M unrolling) = meshRow = 8
 * K<sub>u</sub> (K unrolling) = tileSize = 8
 * N<sub>u</sub> (N unrolling) = meshCol = 8
@@ -65,13 +67,13 @@ for (k1 = 0 to K’/Ku - 1);
 ```
 
 #### Data layout
-To get the right results, matrices should have the right layout in memory. The address of martix A, B, and C should also be given when configuring the Block Gemm. In the current version, these data should be stored in memory in a continuous address style. 
+To get the right results, the input matrices should have the right layout in memory. The address of matrix A, B, and C should also be given when configuring the Block Gemm. In the current version, the data of A and B should be stored in memory with a stride of 1. 
 
 Take a Block Gemm with hardware parameters: `meshRow == tileSize == meshCol == 8` as an example, the `M, K, and N` should be configured as `3, 4, and 5` respectively if we want to do the block matrix multiplication with `C(24,40) = A(24,32) * B(32,40), M’ = 24, K’ = 32, N’ = 40` as shown in below.
 
 ![](./docs/block_mm_for_new_datalayout.png)
 
-To get the right results, the matrix A should be arranged as M<sub>3</sub> K<sub>4</sub> M<sub>8</sub> K<sub>8</sub>. B should be arranged as N<sub>5</sub> K<sub>4</sub> N<sub>8</sub> K<sub>8</sub>. C should be arranged as M<sub>3</sub> N<sub>5</sub> M<sub>8</sub> N<sub>8</sub>. Take matrix A for example, the innermost is 8 elements in the K dimension, then is the 8 rows in the M dimension, then is 4 big columns in the K dimension, and the outermost is 3 big rows in the M dimension.
+To get the right results for `M = 3`, `K=4` and `N=5` , the matrix A should be arranged as M<sub>3</sub> K<sub>4</sub> M<sub>8</sub> K<sub>8</sub>. B should be arranged as N<sub>5</sub> K<sub>4</sub> N<sub>8</sub> K<sub>8</sub>. C should be arranged as M<sub>3</sub> N<sub>5</sub> M<sub>8</sub> N<sub>8</sub>. Take matrix A for example, the innermost is 8 elements in the K dimension, then is the 8 rows in the M dimension, then is 4 big columns in the K dimension, and the outermost is 3 big rows in the M dimension.
 
 ![](./docs/data_layout.png)
 

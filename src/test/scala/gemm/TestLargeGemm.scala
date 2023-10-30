@@ -299,7 +299,7 @@ class BlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   }
 }
 
-// Simple test to see if the BlockGemmController work well with manual configuration
+// Simple test to see if the BlockGemmController works well with manual configuration
 class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new BlockGemmController)

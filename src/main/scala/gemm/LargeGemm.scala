@@ -134,9 +134,9 @@ class BlockGemmController extends Module {
   }
 
   // Write counter update write_counter_next from according to the io.data_valid_o
-  // We need write_counter and write_counter_next beacuse
+  // We need write_counter and write_counter_next because
   // when io.data_valid_o for K cycle, then we can give a real io.gemm_write_valid_o valid in next cycle,
-  // but the write address is generated accoridng to the previous cycle write_counter_next
+  // but the write address is generated according to the previous cycle write_counter_next
   when(io.data_valid_o) {
     write_counter := write_counter_next
   }.elsewhen(cstate === sIDLE) {
@@ -165,7 +165,7 @@ class BlockGemmController extends Module {
     write_valid_counter := 0.U
   }
 
-  // accumulate_counter for geenrating the accumulation signal for BaseGemm
+  // accumulate_counter for generating the accumulation signal for BaseGemm
   when(
     (io.data_valid_i === 1.B) && accumulate_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
   ) {
