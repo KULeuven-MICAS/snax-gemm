@@ -90,7 +90,7 @@ class MeshIO extends Bundle {
   val data_valid_o = Output(Bool())
 }
 
-// Mesh implementation, just creat a mesh of TIles and do the connection
+// Mesh implementation, just create a mesh of TIles and do the connection
 class Mesh extends Module {
 
   val io = IO(new MeshIO())

@@ -7,7 +7,7 @@ import scala.math.BigInt
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.Tag
 
-// Add tags to filter some unncessary test for fast unit test
+// Add tags to filter some unnecessary test for fast unit test
 object Unnecessary extends Tag("Unnecessary")
 
 // Random Integer 8 data test and check with the results of Gemm with golden model
@@ -69,7 +69,7 @@ class GemmArrayRandomTest
             GemmConstant.meshCol,
             results
           )
-          // Check the reuslts
+          // Check the results
           MatrixLibBase.CheckResults(
             GemmConstant.meshRow * GemmConstant.meshCol,
             results_array,

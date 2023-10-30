@@ -344,7 +344,7 @@ class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
 
         // Test the corner cases with one of the configuration of M, K and N is 1
         // to see if the the controller still works well and these test also help to find bug
-        // with different delay of data_valid_i assert to simulate the delay of real memeory respond
+        // with different delay of data_valid_i assert to simulate the delay of real memory respond
         dut.io.start_do_i.poke(false.B)
         dut.io.data_valid_i.poke(false.B)
         dut.clock.step(1)

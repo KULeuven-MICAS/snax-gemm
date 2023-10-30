@@ -3,7 +3,7 @@ package gemm
 import chisel3._
 import scala.math.BigInt
 
-// Scala math submatrix multiplication libray for Block Gemm verification
+// Scala math submatrix multiplication library for Block Gemm verification
 // Some functions are based on the MatrixLibBase
 object MatrixLibBlock {
 
@@ -26,7 +26,7 @@ object MatrixLibBlock {
     )
   }
 
-  // Translate matrix to big bus for inputing to Chisel module
+  // Translate matrix to big bus for inputting to Chisel module
   // The data type is Array[Byte]
   def MatrixArray2BigBus(
       meshRow: Int,
@@ -52,7 +52,7 @@ object MatrixLibBlock {
     BigInt(flattenedUInt_A, 16)
   }
 
-  // Translate matrix to big bus for inputing to Chisel module
+  // Translate matrix to big bus for inputting to Chisel module
   // The data type is Array[Int]
   def MatrixArray2BigBus(
       meshRow: Int,
@@ -80,7 +80,7 @@ object MatrixLibBlock {
     BigInt(flattenedUInt_A, 16)
   }
 
-  // Translate the large input matrixes to submatrixes for inputing to Chisel module and golden result generation
+  // Translate the large input matrixes to submatrices for inputting to Chisel module and golden result generation
   // The matrixes are arranged according to submatrix multiplication rules
   def SplitBlockMatrix(
       M: Int,

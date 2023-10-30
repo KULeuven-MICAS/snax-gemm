@@ -32,7 +32,7 @@ class BlockGemmController extends Module {
 
   val start_do = RegInit(false.B)
 
-  // Regsiters to store the configurations
+  // Registers to store the configurations
   val M = RegInit(0.U(8.W))
   val K = RegInit(0.U(8.W))
   val N = RegInit(0.U(8.W))
@@ -70,7 +70,7 @@ class BlockGemmController extends Module {
   // Changing states
   cstate := nstate
 
-  // Next state changes accoring to three key signals: io.start_do_i, read_tcdm_done and gemm_done
+  // Next state changes according to three key signals: io.start_do_i, read_tcdm_done and gemm_done
   switch(cstate) {
     is(sIDLE) {
       when(io.start_do_i) {
@@ -133,7 +133,7 @@ class BlockGemmController extends Module {
     write_counter_next := 0.U
   }
 
-  // Write counter update write_counter_next from according to the io.data_valid_o
+  // Update write counter from write_counter_next when io.data_valid_o is asserted
   // We need write_counter and write_counter_next because
   // when io.data_valid_o for K cycle, then we can give a real io.gemm_write_valid_o valid in next cycle,
   // but the write address is generated according to the previous cycle write_counter_next
@@ -227,7 +227,7 @@ class BlockGemmIO extends Bundle {
 // BlockGemm module.
 // In this module, a GemmArray is generated to do the computation and
 // a controller is generated to generate the control signals for
-// read/write reqeust and related address
+// read/write request and related address
 class BlockGemm extends Module {
   lazy val io = IO(new BlockGemmIO())
   io.suggestName("io")
