@@ -110,7 +110,7 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 
 
 ### Batch Stride GEMM
-The Batch Stride GEMM is built with the Block GEMM. It takes in an extra Batch configuration (B) except for the M, K and N. It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
+The Batch Stride GEMM is built with the Block GEMM. Besides  M, K and N It takes in an extra Batch configuration (B). It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
 
 #### Computation analysis
 Batch Stride GEMM does Batch number of the same size Block Gemm.

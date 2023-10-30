@@ -58,7 +58,7 @@ object MatrixLibBatch {
   }
 
   // Convert the input matrix to a big bus
-  def SpliteBatchBlockMatrx(
+  def SplitBatchBlockMatrx(
       Batch: Int,
       M: Int,
       K: Int,
