@@ -143,3 +143,7 @@ To run the Gemm accelerator tests, use:
 ```
 sbt test
 ```
+
+## Acknowledgement
+
+We learned a lot from [Huawei DaVinci](https://ieeexplore.ieee.org/document/9407221) when developing the Gemm Accelerator.
