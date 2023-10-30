@@ -157,10 +157,6 @@ class BlockGemmCornerCaseTest
 }
 
 // Simple Block Gemm test to see if the control signals work well
-// In this test, the M, K, N are setted mannually to see the behavior of the Block Gemm and to check if the control signals works well
-// Testing what if the start_do_i is asserted when the Block Gemm is busy
-// And also orchestrating the data_valid_i to see if the Gemm works well under different situations
-// Finaly checking the output manually in the waveform
 class BlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new BlockGemm)
@@ -304,9 +300,6 @@ class BlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 }
 
 // Simple test to see if the BlockGemmController work well with manual configuration
-// In this test, the M, K, N are setted mannually to see the behavior of the Block Gemm Controller and to check if the control signals works well
-// Testing what if the start_do_i is asserted when the Block Gemm is busy
-// And also orchestrating the data_valid_i to see if the Gemm works well under different situations
 class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new BlockGemmController)
@@ -385,7 +378,6 @@ class BlockGemmControllerTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.clock.step(1)
         dut.io.data_valid_i.poke(true.B)
         dut.clock.step(1)
-        dut.io.start_do_i.poke(true.B)
         dut.io.data_valid_o.poke(true.B)
         dut.clock.step(3)
         dut.io.data_valid_i.poke(false.B)

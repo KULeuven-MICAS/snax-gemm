@@ -63,7 +63,6 @@ class BlockGemmController extends Module {
   val gemm_done = WireInit(false.B)
 
   // State declaration
-  // sREAD_DONE state means all the read requests are sent, Gemm only waits for the responds
   val sIDLE :: sREAD :: sREAD_DONE :: Nil = Enum(3)
   val cstate = RegInit(sIDLE)
   val nstate = WireInit(sIDLE)
@@ -121,18 +120,14 @@ class BlockGemmController extends Module {
   }
 
   // Read counter increment according to the start_do and io.data_valid_i
-  when(start_do) {
+  when(io.gemm_read_valid_o && io.busy_o) {
     read_counter := read_counter + 1.U
-  }.elsewhen(read_counter === M * N * K) {
-    read_counter := 0.U
-  }.elsewhen(io.data_valid_i && cstate === sREAD) {
-    read_counter := read_counter + 1.U
-  }.elsewhen(cstate === sIDLE) {
+  }.elsewhen(!io.busy_o) {
     read_counter := 0.U
   }
 
   // Write counter next increment according to the io.data_valid_o
-  when(io.data_valid_o) {
+  when(io.data_valid_o && io.busy_o) {
     write_counter_next := write_counter_next + 1.U
   }.elsewhen(cstate === sIDLE) {
     write_counter_next := 0.U
@@ -179,9 +174,7 @@ class BlockGemmController extends Module {
     (io.data_valid_i === 1.B) && accumulate_counter === K - 1.U && cstate =/= sIDLE
   ) {
     accumulate_counter := 0.U
-  }.elsewhen(
-    write_valid_counter === K - 1.U || cstate === sIDLE
-  ) {
+  }.elsewhen(cstate === sIDLE) {
     accumulate_counter := 0.U
   }
 
@@ -237,6 +230,7 @@ class BlockGemmIO extends Bundle {
 // read/write reqeust and related address
 class BlockGemm extends Module {
   lazy val io = IO(new BlockGemmIO())
+  io.suggestName("io")
 
   val gemm_array = Module(new GemmArray())
   lazy val controller = Module(new BlockGemmController())
