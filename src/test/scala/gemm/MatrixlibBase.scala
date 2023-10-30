@@ -3,7 +3,7 @@ package gemm
 import chisel3._
 import scala.math.BigInt
 
-// Scala math matrix multiplication libray for Gemm verification
+// Scala math matrix multiplication library for Gemm verification
 object MatrixLibBase {
   // This function generates two random data matrix. The size of matrix is (meshRow, tileSize) and (tileSize, meshCol)
   // The data type is signed integer 8 (which is Byte is Scala).
@@ -32,7 +32,7 @@ object MatrixLibBase {
     (random_matrix_A, random_matrix_B)
   }
 
-  // This fucntion prints the matrix with Byte data type
+  // This function prints the matrix with Byte data type
   def PrintMatrixByte_1D(
       meshRow: Int,
       meshCol: Int,
@@ -46,7 +46,7 @@ object MatrixLibBase {
     println("print 1D matrix over!")
   }
 
-  // This fucntion overrides the matrix print function with Int data type
+  // This function overrides the matrix print function with Int data type
   def PrintMatrixByte_1D(
       meshRow: Int,
       meshCol: Int,
@@ -71,7 +71,7 @@ object MatrixLibBase {
   //   f"$intValue%x".reverse.padTo(width, paddingChar).reverse
   // }
 
-  // Translate the Scala matrix to Scala BigInt for inputing the Scala matrix to big Chisel bus
+  // Translate the Scala matrix to Scala BigInt for inputting the Scala matrix to big Chisel bus
   // The matrix data type is Byte
   def Matrix2BigBuses(
       meshRow: Int,
@@ -85,8 +85,8 @@ object MatrixLibBase {
     var flattenedUInt_B = ""
     var intValue = 0
 
-    /* PrintMatrixByte_1D(GEMMConstant.meshCol,GEMMConstant.tileSize,B) */
-    /* PrintMatrixByte_1D(GEMMConstant.tileSize,GEMMConstant.meshCol,B_trans) */
+    /* PrintMatrixByte_1D(GemmConstant.meshCol,GemmConstant.tileSize,B) */
+    /* PrintMatrixByte_1D(GemmConstant.tileSize,GemmConstant.meshCol,B_trans) */
 
     for (i <- 0 until meshRow) {
       for (k <- 0 until tileSize) {
