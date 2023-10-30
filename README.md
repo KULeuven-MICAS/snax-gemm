@@ -9,7 +9,7 @@ The microarchitecture of the GEMM accelerator is shown below. The GEMM array has
 ![](./docs/microarch.png)
 
 ## Functional description
-<!-- This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Block GEMM. -->
+This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Stride GEMM.
 ### Base GEMM
 Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
 | Parameter | Meaning |
@@ -107,13 +107,71 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 | a_i | io_data_a_i | meshRow * tileSize * input | In | A big bus containing all the data elements of the input (sub-)matrix A |
 | b_i | io_data_b_i | tileSize * meshCol * input | In | A big bus containing all the data elements of the input (sub-)matrix B |
 | c_o | io_data_c_o | meshRow * meshCol * output | Out | A big bus containing all the data elements of the input (sub-)matrix C |
+
+
+### Batch Stride GEMM
+The Batch Stride GEMM is built with the Block GEMM. It takes in an extra Batch configuration (B) except for the M, K and N. It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
+
+#### Computation analysis
+Batch Stride GEMM does Batch number of the same size Block Gemm.
+The computation flow is shown as the following picture.
+
+![](./docs/batch_block_matrix_mul.png)
+
+The pseudocode is :
+```
+def deltasubA = dataWidthA * meshRow * tileSize / DataWidthPerAddr
+def deltasubB = dataWidthB * meshCol * tileSize / DataWidthPerAddr
+def deltasubC = dataWidthC * meshRow * meshCol / DataWidthPerAddr
+
+for (b = 0; b < B; b++) {
+  for (i = 0; i < M; i++) {
+    for (j = 0; j < N; j++) {
+      for (k = 0; k < K; k++) {
+        addr_a = start_addr_a + b * strideA + m * ldA + k * deltasubA
+        addr_b = start_addr_b + b * strideB + n * ldB + k * deltasubB
+        addr_c = start_addr_c + b * strideC + m * ldC + n * deltasubC
+        C[addr_c] = baseGemm(addr_a,addr_b)
+      }
+    }
+  }
+}
+```
+
+#### Data layout
+The data layout of Batch Stride GEMM is the same as Block GEMM except for there is another outmost dimension which is B.
+
+#### Programming model
+```
+<T>gemmStridedBatched(
+int M, int N, int K,
+const T* A, int ldA, int strideA, 
+const T* B, int ldB, int strideB, 
+const T* C, int ldC, int strideC,
+int B)
+```
+
+#### Ports
+Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra ports which is listed below.
+
+| Signals | Signal name in generated SV | Width | Dir | Description |
+| - | - | - | - | - |
+| B_i | io_ctrl_B_i | 8 | The Batch size setting |
+| ldA_i | io_ctrl_ldA_i | 8 | the address stride for sub-matrix in matrix A |
+| ldB_i | io_ctrl_ldB_i | 8 | the address stride for sub-matrix in matrix B |
+| ldC_i | io_ctrl_ldC_i | 8 | the address stride for sub-matrix in matrix C |
+| StrideA_i | io_ctrl_StrideA_i | 8 | the address stride for matrix A in different batch|
+| StrideB_i | io_ctrl_StrideB_i | 8 | the address stride for matrix B in different batch|
+| StrideC_i | io_ctrl_StrideC_i | 8 | the address stride for matrix C in different batch|
+
+
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
 The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. 
 Then these matrices and configurations are fed into the GEMM accelerator. 
 After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
 
-There is also a corner case test for Block Gemm to see if the Block Gemm works well in extreme configurations, such as `M == K == N == 1`.
+There is also a corner case test for Block Gemm and Batch Stride Gemm to see if the Block Gemm and Batch Stride Gemm works well in extreme configurations, such as `M == K == N == 1` for Block Gemm.
 
 In the current unit test, we only test the GEMM with input datatype as int8 and output data type as int32. The GEMM array size is also fixed.
 
