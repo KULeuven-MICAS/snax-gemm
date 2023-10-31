@@ -167,7 +167,7 @@ To better illustrate the meaning of the ldA, ldB, ldC, strideA, strideB, and str
 | b=0, m=0, k=0, n=1 | start address of A11  | start address of B12 (ptr_addr_b_i + ldB, ldB = the incremental address for a new block column of B) |  start address of C12  (ptr_addr_c_i + n * deltasubC, deltasubC = Address Increment of submatrix of C) |
 | b=0, m=0, k=1, n=1 | start address of A12(ptr_addr_a_i + k * deltasubA)  | start address of B12 (ptr_addr_b_i + ldB + deltasubB) |  start address of C12  (ptr_addr_c_i + n * deltasubC) |
 | ... | ... | ... | ... |
-| b=0, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
+| b=1, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
 | ... | ... | ... | ... |
 
 #### Data layout
@@ -196,6 +196,15 @@ Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra 
 | strideB_i | io_ctrl_strideB_i | 8 | the address stride for matrix B in different batch|
 | strideC_i | io_ctrl_strideC_i | 8 | the address stride for matrix C in different batch|
 
+### Batch Stride GEMM with multi-cycle output
+This module adds support for 8, 16 32 TCDM ports with 64 bits width for each TCDM ports. There is no functionality difference from software side.
+In hardware, the Gemm will stall the input and the computation until the output is finished.
+
+#### Ports
+Besides the ports already in Batch Stride GEMM, this module add another multi cycle output port.
+| Signals | Signal name in generated SV | Width | Dir | Description |
+| - | - | - | - | - |
+| multi_stage_c_o | io_data_multi_stage_c_o | TCDMWritePorts * GemmConstant.TCDMDataWidth | Out | multi cycle output port |
 
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
