@@ -110,7 +110,7 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 
 
 ### Batch Stride GEMM
-The Batch Stride GEMM is built with the Block GEMM. Basicaly, the Batch Stride GEMM does multiple block matrix multiplication. The The pseudocode is:
+The Batch Stride GEMM is built with the Block GEMM. Basically, the Batch Stride GEMM does multiple block matrix multiplication. The pseudocode is:
 ```
 for (b = 0; b < B; b++) {
   C[b] = A[b] * B[b] // Each is a blockGemm
