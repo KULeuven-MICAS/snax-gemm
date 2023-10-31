@@ -64,24 +64,6 @@ class BatchGemmController extends BlockGemmController {
     ldC := 0.U
   }
 
-  // Read counter increment according to the start_do, start_batch and io.data_valid_i
-  when(start_do || start_batch) {
-    read_counter := read_counter + 1.U
-  }.elsewhen(read_counter === M * N * K * B) {
-    read_counter := 0.U
-  }.elsewhen(io.data_valid_i && cstate === sREAD) {
-    read_counter := read_counter + 1.U
-  }.elsewhen(cstate === sIDLE) {
-    read_counter := 0.U
-  }
-
-  // Write counter next increment according to the io.data_valid_o
-  when(io.data_valid_o && write_counter_next =/= M * N * K * B) {
-    write_counter_next := write_counter_next + 1.U
-  }.elsewhen(cstate === sIDLE) {
-    write_counter_next := 0.U
-  }
-
   // Counters for generating the right addresses for block matrix multiplication
   // with the consideration of batch
   M_read_counter := (read_counter - Batch_read_counter * M * K * N) / (K * N)
@@ -110,7 +92,7 @@ class BatchGemmController extends BlockGemmController {
   io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
   io.accumulate_i := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
-  start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && cstate === sREAD
+  start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && (Batch_read_counter =/= B - 1.U) && cstate === sREAD
 
   io.busy_o := (cstate =/= sIDLE)
 
@@ -145,6 +127,7 @@ class BatchGemmIO extends BlockGemmIO {
 // read/write request and related address
 class BatchGemm extends BlockGemm {
   override lazy val io = IO(new BatchGemmIO())
+  io.suggestName("io")
 
   override lazy val controller = Module(new BatchGemmController())
 
