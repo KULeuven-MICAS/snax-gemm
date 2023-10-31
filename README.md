@@ -9,7 +9,7 @@ The microarchitecture of the GEMM accelerator is shown below. The GEMM array has
 ![](./docs/microarch.png)
 
 ## Functional description
-<!-- This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Block GEMM. -->
+This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Stride GEMM.
 ### Base GEMM
 Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
 | Parameter | Meaning |
@@ -107,13 +107,103 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 | a_i | io_data_a_i | meshRow * tileSize * input | In | A big bus containing all the data elements of the input (sub-)matrix A |
 | b_i | io_data_b_i | tileSize * meshCol * input | In | A big bus containing all the data elements of the input (sub-)matrix B |
 | c_o | io_data_c_o | meshRow * meshCol * output | Out | A big bus containing all the data elements of the input (sub-)matrix C |
+
+
+### Batch Stride GEMM
+The Batch Stride GEMM is built with the Block GEMM. Basically, the Batch Stride GEMM does multiple block matrix multiplication. The pseudocode is:
+```
+for (b = 0; b < B; b++) {
+  C[b] = A[b] * B[b] // Each is a blockGemm
+}
+``` 
+
+Besides  M, K and N It takes in an extra Batch configuration (B). It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
+
+The illustration of ldA, ldB, ldC, strideA, strideB, and strideC is listed below.
+
+| Stride configuration | Meaning |
+| - | -|
+| ldA | the incremental address for a new block row of A |
+| ldB | the incremental address for a new block column of B |
+| ldC | the incremental address for a new block row of C |
+|strideA | the incremental address of matrix A for each batch |
+|strideB | the incremental address of matrix B for each batch |
+|strideC | the incremental address of matrix C for each batch |
+
+#### Computation analysis
+Batch Stride GEMM does Batch number of the same size Block Gemm.
+The computation flow is shown as the following picture.
+
+![](./docs/batch_block_matrix_mul.png)
+
+The pseudocode is :
+```
+def deltasubA = dataWidthA * meshRow * tileSize / DataWidthPerAddr
+def deltasubB = dataWidthB * meshCol * tileSize / DataWidthPerAddr
+def deltasubC = dataWidthC * meshRow * meshCol / DataWidthPerAddr
+
+for (b = 0; b < B; b++) {
+  for (i = 0; i < M; i++) {
+    for (j = 0; j < N; j++) {
+      for (k = 0; k < K; k++) {
+        addr_a = start_addr_a + b * strideA + m * ldA + k * deltasubA
+        addr_b = start_addr_b + b * strideB + n * ldB + k * deltasubB
+        addr_c = start_addr_c + b * strideC + m * ldC + n * deltasubC
+        C[addr_c] = baseGemm(addr_a,addr_b)
+      }
+    }
+  }
+}
+```
+
+To better illustrate the meaning of the ldA, ldB, ldC, strideA, strideB, and strideC, an address table with an auxiliary picture is shown below.
+
+![](./docs/strides.png)
+
+| Computation process| Address of submatrix of A generation using strides | Address of submatrix of A generation using strides | Address of submatrix of A generation using strides | 
+| - | - | - | - | 
+| b=0, m=0, k=0, n=0 | start address of A11  | start address of B11  |  start address of C11 |
+| b=0, m=0, k=1, n=0 | start address of A12 (ptr_addr_a_i + k * deltasubA, deltasubA = Address Increment of submatrix of A)  | start address of B21 (ptr_addr_b_i + k * deltasubB, deltasubB = Address Increment of submatrix of B)   |  start address of C11 |
+| b=0, m=0, k=0, n=1 | start address of A11  | start address of B12 (ptr_addr_b_i + ldB, ldB = the incremental address for a new block column of B) |  start address of C12  (ptr_addr_c_i + n * deltasubC, deltasubC = Address Increment of submatrix of C) |
+| b=0, m=0, k=1, n=1 | start address of A12(ptr_addr_a_i + k * deltasubA)  | start address of B12 (ptr_addr_b_i + ldB + deltasubB) |  start address of C12  (ptr_addr_c_i + n * deltasubC) |
+| ... | ... | ... | ... |
+| b=0, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
+| ... | ... | ... | ... |
+
+#### Data layout
+The data layout of Batch Stride GEMM is the same as Block GEMM except for there is another outmost dimension which is B.
+
+#### Programming model
+```
+<T>gemmStridedBatched(
+int M, int N, int K,
+const T* A, int ldA, int strideA, 
+const T* B, int ldB, int strideB, 
+const T* C, int ldC, int strideC,
+int B)
+```
+
+#### Ports
+Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra ports which is listed below.
+
+| Signals | Signal name in generated SV | Width | Dir | Description |
+| - | - | - | - | - |
+| B_i | io_ctrl_B_i | 8 | The Batch size setting |
+| ldA_i | io_ctrl_ldA_i | 8 | the address stride for sub-matrix in matrix A |
+| ldB_i | io_ctrl_ldB_i | 8 | the address stride for sub-matrix in matrix B |
+| ldC_i | io_ctrl_ldC_i | 8 | the address stride for sub-matrix in matrix C |
+| strideA_i | io_ctrl_strideA_i | 8 | the address stride for matrix A in different batch|
+| strideB_i | io_ctrl_strideB_i | 8 | the address stride for matrix B in different batch|
+| strideC_i | io_ctrl_strideC_i | 8 | the address stride for matrix C in different batch|
+
+
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
 The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. 
 Then these matrices and configurations are fed into the GEMM accelerator. 
 After the computation, the output result of the GEMM accelerator will be compared with the golden model in Scala.
 
-There is also a corner case test for Block Gemm to see if the Block Gemm works well in extreme configurations, such as `M == K == N == 1`.
+There is also a corner case test for Block Gemm and Batch Stride Gemm to see if the Block Gemm and Batch Stride Gemm works well in extreme configurations, such as `M == K == N == 1` for Block Gemm.
 
 In the current unit test, we only test the GEMM with input datatype as int8 and output data type as int32. The GEMM array size is also fixed.
 
