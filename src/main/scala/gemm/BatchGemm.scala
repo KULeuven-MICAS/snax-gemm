@@ -10,9 +10,9 @@ class BatchGemmControllerIO extends BlockGemmControllerIO {
   val ldA_i = Input(UInt(8.W))
   val ldB_i = Input(UInt(8.W))
   val ldC_i = Input(UInt(8.W))
-  val StrideA_i = Input(UInt(8.W))
-  val StrideB_i = Input(UInt(8.W))
-  val StrideC_i = Input(UInt(8.W))
+  val strideA_i = Input(UInt(8.W))
+  val strideB_i = Input(UInt(8.W))
+  val strideC_i = Input(UInt(8.W))
 
 }
 
@@ -30,11 +30,11 @@ class BatchGemmController extends BlockGemmController {
   val ldB = RegInit(0.U(8.W))
   val ldC = RegInit(0.U(8.W))
 
-  val StrideA = RegInit(0.U(8.W))
-  val StrideB = RegInit(0.U(8.W))
-  val StrideC = RegInit(0.U(8.W))
+  val strideA = RegInit(0.U(8.W))
+  val strideB = RegInit(0.U(8.W))
+  val strideC = RegInit(0.U(8.W))
 
-  // // Counters for tracing the batch
+  // Counters for tracing the batch
   val Batch_read_counter = WireInit(0.U(8.W))
   val Batch_write_counter = WireInit(0.U(8.W))
 
@@ -48,17 +48,17 @@ class BatchGemmController extends BlockGemmController {
   // Store the configurations when io.start_do_i && !io.busy_o
   when(io.start_do_i && !io.busy_o) {
     B := io.B_i
-    StrideA := io.StrideA_i
-    StrideB := io.StrideB_i
-    StrideC := io.StrideC_i
+    strideA := io.strideA_i
+    strideB := io.strideB_i
+    strideC := io.strideC_i
     ldA := io.ldA_i
     ldB := io.ldB_i
     ldC := io.ldC_i
   }.elsewhen(cstate === sIDLE) {
     B := 0.U
-    StrideA := 0.U
-    StrideB := 0.U
-    StrideC := 0.U
+    strideA := 0.U
+    strideB := 0.U
+    strideC := 0.U
     ldA := 0.U
     ldB := 0.U
     ldC := 0.U
@@ -115,9 +115,9 @@ class BatchGemmController extends BlockGemmController {
   io.busy_o := (cstate =/= sIDLE)
 
   // Address generation
-  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * StrideA + M_read_counter * ldA + (GemmConstant.baseAddrIncrementA.U) * (K_read_counter)
-  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * StrideB + N_read_counter * ldB + (GemmConstant.baseAddrIncrementB.U) * (K_read_counter)
-  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * StrideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
+  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * strideA + M_read_counter * ldA + (GemmConstant.baseAddrIncrementA.U) * (K_read_counter)
+  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * strideB + N_read_counter * ldB + (GemmConstant.baseAddrIncrementB.U) * (K_read_counter)
+  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * strideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
 }
 
 // The BatchGemm's control port declaration.
@@ -128,9 +128,9 @@ class BatchGemmCtrlIO extends BlockGemmCtrlIO {
   val ldA_i = Input(UInt(8.W))
   val ldB_i = Input(UInt(8.W))
   val ldC_i = Input(UInt(8.W))
-  val StrideA_i = Input(UInt(8.W))
-  val StrideB_i = Input(UInt(8.W))
-  val StrideC_i = Input(UInt(8.W))
+  val strideA_i = Input(UInt(8.W))
+  val strideB_i = Input(UInt(8.W))
+  val strideC_i = Input(UInt(8.W))
 
 }
 
@@ -149,12 +149,13 @@ class BatchGemm extends BlockGemm {
   override lazy val controller = Module(new BatchGemmController())
 
   controller.io.B_i <> io.ctrl.B_i
+  
   controller.io.ldA_i <> io.ctrl.ldA_i
   controller.io.ldB_i <> io.ctrl.ldB_i
   controller.io.ldC_i <> io.ctrl.ldC_i
 
-  controller.io.StrideA_i <> io.ctrl.StrideA_i
-  controller.io.StrideB_i <> io.ctrl.StrideB_i
-  controller.io.StrideC_i <> io.ctrl.StrideC_i
+  controller.io.strideA_i <> io.ctrl.strideA_i
+  controller.io.strideB_i <> io.ctrl.strideB_i
+  controller.io.strideC_i <> io.ctrl.strideC_i
 
 }

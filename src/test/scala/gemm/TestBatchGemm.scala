@@ -207,9 +207,9 @@ trait AbstractBatchGemmtest {
     dut.io.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.ctrl.ldB_i.poke(ld_addr_B)
     dut.io.ctrl.ldC_i.poke(ld_addr_C)
-    dut.io.ctrl.StrideA_i.poke(stride_addr_A)
-    dut.io.ctrl.StrideB_i.poke(stride_addr_B)
-    dut.io.ctrl.StrideC_i.poke(stride_addr_C)
+    dut.io.ctrl.strideA_i.poke(stride_addr_A)
+    dut.io.ctrl.strideB_i.poke(stride_addr_B)
+    dut.io.ctrl.strideC_i.poke(stride_addr_C)
     dut.clock.step(1)
     dut.io.ctrl.start_do_i.poke(false.B)
 
@@ -398,9 +398,9 @@ class BatchGemmTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.io.ctrl.N_i.poke(2)
 
         dut.io.ctrl.B_i.poke(2)
-        dut.io.ctrl.StrideA_i.poke(1)
-        dut.io.ctrl.StrideB_i.poke(1)
-        dut.io.ctrl.StrideC_i.poke(1)
+        dut.io.ctrl.strideA_i.poke(1)
+        dut.io.ctrl.strideB_i.poke(1)
+        dut.io.ctrl.strideC_i.poke(1)
 
         dut.io.ctrl.ptr_addr_a_i.poke(2)
         dut.io.ctrl.ptr_addr_b_i.poke(3)
