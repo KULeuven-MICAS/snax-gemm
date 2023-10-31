@@ -167,7 +167,7 @@ trait AbstractBatchGemmtest {
       )
 
     // If the gemm_write_valid_o is asserted, take out the c_o data for check
-    def check_output() = {
+    def checkOutput() = {
       if (dut.io.ctrl.gemm_write_valid_o.peekBoolean()) {
         M_write_counter =
           (write_counter - current_write_batch * size_M * size_N) / size_N
@@ -261,7 +261,7 @@ trait AbstractBatchGemmtest {
         current_read_batch = current_read_batch + 1
       }
 
-      check_output()
+      checkOutput()
 
     }
 
@@ -269,7 +269,7 @@ trait AbstractBatchGemmtest {
     dut.io.ctrl.data_valid_i.poke(false.B)
 
     while (dut.io.ctrl.busy_o.peekBoolean()) {
-      check_output()
+      checkOutput()
       dut.clock.step(1)
     }
 
