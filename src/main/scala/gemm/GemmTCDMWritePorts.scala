@@ -116,12 +116,12 @@ class BatchGemmTCDMWritePortsIO(TCDMWritePorts: Int = 8) extends BatchGemmIO {
   override val data = new TCDMWritePortsDataIO(TCDMWritePorts)
 }
 
-// The Gemm with multiply cycle output port
+// The Gemm with multiple cycle output port
 // BatchGemmTCDMWritePortsMultiOutput inherits BatchGemmTCDMWritePorts
 class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
-    extends BatchGemmTCDMWritePorts (TCDMWritePorts){
-  
-  override lazy val io = noPrefix{ 
+    extends BatchGemmTCDMWritePorts(TCDMWritePorts) {
+
+  override lazy val io = noPrefix {
     IO(new BatchGemmTCDMWritePortsIO(TCDMWritePorts))
   }
 
@@ -171,7 +171,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
     controller.io.addr_c_o,
     addr_c + addrDelta.U
   )
-  
+
   io.ctrl.gemm_write_valid_o := controller.io.gemm_write_valid_o || output_valid_multi_stages
 
 }

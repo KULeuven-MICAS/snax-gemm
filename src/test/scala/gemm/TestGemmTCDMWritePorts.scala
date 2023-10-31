@@ -450,7 +450,7 @@ class BatchGemmTCDMWritePortsManualTest
         dut.io.ctrl.data_valid_i.poke(true.B)
         dut.clock.step(2)
         dut.io.ctrl.data_valid_i.poke(false.B)
-        dut.clock.step(2)
+        dut.clock.step(3)
         dut.io.ctrl.data_valid_i.poke(true.B)
         dut.clock.step(2)
         dut.io.ctrl.data_valid_i.poke(false.B)
@@ -469,7 +469,7 @@ class BatchGemmTCDMWritePortsManualTest
   }
 }
 
-// This is a manual test for the Gemm with multiply cycle output port
+// This is a manual test for the Gemm with multiple cycle output port
 // TODO: add random and automatic test for BatchGemmTCDMWritePortsMultiOutput
 class BatchGemmTCDMWritePortsMultiOutputManualTest
     extends AnyFlatSpec
