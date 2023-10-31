@@ -110,7 +110,14 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 
 
 ### Batch Stride GEMM
-The Batch Stride GEMM is built with the Block GEMM. Besides  M, K and N It takes in an extra Batch configuration (B). It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
+The Batch Stride GEMM is built with the Block GEMM. Basicaly, the Batch Stride GEMM does multiple block matrix multiplication. The The pseudocode is:
+```
+for (b = 0; b < B; b++) {
+  C[b] = A[b] * B[b] // Each is a blockGemm
+}
+``` 
+
+Besides  M, K and N It takes in an extra Batch configuration (B). It also takes in six extra strides configuration, eg., ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch. 
 
 The illustration of ldA, ldB, ldC, strideA, strideB, and strideC is listed below.
 
@@ -161,6 +168,7 @@ To better illustrate the meaning of the ldA, ldB, ldC, strideA, strideB, and str
 | b=0, m=0, k=1, n=1 | start address of A12(ptr_addr_a_i + k * deltasubA)  | start address of B12 (ptr_addr_b_i + ldB + deltasubB) |  start address of C12  (ptr_addr_c_i + n * deltasubC) |
 | ... | ... | ... | ... |
 | b=0, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
+| ... | ... | ... | ... |
 
 #### Data layout
 The data layout of Batch Stride GEMM is the same as Block GEMM except for there is another outmost dimension which is B.
