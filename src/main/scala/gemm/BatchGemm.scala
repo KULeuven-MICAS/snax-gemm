@@ -149,7 +149,7 @@ class BatchGemm extends BlockGemm {
   override lazy val controller = Module(new BatchGemmController())
 
   controller.io.B_i <> io.ctrl.B_i
-  
+
   controller.io.ldA_i <> io.ctrl.ldA_i
   controller.io.ldB_i <> io.ctrl.ldB_i
   controller.io.ldC_i <> io.ctrl.ldC_i
