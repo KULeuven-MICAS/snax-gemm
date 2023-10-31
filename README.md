@@ -196,6 +196,7 @@ Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra 
 | strideB_i | io_ctrl_strideB_i | 8 | the address stride for matrix B in different batch|
 | strideC_i | io_ctrl_strideC_i | 8 | the address stride for matrix C in different batch|
 
+
 ### Batch Stride GEMM with multi-cycle output
 This module adds support for 8, 16 32 TCDM ports with 64 bits width for each TCDM ports. There is no functionality difference from software side.
 In hardware, the Gemm will stall the input and the computation until the output is finished.
@@ -205,6 +206,7 @@ Besides the ports already in Batch Stride GEMM, this module add another multi cy
 | Signals | Signal name in generated SV | Width | Dir | Description |
 | - | - | - | - | - |
 | multi_stage_c_o | io_data_multi_stage_c_o | TCDMWritePorts * GemmConstant.TCDMDataWidth | Out | multi cycle output port |
+
 
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
