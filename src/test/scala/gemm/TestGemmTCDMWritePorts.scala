@@ -316,11 +316,10 @@ class GemmTestWrapperRandomTest
     with AbstractGemmTestWrapperBaseTest {
   "DUT" should "pass" in {
 
-    val GemmTestWrapperRandomTest_TestLoop = 2
     var TCDMWritePorts = 8
     val TCDMWritePortsCandidate = List(8, 16, 32)
 
-    for (i <- 0 until GemmTestWrapperRandomTest_TestLoop) {
+    for (i <- 0 until TestParameters.GemmTestWrapperRandomTest_TestLoop) {
 
       // For generating random TCDMWritePorts number
       val random = new Random
