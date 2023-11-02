@@ -6,13 +6,13 @@ import chisel3.util._
 // Detailed explanation of these ports can be found in the README.
 // BatchGemmControllerIO inherits from BlockGemmControllerIO
 class BatchGemmControllerIO extends BlockGemmControllerIO {
-  val B_i = Input(UInt(8.W))
-  val ldA_i = Input(UInt(8.W))
-  val ldB_i = Input(UInt(8.W))
-  val ldC_i = Input(UInt(8.W))
-  val strideA_i = Input(UInt(8.W))
-  val strideB_i = Input(UInt(8.W))
-  val strideC_i = Input(UInt(8.W))
+  val B_i = Input(UInt(GemmConstant.sizeConfigLen.W))
+  val ldA_i = Input(UInt(GemmConstant.addrLen.W))
+  val ldB_i = Input(UInt(GemmConstant.addrLen.W))
+  val ldC_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideA_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideB_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideC_i = Input(UInt(GemmConstant.addrLen.W))
 
 }
 
@@ -24,19 +24,19 @@ class BatchGemmController extends BlockGemmController {
   override lazy val io = IO(new BatchGemmControllerIO())
 
   // Registers to store the configurations
-  val B = RegInit(0.U(8.W))
+  val B = RegInit(0.U(GemmConstant.sizeConfigLen.W))
 
-  val ldA = RegInit(0.U(8.W))
-  val ldB = RegInit(0.U(8.W))
-  val ldC = RegInit(0.U(8.W))
+  val ldA = RegInit(0.U(GemmConstant.addrLen.W))
+  val ldB = RegInit(0.U(GemmConstant.addrLen.W))
+  val ldC = RegInit(0.U(GemmConstant.addrLen.W))
 
-  val strideA = RegInit(0.U(8.W))
-  val strideB = RegInit(0.U(8.W))
-  val strideC = RegInit(0.U(8.W))
+  val strideA = RegInit(0.U(GemmConstant.addrLen.W))
+  val strideB = RegInit(0.U(GemmConstant.addrLen.W))
+  val strideC = RegInit(0.U(GemmConstant.addrLen.W))
 
   // Counters for tracing the batch
-  val Batch_read_counter = WireInit(0.U(8.W))
-  val Batch_write_counter = WireInit(0.U(8.W))
+  val Batch_read_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
+  val Batch_write_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
 
   // Signal for start a new batch
   val start_batch = WireInit(false.B)
@@ -54,6 +54,7 @@ class BatchGemmController extends BlockGemmController {
     ldA := io.ldA_i
     ldB := io.ldB_i
     ldC := io.ldC_i
+    assert(io.B_i =/= 0.U, "B == 0, invalid configuration!")
   }.elsewhen(cstate === sIDLE) {
     B := 0.U
     strideA := 0.U
@@ -106,13 +107,13 @@ class BatchGemmController extends BlockGemmController {
 // Detailed explanation of these ports can be found in the README
 // BatchGemmCtrlIO inherits BlockGemmCtrlIO
 class BatchGemmCtrlIO extends BlockGemmCtrlIO {
-  val B_i = Input(UInt(8.W))
-  val ldA_i = Input(UInt(8.W))
-  val ldB_i = Input(UInt(8.W))
-  val ldC_i = Input(UInt(8.W))
-  val strideA_i = Input(UInt(8.W))
-  val strideB_i = Input(UInt(8.W))
-  val strideC_i = Input(UInt(8.W))
+  val B_i = Input(UInt(GemmConstant.sizeConfigLen.W))
+  val ldA_i = Input(UInt(GemmConstant.addrLen.W))
+  val ldB_i = Input(UInt(GemmConstant.addrLen.W))
+  val ldC_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideA_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideB_i = Input(UInt(GemmConstant.addrLen.W))
+  val strideC_i = Input(UInt(GemmConstant.addrLen.W))
 
 }
 

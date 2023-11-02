@@ -48,13 +48,13 @@ class BatchGemmTCDMWritePorts(TCDMWritePorts: Int = 8) extends BatchGemm {
   val stages = GemmConstant.idealTCDMWritePorts / TCDMWritePorts
 
   // signals and counters for generating stall signal
-  val K = RegInit(0.U(8.W))
+  val K = RegInit(0.U(GemmConstant.sizeConfigLen.W))
   val need_stall = stages.U > K
   // - 1.U as start_stall_counter also stalls on cycle
   val stall_cycle_num = stages.U - K - 1.U
   val stall = WireInit(false.B)
   val start_stall_counter = WireInit(false.B)
-  val stall_counter = RegInit(0.U(8.W))
+  val stall_counter = RegInit(0.U(GemmConstant.sizeConfigLen.W))
   val read_rsp_counter = RegInit(0.U(24.W))
 
   val output_reg = RegInit(
@@ -63,7 +63,7 @@ class BatchGemmTCDMWritePorts(TCDMWritePorts: Int = 8) extends BatchGemm {
   val output_counter = RegInit(0.U(log2Ceil(stages).W))
   val addr_c = RegInit(0.U(32.W))
 
-  K := Mux(io.ctrl.start_do_i, io.ctrl.K_i, K)
+  K := Mux(io.ctrl.start_do_i && !controller.io.busy_o, io.ctrl.K_i, K)
 
   // counting the read respond signal to decide when to stall
   when(read_rsp_counter =/= K && io.ctrl.data_valid_i === 1.B) {
@@ -169,9 +169,11 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   io.ctrl.addr_c_o := Mux(
     controller.io.gemm_write_valid_o,
     controller.io.addr_c_o,
-    addr_c + addrDelta.U
+    addr_c + addrDelta.U * output_counter
   )
 
   io.ctrl.gemm_write_valid_o := controller.io.gemm_write_valid_o || output_valid_multi_stages
-
+  io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
+  controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
+  
 }
