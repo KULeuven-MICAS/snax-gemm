@@ -61,7 +61,7 @@ class BatchGemmTCDMWritePorts(TCDMWritePorts: Int = 8) extends BatchGemm {
     0.U(((stages - 1) * TCDMWritePorts * GemmConstant.TCDMDataWidth).W)
   )
   val output_counter = RegInit(0.U(log2Ceil(stages).W))
-  val addr_c = RegInit(0.U(32.W))
+  val addr_c = RegInit(0.U(GemmConstant.addrLen.W))
 
   K := Mux(io.ctrl.start_do_i && !controller.io.busy_o, io.ctrl.K_i, K)
 
@@ -175,5 +175,5 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   io.ctrl.gemm_write_valid_o := controller.io.gemm_write_valid_o || output_valid_multi_stages
   io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
   controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
-  
+
 }

@@ -12,10 +12,10 @@ class GenDataValidAddrDelay extends Module {
   val io = IO(new Bundle {
     val data_valid_i = Input(Bool())
     val data_valid_o = Output(Bool())
-    val addr_a_i = Input(UInt(32.W))
-    val addr_b_i = Input(UInt(32.W))
-    val addr_a_o = Output(UInt(32.W))
-    val addr_b_o = Output(UInt(32.W))
+    val addr_a_i = Input(UInt(GemmConstant.addrLen.W))
+    val addr_b_i = Input(UInt(GemmConstant.addrLen.W))
+    val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
+    val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
   })
 
   val random = new Random
@@ -33,8 +33,8 @@ class GemmTestWrapper(TCDMWritePorts: Int) extends Module {
   val io = IO(new Bundle {
     val batch_gemm = new BatchGemmIO()
     val data_valid_i = Output(Bool())
-    val addr_a_o = Output(UInt(32.W))
-    val addr_b_o = Output(UInt(32.W))
+    val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
+    val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
   })
 
   val gemm = Module(new BatchGemmTCDMWritePorts(TCDMWritePorts))

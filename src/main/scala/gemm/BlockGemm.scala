@@ -11,16 +11,16 @@ class BlockGemmControllerIO extends Bundle {
   val data_valid_o = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val ptr_addr_a_i = Input(UInt(32.W))
-  val ptr_addr_b_i = Input(UInt(32.W))
-  val ptr_addr_c_i = Input(UInt(32.W))
+  val ptr_addr_a_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_b_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_c_i = Input(UInt(GemmConstant.addrLen.W))
 
   val gemm_read_valid_o = Output(Bool())
   val gemm_write_valid_o = Output(Bool())
 
-  val addr_a_o = Output(UInt(32.W))
-  val addr_b_o = Output(UInt(32.W))
-  val addr_c_o = Output(UInt(32.W))
+  val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_c_o = Output(UInt(GemmConstant.addrLen.W))
 
   val busy_o = Output(Bool())
   val accumulate_i = Output(Bool())
@@ -37,9 +37,9 @@ class BlockGemmController extends Module {
   val K = RegInit(0.U(GemmConstant.sizeConfigLen.W))
   val N = RegInit(0.U(GemmConstant.sizeConfigLen.W))
 
-  val ptr_addr_a = RegInit(0.U(32.W))
-  val ptr_addr_b = RegInit(0.U(32.W))
-  val ptr_addr_c = RegInit(0.U(32.W))
+  val ptr_addr_a = RegInit(0.U(GemmConstant.addrLen.W))
+  val ptr_addr_b = RegInit(0.U(GemmConstant.addrLen.W))
+  val ptr_addr_c = RegInit(0.U(GemmConstant.addrLen.W))
 
   // Counters for tracing the block matrix multiplication
   val read_counter = RegInit(0.U(24.W))
@@ -103,7 +103,10 @@ class BlockGemmController extends Module {
     ptr_addr_a := io.ptr_addr_a_i
     ptr_addr_b := io.ptr_addr_b_i
     ptr_addr_c := io.ptr_addr_c_i
-    assert(io.M_i =/= 0.U && io.K_i =/= 0.U && io.K_i =/= 0.U , " M == 0 or K ==0 or N == 0, invalid configuration!")
+    assert(
+      io.M_i =/= 0.U && io.K_i =/= 0.U && io.K_i =/= 0.U,
+      " M == 0 or K ==0 or N == 0, invalid configuration!"
+    )
   }.elsewhen(cstate === sIDLE) {
     M := 0.U
     N := 0.U
@@ -205,16 +208,16 @@ class BlockGemmCtrlIO extends Bundle {
   val start_do_i = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val ptr_addr_a_i = Input(UInt(32.W))
-  val ptr_addr_b_i = Input(UInt(32.W))
-  val ptr_addr_c_i = Input(UInt(32.W))
+  val ptr_addr_a_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_b_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_c_i = Input(UInt(GemmConstant.addrLen.W))
 
   val gemm_read_valid_o = Output(Bool())
   val gemm_write_valid_o = Output(Bool())
 
-  val addr_a_o = Output(UInt(32.W))
-  val addr_b_o = Output(UInt(32.W))
-  val addr_c_o = Output(UInt(32.W))
+  val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_c_o = Output(UInt(GemmConstant.addrLen.W))
 
   val busy_o = Output(Bool())
 }
