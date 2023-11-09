@@ -7,4 +7,4 @@ repos:
   rev: 1.0.1
   hooks:
   - id: scalafmt
-    args: [ -t ] # run in server mode on port 9090 and pass `--test` to scalafmt; alternatively you can place here other supported cmdline arguments
+    args: [ -t ] # pass `--test` to scalafmt; alternatively you can place here other supported cmdline arguments

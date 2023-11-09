@@ -4,23 +4,23 @@ import chisel3.util._
 
 // The BlockGemmControllerIO's port declaration. Detailed explanation of these ports can be found in the README
 class BlockGemmControllerIO extends Bundle {
-  val M_i = Input(UInt(GemmConstant.sizeConfigLen.W))
-  val K_i = Input(UInt(GemmConstant.sizeConfigLen.W))
-  val N_i = Input(UInt(GemmConstant.sizeConfigLen.W))
+  val M_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val K_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val N_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
   val start_do_i = Input(Bool())
   val data_valid_o = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val ptr_addr_a_i = Input(UInt(GemmConstant.addrLen.W))
-  val ptr_addr_b_i = Input(UInt(GemmConstant.addrLen.W))
-  val ptr_addr_c_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_a_i = Input(UInt(GemmConstant.addrWidth.W))
+  val ptr_addr_b_i = Input(UInt(GemmConstant.addrWidth.W))
+  val ptr_addr_c_i = Input(UInt(GemmConstant.addrWidth.W))
 
   val gemm_read_valid_o = Output(Bool())
   val gemm_write_valid_o = Output(Bool())
 
-  val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
-  val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
-  val addr_c_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_a_o = Output(UInt(GemmConstant.addrWidth.W))
+  val addr_b_o = Output(UInt(GemmConstant.addrWidth.W))
+  val addr_c_o = Output(UInt(GemmConstant.addrWidth.W))
 
   val busy_o = Output(Bool())
   val accumulate_i = Output(Bool())
@@ -33,13 +33,13 @@ class BlockGemmController extends Module {
   val start_do = RegInit(false.B)
 
   // Registers to store the configurations
-  val M = RegInit(0.U(GemmConstant.sizeConfigLen.W))
-  val K = RegInit(0.U(GemmConstant.sizeConfigLen.W))
-  val N = RegInit(0.U(GemmConstant.sizeConfigLen.W))
+  val M = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val K = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val N = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
 
-  val ptr_addr_a = RegInit(0.U(GemmConstant.addrLen.W))
-  val ptr_addr_b = RegInit(0.U(GemmConstant.addrLen.W))
-  val ptr_addr_c = RegInit(0.U(GemmConstant.addrLen.W))
+  val ptr_addr_a = RegInit(0.U(GemmConstant.addrWidth.W))
+  val ptr_addr_b = RegInit(0.U(GemmConstant.addrWidth.W))
+  val ptr_addr_c = RegInit(0.U(GemmConstant.addrWidth.W))
 
   // Counters for tracing the block matrix multiplication
   val read_counter = RegInit(0.U(24.W))
@@ -47,17 +47,17 @@ class BlockGemmController extends Module {
   val write_counter_next = RegInit(0.U(24.W))
 
   // Counters for generating the right addresses
-  val M_read_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
-  val N_read_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
-  val K_read_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
+  val M_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val N_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val K_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
 
-  val M_write_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
-  val N_write_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
-  val K_write_counter = WireInit(0.U(GemmConstant.sizeConfigLen.W))
+  val M_write_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val N_write_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val K_write_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
 
   // Counters for write valid and accumulate signal generation
-  val write_valid_counter = RegInit(0.U(GemmConstant.sizeConfigLen.W))
-  val accumulate_counter = RegInit(0.U(GemmConstant.sizeConfigLen.W))
+  val write_valid_counter = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val accumulate_counter = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
 
   val read_tcdm_done = WireInit(false.B)
   val gemm_done = WireInit(false.B)
@@ -201,23 +201,23 @@ class BlockGemmController extends Module {
 
 // The BlockGemm's control port declaration. Detailed explanation of these ports can be found in the README
 class BlockGemmCtrlIO extends Bundle {
-  val M_i = Input(UInt(GemmConstant.sizeConfigLen.W))
-  val K_i = Input(UInt(GemmConstant.sizeConfigLen.W))
-  val N_i = Input(UInt(GemmConstant.sizeConfigLen.W))
+  val M_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val K_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val N_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
 
   val start_do_i = Input(Bool())
   val data_valid_i = Input(Bool())
 
-  val ptr_addr_a_i = Input(UInt(GemmConstant.addrLen.W))
-  val ptr_addr_b_i = Input(UInt(GemmConstant.addrLen.W))
-  val ptr_addr_c_i = Input(UInt(GemmConstant.addrLen.W))
+  val ptr_addr_a_i = Input(UInt(GemmConstant.addrWidth.W))
+  val ptr_addr_b_i = Input(UInt(GemmConstant.addrWidth.W))
+  val ptr_addr_c_i = Input(UInt(GemmConstant.addrWidth.W))
 
   val gemm_read_valid_o = Output(Bool())
   val gemm_write_valid_o = Output(Bool())
 
-  val addr_a_o = Output(UInt(GemmConstant.addrLen.W))
-  val addr_b_o = Output(UInt(GemmConstant.addrLen.W))
-  val addr_c_o = Output(UInt(GemmConstant.addrLen.W))
+  val addr_a_o = Output(UInt(GemmConstant.addrWidth.W))
+  val addr_b_o = Output(UInt(GemmConstant.addrWidth.W))
+  val addr_c_o = Output(UInt(GemmConstant.addrWidth.W))
 
   val busy_o = Output(Bool())
 }

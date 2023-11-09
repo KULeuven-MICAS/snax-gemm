@@ -46,7 +46,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   // signals for indicating when to stall
   // stall after reading K matrix until writing current output is ready
   val stalled_by_write_reg = RegInit(false.B)
-  val K = RegInit(0.U(GemmConstant.sizeConfigLen.W))
+  val K = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
   val read_rsp_counter = RegInit(0.U(24.W))
   val start_stall_counter = WireInit(false.B)
 
@@ -65,11 +65,11 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   val output_reg = RegInit(
     0.U(((stages) * TCDMWritePorts * GemmConstant.TCDMDataWidth).W)
   )
-  val addr_c = RegInit(0.U(GemmConstant.addrLen.W))
+  val addr_c = RegInit(0.U(GemmConstant.addrWidth.W))
 
   // regs to store input matrix address fro keep sending request when waiting for the q_ready
-  val addr_a = RegInit(0.U(GemmConstant.addrLen.W))
-  val addr_b = RegInit(0.U(GemmConstant.addrLen.W))
+  val addr_a = RegInit(0.U(GemmConstant.addrWidth.W))
+  val addr_b = RegInit(0.U(GemmConstant.addrWidth.W))
 
   // for generating the address in multi cycle output
   def addrDelta =

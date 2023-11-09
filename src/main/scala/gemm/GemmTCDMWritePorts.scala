@@ -48,20 +48,20 @@ class BatchGemmTCDMWritePorts(TCDMWritePorts: Int = 8) extends BatchGemm {
   val stages = GemmConstant.idealTCDMWritePorts / TCDMWritePorts
 
   // signals and counters for generating stall signal
-  val K = RegInit(0.U(GemmConstant.sizeConfigLen.W))
+  val K = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
   val need_stall = stages.U > K
   // - 1.U as start_stall_counter also stalls on cycle
   val stall_cycle_num = stages.U - K - 1.U
   val stall = WireInit(false.B)
   val start_stall_counter = WireInit(false.B)
-  val stall_counter = RegInit(0.U(GemmConstant.sizeConfigLen.W))
+  val stall_counter = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
   val read_rsp_counter = RegInit(0.U(24.W))
 
   val output_reg = RegInit(
     0.U(((stages - 1) * TCDMWritePorts * GemmConstant.TCDMDataWidth).W)
   )
   val output_counter = RegInit(0.U(log2Ceil(stages).W))
-  val addr_c = RegInit(0.U(GemmConstant.addrLen.W))
+  val addr_c = RegInit(0.U(GemmConstant.addrWidth.W))
 
   K := Mux(io.ctrl.start_do_i && !controller.io.busy_o, io.ctrl.K_i, K)
 
