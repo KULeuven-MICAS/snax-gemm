@@ -59,7 +59,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   // signals for indicating output progress
   val output_counter = RegInit(0.U(log2Ceil(stages).W))
   // indicating if we are output result matrix
-  val output_state = RegInit(0.U(1.W)) 
+  val output_state = RegInit(0.U(1.W))
 
   // regs to store data and address when output in multi-cycle or waiting for q_ready
   val output_reg = RegInit(
@@ -160,7 +160,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
     addr_c + addrDelta.U * output_counter
   )
 
-  // not busy util all write finish 
+  // not busy util all write finish
   io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
   controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
 
