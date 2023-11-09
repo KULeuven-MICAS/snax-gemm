@@ -180,7 +180,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
     keep_write := 0.B
   }
 
-// giving output
+  // giving output
   io.ctrl.gemm_read_valid_o := controller.io.gemm_read_valid_o || keep_read
   io.ctrl.gemm_write_valid_o := controller.io.gemm_write_valid_o || output_valid_multi_stages || keep_write
   io.ctrl.addr_a_o := Mux(
