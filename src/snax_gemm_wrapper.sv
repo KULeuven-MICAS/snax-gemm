@@ -11,7 +11,6 @@
 
 import riscv_instr::*;
 import reqrsp_pkg::*;
-// `include "csr_def.svh"
 
 module snax_gemm # (
   parameter int unsigned DataWidth     = 64,
