@@ -35,8 +35,8 @@ class BatchGemmController extends BlockGemmController {
   val strideC = RegInit(0.U(GemmConstant.addrWidth.W))
 
   // Counters for tracing the batch
-  val batch_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
-  val batch_write_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val Batch_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val Batch_write_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
 
   // Signal for start a new batch
   val start_batch = WireInit(false.B)
@@ -67,40 +67,40 @@ class BatchGemmController extends BlockGemmController {
 
   // Counters for generating the right addresses for block matrix multiplication
   // with the consideration of batch
-  M_read_counter := (read_counter - batch_read_counter * M * K * N) / (K * N)
-  K_read_counter := ((read_counter - batch_read_counter * M * K * N) % (K * N)) % K
-  N_read_counter := ((read_counter - batch_read_counter * M * K * N) % (K * N)) / K
+  M_read_counter := (read_counter - Batch_read_counter * M * K * N) / (K * N)
+  K_read_counter := ((read_counter - Batch_read_counter * M * K * N) % (K * N)) % K
+  N_read_counter := ((read_counter - Batch_read_counter * M * K * N) % (K * N)) / K
 
-  M_write_counter := ((write_counter - batch_write_counter * M * K * N) / K) / N
-  K_write_counter := (write_counter - batch_write_counter * M * K * N) % K
-  N_write_counter := ((write_counter - batch_write_counter * M * K * N) / K) % N
+  M_write_counter := ((write_counter - Batch_write_counter * M * K * N) / K) / N
+  K_write_counter := (write_counter - Batch_write_counter * M * K * N) % K
+  N_write_counter := ((write_counter - Batch_write_counter * M * K * N) / K) % N
 
-  batch_read_counter := Mux(cstate =/= sIDLE, (read_counter) / (M * K * N), 0.U)
-  batch_write_counter := Mux(
+  Batch_read_counter := Mux(cstate =/= sIDLE, (read_counter) / (M * K * N), 0.U)
+  Batch_write_counter := Mux(
     cstate =/= sIDLE,
     (write_counter) / (M * K * N),
     0.U
   )
 
   // Intermediate or output control signals generation according to the counters
-  read_tcdm_done_once := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && (batch_read_counter =/= B - 1.U) && cstate =/= sIDLE && io.gemm_read_valid_o
-  read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && (batch_read_counter === B - 1.U) && cstate =/= sIDLE && io.gemm_read_valid_o
+  read_tcdm_done_once := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && (Batch_read_counter =/= B - 1.U) && cstate =/= sIDLE && io.gemm_read_valid_o
+  read_tcdm_done := (M_read_counter === (M - 1.U)) && (N_read_counter === (N - 1.U)) && (K_read_counter === (K - 1.U)) && (Batch_read_counter === B - 1.U) && cstate =/= sIDLE && io.gemm_read_valid_o
 
-  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && (batch_write_counter === B - 1.U) && cstate =/= sIDLE && io.gemm_write_valid_o
-  gemm_done_once := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && (batch_write_counter =/= B - 1.U) && cstate =/= sIDLE && io.gemm_write_valid_o
+  gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && (Batch_write_counter === B - 1.U) && cstate =/= sIDLE && io.gemm_write_valid_o
+  gemm_done_once := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && (Batch_write_counter =/= B - 1.U) && cstate =/= sIDLE && io.gemm_write_valid_o
 
   io.gemm_read_valid_o := (start_do === 1.B || start_batch === 1.B) || (io.data_valid_i && (cstate === sREAD))
   io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
   io.accumulate_i := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
-  start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && (batch_read_counter =/= B - 1.U) && cstate === sREAD
+  start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && (Batch_read_counter =/= B - 1.U) && cstate === sREAD
 
   io.busy_o := (cstate =/= sIDLE)
 
   // Address generation
-  io.addr_a_o := io.ptr_addr_a_i + batch_read_counter * strideA + M_read_counter * ldA + (GemmConstant.baseAddrIncrementA.U) * (K_read_counter)
-  io.addr_b_o := io.ptr_addr_b_i + batch_read_counter * strideB + N_read_counter * ldB + (GemmConstant.baseAddrIncrementB.U) * (K_read_counter)
-  io.addr_c_o := io.ptr_addr_c_i + batch_write_counter * strideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
+  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * strideA + M_read_counter * ldA + (GemmConstant.baseAddrIncrementA.U) * (K_read_counter)
+  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * strideB + N_read_counter * ldB + (GemmConstant.baseAddrIncrementB.U) * (K_read_counter)
+  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * strideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
 }
 
 // The BatchGemm's control port declaration.

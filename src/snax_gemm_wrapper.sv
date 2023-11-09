@@ -58,6 +58,9 @@ module snax_gemm # (
   localparam int unsigned InputMatrixSize  = DataWidth * InputTcdmPorts / 2;
   localparam int unsigned OutputMatrixSize = DataWidth * OutputTcdmPorts;          // x4 because of multiplication and addition considerations
 
+  localparam int unsigned AddrWidth = 32;
+  localparam int unsigned SizeConfigWidth = 8;
+
   // CSRs wires
   localparam int unsigned RegNum        = 11;
   localparam int unsigned CsrAddrOFfset = 32'h3c0;
@@ -84,26 +87,26 @@ module snax_gemm # (
   logic io_ctrl_write_mem_ready;
 
   // gemm matrix size configuration and address setting signals
-  logic [7:0] io_ctrl_B_i;
-  logic [7:0] io_ctrl_M_i;
-  logic [7:0] io_ctrl_K_i;
-  logic [7:0] io_ctrl_N_i;
+  logic [AddrWidth - 1:0] io_ctrl_B_i;
+  logic [AddrWidth - 1:0] io_ctrl_M_i;
+  logic [AddrWidth - 1:0] io_ctrl_K_i;
+  logic [AddrWidth - 1:0] io_ctrl_N_i;
 
-  logic [31:0] io_ctrl_ptr_addr_a_i;
-  logic [31:0] io_ctrl_ptr_addr_b_i;
-  logic [31:0] io_ctrl_ptr_addr_c_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_a_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_b_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_c_i;
 
-  logic [31:0] io_ctrl_ldA_i;
-  logic [31:0] io_ctrl_ldB_i;
-  logic [31:0] io_ctrl_ldC_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ldA_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ldB_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_ldC_i;
 
-  logic [31:0] io_ctrl_strideA_i;
-  logic [31:0] io_ctrl_strideB_i;
-  logic [31:0] io_ctrl_strideC_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_strideA_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_strideB_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_strideC_i;
 
-  logic [31:0] io_ctrl_addr_a_o;
-  logic [31:0] io_ctrl_addr_b_o;
-  logic [31:0] io_ctrl_addr_c_o;
+  logic [SizeConfigWidth - 1:0] io_ctrl_addr_a_o;
+  logic [SizeConfigWidth - 1:0] io_ctrl_addr_b_o;
+  logic [SizeConfigWidth - 1:0] io_ctrl_addr_c_o;
   
   // local input matrix buffer
   logic [ InputMatrixSize * 2 - 1:0] data_reg;  
