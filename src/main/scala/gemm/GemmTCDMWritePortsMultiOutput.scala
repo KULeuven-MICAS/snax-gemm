@@ -164,7 +164,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
   controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
 
-  // if not q_ready, keep sending read/write request
+  // below is for if not q_ready, keep sending read/write request
   read_fire := io.ctrl.gemm_read_valid_o && io.ctrl.read_mem_ready
   write_fire := io.ctrl.gemm_write_valid_o && io.ctrl.write_mem_ready
 
