@@ -195,3 +195,10 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
   )
 
 }
+
+object BatchGemmTCDMWritePortsMultiOutput extends App {
+  emitVerilog(
+    new (BatchGemmTCDMWritePortsMultiOutput),
+    Array("--target-dir", "generated/gemm")
+  )
+}

@@ -7,6 +7,9 @@ import chisel3.util._
 // BatchGemmControllerIO inherits from BlockGemmControllerIO
 class BatchGemmControllerIO extends BlockGemmControllerIO {
   val B_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val strideinnermostA_i = Input(UInt(GemmConstant.addrWidth.W))
+  val strideinnermostB_i = Input(UInt(GemmConstant.addrWidth.W))
+  val strideinnermostC_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldA_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldB_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldC_i = Input(UInt(GemmConstant.addrWidth.W))
@@ -25,6 +28,10 @@ class BatchGemmController extends BlockGemmController {
 
   // Registers to store the configurations
   val B = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+
+  val strideinnermostA_i = RegInit(0.U(GemmConstant.addrWidth.W))
+  val strideinnermostB_i = RegInit(0.U(GemmConstant.addrWidth.W))
+  val strideinnermostC_i = RegInit(0.U(GemmConstant.addrWidth.W))
 
   val ldA = RegInit(0.U(GemmConstant.addrWidth.W))
   val ldB = RegInit(0.U(GemmConstant.addrWidth.W))
@@ -54,6 +61,9 @@ class BatchGemmController extends BlockGemmController {
     ldA := io.ldA_i
     ldB := io.ldB_i
     ldC := io.ldC_i
+    strideinnermostA_i := io.strideinnermostA_i
+    strideinnermostB_i := io.strideinnermostB_i
+    strideinnermostC_i := io.strideinnermostC_i
     assert(io.B_i =/= 0.U, "B == 0, invalid configuration!")
   }.elsewhen(cstate === sIDLE) {
     B := 0.U
@@ -63,6 +73,9 @@ class BatchGemmController extends BlockGemmController {
     ldA := 0.U
     ldB := 0.U
     ldC := 0.U
+    strideinnermostA_i := 0.U
+    strideinnermostB_i := 0.U
+    strideinnermostC_i := 0.U
   }
 
   // Counters for generating the right addresses for block matrix multiplication
@@ -98,9 +111,9 @@ class BatchGemmController extends BlockGemmController {
   io.busy_o := (cstate =/= sIDLE)
 
   // Address generation
-  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * strideA + M_read_counter * ldA + (GemmConstant.baseAddrIncrementA.U) * (K_read_counter)
-  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * strideB + N_read_counter * ldB + (GemmConstant.baseAddrIncrementB.U) * (K_read_counter)
-  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * strideC + M_write_counter * ldC + (GemmConstant.baseAddrIncrementC.U) * (N_write_counter)
+  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * strideA + M_read_counter * ldA + strideinnermostA_i * (K_read_counter)
+  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * strideB + N_read_counter * ldB + strideinnermostB_i * (K_read_counter)
+  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * strideC + M_write_counter * ldC + strideinnermostC_i * (N_write_counter)
 }
 
 // The BatchGemm's control port declaration.
@@ -108,6 +121,9 @@ class BatchGemmController extends BlockGemmController {
 // BatchGemmCtrlIO inherits BlockGemmCtrlIO
 class BatchGemmCtrlIO extends BlockGemmCtrlIO {
   val B_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val strideinnermostA_i = Input(UInt(GemmConstant.addrWidth.W))
+  val strideinnermostB_i = Input(UInt(GemmConstant.addrWidth.W))
+  val strideinnermostC_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldA_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldB_i = Input(UInt(GemmConstant.addrWidth.W))
   val ldC_i = Input(UInt(GemmConstant.addrWidth.W))
@@ -142,4 +158,14 @@ class BatchGemm extends BlockGemm {
   controller.io.strideB_i <> io.ctrl.strideB_i
   controller.io.strideC_i <> io.ctrl.strideC_i
 
+  controller.io.strideinnermostA_i <> io.ctrl.strideinnermostA_i
+  controller.io.strideinnermostB_i <> io.ctrl.strideinnermostB_i
+  controller.io.strideinnermostC_i <> io.ctrl.strideinnermostC_i
+}
+
+object BatchGemm extends App {
+  emitVerilog(
+    new (BatchGemm),
+    Array("--target-dir", "generated/gemm")
+  )
 }

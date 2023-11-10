@@ -104,3 +104,10 @@ class BatchGemmTCDMWritePorts(TCDMWritePorts: Int = 8) extends BatchGemm {
   controller.io.stalled_by_write := stalled_by_write
 
 }
+
+object BatchGemmTCDMWritePorts extends App {
+  emitVerilog(
+    new (BatchGemmTCDMWritePorts),
+    Array("--target-dir", "generated/gemm")
+  )
+}

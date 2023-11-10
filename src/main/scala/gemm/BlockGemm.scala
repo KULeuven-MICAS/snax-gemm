@@ -262,3 +262,10 @@ class BlockGemm extends Module {
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
   gemm_array.io.accumulate_i := controller.io.accumulate_i
 }
+
+object BlockGemm extends App {
+  emitVerilog(
+    new (BlockGemm),
+    Array("--target-dir", "generated/gemm")
+  )
+}
