@@ -78,7 +78,7 @@ trait AbstractGemmTestWrapperBaseTest {
     var N_read_counter = 0
     var K_read_counter = 0
 
-    println("start batch gemm", size_Batch, size_M, size_K, size_N)
+    // println("start batch gemm", size_Batch, size_M, size_K, size_N)
 
     // Randomly generation of input matrices
     val (matrix_A, matrix_B) =
@@ -109,6 +109,9 @@ trait AbstractGemmTestWrapperBaseTest {
     val (ld_addr_A, ld_addr_B, ld_addr_C) = MatrixLibBlock.GenRandSizeTest()
     val (stride_addr_A, stride_addr_B, stride_addr_C) =
       MatrixLibBlock.GenRandSizeTest()
+    val strideinnermostA_i = GemmConstant.baseAddrIncrementA
+    val strideinnermostB_i = GemmConstant.baseAddrIncrementB
+    val strideinnermostC_i = GemmConstant.baseAddrIncrementC
     // println(split_matrix_A.size, split_matrix_B.size)
 
     // Generation of golden result in Scala
@@ -137,8 +140,8 @@ trait AbstractGemmTestWrapperBaseTest {
 
         split_matrix_C(current_write_batch)(addr_slide_C.toInt) =
           dut.io.batch_gemm.data.c_o.peekInt()
-        println(M_write_counter, N_write_counter)
-        println("write", current_write_batch, write_counter, addr_slide_C)
+        // println(M_write_counter, N_write_counter)
+        // println("write", current_write_batch, write_counter, addr_slide_C)
 
         // Update write counters
         write_counter = write_counter + 1
@@ -163,6 +166,10 @@ trait AbstractGemmTestWrapperBaseTest {
     dut.io.batch_gemm.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.batch_gemm.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
+    dut.io.batch_gemm.ctrl.strideinnermostA_i.poke(strideinnermostA_i)
+    dut.io.batch_gemm.ctrl.strideinnermostB_i.poke(strideinnermostB_i)
+    dut.io.batch_gemm.ctrl.strideinnermostC_i.poke(strideinnermostC_i)
+
     dut.io.batch_gemm.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.batch_gemm.ctrl.ldB_i.poke(ld_addr_B)
     dut.io.batch_gemm.ctrl.ldC_i.poke(ld_addr_C)
@@ -186,13 +193,13 @@ trait AbstractGemmTestWrapperBaseTest {
         N_read_counter =
           ((read_counter - current_read_batch * size_M * size_K * size_N) % (size_N * size_K)) / size_K
 
-        println(
-          read_counter,
-          current_read_batch,
-          M_read_counter,
-          K_read_counter,
-          N_read_counter
-        )
+        // println(
+        //   read_counter,
+        //   current_read_batch,
+        //   M_read_counter,
+        //   K_read_counter,
+        //   N_read_counter
+        // )
 
         val addr_slide_A = M_read_counter * size_K + K_read_counter
         val addr_slide_B = N_read_counter * size_K + K_read_counter
@@ -209,7 +216,7 @@ trait AbstractGemmTestWrapperBaseTest {
         )
 
         // Give the right a_i and b_i data according to the address
-        println("read", addr_slide_A, addr_slide_B)
+        // println("read", addr_slide_A, addr_slide_B)
         dut.io.batch_gemm.data.a_i
           .poke(split_matrix_A(current_read_batch)(addr_slide_A.toInt))
         dut.io.batch_gemm.data.b_i
