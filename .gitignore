@@ -1,0 +1,14 @@
+/project/project/
+/project/target/
+/target/
+/project/
+/generated/
+/test_run_dir/
+/.metals/
+/.vscode/
+.bloop/
+.bsp/
+.github/workflows/.bsp/
+.github/workflows/project/
+.github/workflows/target/
+*.txt

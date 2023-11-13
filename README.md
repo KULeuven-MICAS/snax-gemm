@@ -167,7 +167,7 @@ To better illustrate the meaning of the ldA, ldB, ldC, strideA, strideB, and str
 | b=0, m=0, k=0, n=1 | start address of A11  | start address of B12 (ptr_addr_b_i + ldB, ldB = the incremental address for a new block column of B) |  start address of C12  (ptr_addr_c_i + n * deltasubC, deltasubC = Address Increment of submatrix of C) |
 | b=0, m=0, k=1, n=1 | start address of A12(ptr_addr_a_i + k * deltasubA)  | start address of B12 (ptr_addr_b_i + ldB + deltasubB) |  start address of C12  (ptr_addr_c_i + n * deltasubC) |
 | ... | ... | ... | ... |
-| b=0, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
+| b=1, m=0, k=0, n=0 | start address of A11' for batch 1 (ptr_addr_a_i + stride_A, stride_A = the incremental address of matrix A for each batch) | start address of B11' for batch 1 (ptr_addr_b_i + stride_B, stride_B = the incremental address of matrix B for each batch) |  start address of C11' for batch 1 (ptr_addr_c_i + stride_C, stride_C = the incremental address of matrix C for each batch)|
 | ... | ... | ... | ... |
 
 #### Data layout
@@ -197,6 +197,17 @@ Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra 
 | strideC_i | io_ctrl_strideC_i | 8 | the address stride for matrix C in different batch|
 
 
+### Batch Stride GEMM with multi-cycle output
+This module adds support for 8, 16 32 TCDM ports with 64 bits width for each TCDM ports. There is no functionality difference from software side.
+In hardware, the Gemm will stall the input and the computation until the output is finished.
+
+#### Ports
+Besides the ports already in Batch Stride GEMM, this module add another multi cycle output port.
+| Signals | Signal name in generated SV | Width | Dir | Description |
+| - | - | - | - | - |
+| multi_stage_c_o | io_data_multi_stage_c_o | TCDMWritePorts * GemmConstant.TCDMDataWidth | Out | multi cycle output port |
+
+
 ## Unit test
 This repository also contains some unit tests for each version of GEMM. 
 The unit tests are also written in Chisel. Firstly, random input matrices and random size configurations are generated. 
@@ -209,29 +220,38 @@ In the current unit test, we only test the GEMM with input datatype as int8 and 
 
 ## Quickstart
 Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
-### Install Java
+### Set up Chisel environment
+Run following script: 
 ```
-sudo apt install openjdk-11-jre-headless
-sudo apt install openjdk-11-jdk-headless
+./install.sh
 ```
-
-### Install Sbt
-```
-echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
-sudo apt-get update
-sudo apt-get install sbt
-```
-
-### Install Firtool
-* Download the Firtool from https://github.com/llvm/circt/releases/tag/firtool-1.42.0 and unzip it. The version is 1.42.0.
-* Add the bin of Firtool to the PATH
 
 ## Run tests
-To run the Gemm accelerator tests, use:
+To run all the Gemm accelerator tests, use:
 ```
 sbt test
+```
+
+To run specific test, use:
+```
+sbt "testOnly gemm.${chisel_test_name}"
+```
+where `chisel_test_name` is the class name of the specific test. For instance, use:
+```
+sbt "testOnly gemm.GemmArrayRandomTest"
+```
+to only run the random data and random matrix size test for Base Gemm.
+
+Note: run the test for the Chisel module also generate the corresponding system verilog file to test if the system verilog file can be generated correctly.
+
+## Generate System Verilog file
+To generate the corresponding system verilog file for specific Chisel module, use:
+```
+sbt "runMain gemm.${chisel_module_name}"
+```
+For instance, to generate the system verilog file for Base Gemm, use:
+```
+sbt "runMain gemm.GemmArray"
 ```
 
 ## Acknowledgement

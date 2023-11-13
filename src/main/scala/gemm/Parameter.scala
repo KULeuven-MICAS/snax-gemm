@@ -13,6 +13,9 @@ object GemmConstant {
   def meshRow = 8
   def meshCol = 8
 
+  def addrWidth = 32
+  def sizeConfigWidth = 8
+
   def dataWidthPerAddr = 8
   def baseAddrIncrementA =
     dataWidthA * meshRow * tileSize / dataWidthPerAddr
@@ -21,7 +24,8 @@ object GemmConstant {
   def baseAddrIncrementC =
     dataWidthC * meshRow * meshCol / dataWidthPerAddr
 
-  def TCDMWritePorts = 8.U
-  def idealTCDMWritePorts = 32.U
+  def TCDMWritePorts = 8
+  def idealTCDMWritePorts = 32
+  def TCDMDataWidth = 64
 
 }

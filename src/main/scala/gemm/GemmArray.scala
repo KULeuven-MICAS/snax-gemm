@@ -207,3 +207,10 @@ class GemmArray extends Module {
   mesh.io.control_i.accumulate_i := io.accumulate_i
   io.data_valid_o := mesh.io.data_valid_o
 }
+
+object GemmArray extends App {
+  emitVerilog(
+    new (GemmArray),
+    Array("--target-dir", "generated/gemm")
+  )
+}
