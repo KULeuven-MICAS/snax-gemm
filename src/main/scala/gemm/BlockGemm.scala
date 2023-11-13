@@ -240,6 +240,13 @@ class BlockGemm extends Module {
   val gemm_array = Module(new GemmArray())
   lazy val controller = Module(new BlockGemmController())
 
+  val gemm_write_ready_o = WireInit(false.B)
+  val keep_gemm_write_valid_o = RegInit(false.B)
+  val gemm_write_valid_o =
+    (controller.io.gemm_write_valid_o || keep_gemm_write_valid_o)
+  keep_gemm_write_valid_o := gemm_write_valid_o && !gemm_write_ready_o
+  gemm_write_ready_o := 1.B
+
   controller.io.M_i <> io.ctrl.M_i
   controller.io.K_i <> io.ctrl.K_i
   controller.io.N_i <> io.ctrl.N_i
@@ -249,7 +256,7 @@ class BlockGemm extends Module {
   controller.io.ptr_addr_b_i <> io.ctrl.ptr_addr_b_i
   controller.io.ptr_addr_c_i <> io.ctrl.ptr_addr_c_i
   controller.io.gemm_read_valid_o <> io.ctrl.gemm_read_valid_o
-  controller.io.gemm_write_valid_o <> io.ctrl.gemm_write_valid_o
+  io.ctrl.gemm_write_valid_o := gemm_write_valid_o
   controller.io.addr_a_o <> io.ctrl.addr_a_o
   controller.io.addr_b_o <> io.ctrl.addr_b_o
   controller.io.addr_c_o <> io.ctrl.addr_c_o
@@ -263,6 +270,7 @@ class BlockGemm extends Module {
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
   gemm_array.io.accumulate_i := controller.io.accumulate_i
+  gemm_array.io.data_ready_o := 1.B
 }
 
 object BlockGemm extends App {
