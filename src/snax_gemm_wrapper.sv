@@ -36,21 +36,27 @@ module snax_gemm # (
 );
 
   // CSR addresses setting
-  localparam int unsigned Address_A_CSR = 32'h3c0;
-  localparam int unsigned Address_B_CSR = 32'h3c1;
-  localparam int unsigned Address_C_CSR = 32'h3c2;
+  localparam int unsigned B_M_K_N_CSR = 32'h3c0;
 
-  localparam int unsigned B_M_K_N_CSR = 32'h3c3;
+  localparam int unsigned Address_A_CSR = 32'h3c1;
+  localparam int unsigned Address_B_CSR = 32'h3c2;
+  localparam int unsigned Address_C_CSR = 32'h3c3;
 
-  localparam int unsigned ldA_CSR = 32'h3c4;
-  localparam int unsigned ldB_CSR = 32'h3c5;
-  localparam int unsigned ldC_CSR = 32'h3c6;
+  localparam int unsigned StrideInnermostA_CSR = 32'h3c4;
+  localparam int unsigned StrideInnermostB_CSR = 32'h3c5;
+  localparam int unsigned StrideInnermostC_CSR = 32'h3c6;
 
-  localparam int unsigned StrideA_CSR = 32'h3c7;
-  localparam int unsigned StrideB_CSR = 32'h3c8;
-  localparam int unsigned StrideC_CSR = 32'h3c9;
+  localparam int unsigned ldA_CSR = 32'h3c7;
+  localparam int unsigned ldB_CSR = 32'h3c8;
+  localparam int unsigned ldC_CSR = 32'h3c9;
 
-  localparam int unsigned STATE_CSR = 32'h3ca;
+  localparam int unsigned StrideA_CSR = 32'h3ca;
+  localparam int unsigned StrideB_CSR = 32'h3cb;
+  localparam int unsigned StrideC_CSR = 32'h3cc;
+
+  localparam int unsigned PERF_COUNTER_CSR = 32'h3cd;
+
+  localparam int unsigned STATE_CSR = 32'h3ce;
 
   // Local parameters for input and output sizes
   localparam int unsigned InputTcdmPorts = 16;
@@ -62,7 +68,7 @@ module snax_gemm # (
   localparam int unsigned SizeConfigWidth = 8;
 
   // CSRs wires
-  localparam int unsigned RegNum        = 11;
+  localparam int unsigned RegNum        = 15;
   localparam int unsigned CsrAddrOFfset = 32'h3c0;
 
   logic [31:0] CSRs [RegNum];
@@ -70,6 +76,10 @@ module snax_gemm # (
 
   logic write_csr;
   logic read_csr;
+  logic gemm_state;
+  logic gemm_busy2idle;
+  logic gemm_idle2busy;
+  logic write_state_csr;
 
   // Gemm wires
   // gemm data ports
@@ -85,28 +95,33 @@ module snax_gemm # (
   logic io_ctrl_busy_o;
   logic io_ctrl_read_mem_ready;
   logic io_ctrl_write_mem_ready;
-
+  logic [31:0] io_ctrl_perf_counter;
+  
   // gemm matrix size configuration and address setting signals
-  logic [AddrWidth - 1:0] io_ctrl_B_i;
-  logic [AddrWidth - 1:0] io_ctrl_M_i;
-  logic [AddrWidth - 1:0] io_ctrl_K_i;
-  logic [AddrWidth - 1:0] io_ctrl_N_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_B_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_M_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_K_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_N_i;
 
-  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_a_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_b_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_ptr_addr_c_i;
+  logic [AddrWidth - 1:0] io_ctrl_ptr_addr_a_i;
+  logic [AddrWidth - 1:0] io_ctrl_ptr_addr_b_i;
+  logic [AddrWidth - 1:0] io_ctrl_ptr_addr_c_i;
 
-  logic [SizeConfigWidth - 1:0] io_ctrl_ldA_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_ldB_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_ldC_i;
+  logic [AddrWidth - 1:0] io_ctrl_strideinnermostA_i;
+  logic [AddrWidth - 1:0] io_ctrl_strideinnermostB_i;
+  logic [AddrWidth - 1:0] io_ctrl_strideinnermostC_i;
 
-  logic [SizeConfigWidth - 1:0] io_ctrl_strideA_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_strideB_i;
-  logic [SizeConfigWidth - 1:0] io_ctrl_strideC_i;
+  logic [AddrWidth - 1:0] io_ctrl_ldA_i;
+  logic [AddrWidth - 1:0] io_ctrl_ldB_i;
+  logic [AddrWidth - 1:0] io_ctrl_ldC_i;
 
-  logic [SizeConfigWidth - 1:0] io_ctrl_addr_a_o;
-  logic [SizeConfigWidth - 1:0] io_ctrl_addr_b_o;
-  logic [SizeConfigWidth - 1:0] io_ctrl_addr_c_o;
+  logic [AddrWidth - 1:0] io_ctrl_strideA_i;
+  logic [AddrWidth - 1:0] io_ctrl_strideB_i;
+  logic [AddrWidth - 1:0] io_ctrl_strideC_i;
+
+  logic [AddrWidth - 1:0] io_ctrl_addr_a_o;
+  logic [AddrWidth - 1:0] io_ctrl_addr_b_o;
+  logic [AddrWidth - 1:0] io_ctrl_addr_c_o;
   
   // local input matrix buffer
   logic [ InputMatrixSize * 2 - 1:0] data_reg;  
@@ -132,24 +147,23 @@ module snax_gemm # (
       for (int i=0; i < RegNum - 1; i++) begin
         CSRs[i] <= 32'd0;
       end     
-      CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd1;
+      CSRs[STATE_CSR - CsrAddrOFfset] <= 32'b10;
     end else begin
-      // if gemm is busy, no CSR settings
-      if(write_csr == 1'b1 && io_ctrl_busy_o != 1'b1) begin
+      // if changing gemm state, no state CSR settings
+      if (gemm_idle2busy == 1'b1) begin
+        CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd0;          
+      end        
+      else if (gemm_busy2idle == 1'b1) begin
+        CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd1;
+      end
+      if(write_csr == 1'b1 && snax_qready_o) begin
         CSRs[csr_addr] <= snax_req_i.data_arga[31:0];
       end 
-      else begin
-        if (io_ctrl_busy_o == 1'b1) begin
-          CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd0;          
-        end        
-        else if (io_ctrl_busy_o == 1'b0) begin
-          CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd1;
-        end
-      end
     end
   end
 
   // Read CSRs
+  // TODO: add check for snax_pready_i
   always_comb begin
     if (!rst_ni) begin
         snax_resp_o.data  = 0;
@@ -173,6 +187,18 @@ module snax_gemm # (
   end
 
   // Read or write control logic
+  always_ff @ (posedge clk_i or negedge rst_ni)  begin
+    if (!rst_ni) begin
+      gemm_state <= 1'b0;
+    end else begin
+      gemm_state <= io_ctrl_busy_o;
+    end
+  end
+
+  assign gemm_busy2idle = gemm_state == 1'b1 && io_ctrl_busy_o == 1'b0;
+  assign gemm_idle2busy = gemm_state == 1'b0 && io_ctrl_busy_o == 1'b1;
+  assign write_state_csr = gemm_state != io_ctrl_busy_o;
+
   always_comb begin
     if (!rst_ni) begin
       read_csr = 1'b0;
@@ -196,8 +222,8 @@ module snax_gemm # (
     end
   end
 
-  // when gemm is not busy, ready for CSR settings
-  assign snax_qready_o = io_ctrl_busy_o != 1'b1;
+  // when writing state csr and attempt accessing state csr, not ready for CSR settings
+  assign snax_qready_o = !(write_state_csr == 1'b1 && csr_addr == STATE_CSR - CsrAddrOFfset && write_csr);
   assign csr_addr = snax_req_i.data_argb - CsrAddrOFfset;
 
   // configuration of gemm
@@ -209,6 +235,10 @@ module snax_gemm # (
   assign io_ctrl_ptr_addr_a_i = CSRs[Address_A_CSR - CsrAddrOFfset];
   assign io_ctrl_ptr_addr_b_i = CSRs[Address_B_CSR - CsrAddrOFfset];
   assign io_ctrl_ptr_addr_c_i = CSRs[Address_C_CSR - CsrAddrOFfset];
+
+  assign io_ctrl_strideinnermostA_i = CSRs[StrideInnermostA_CSR - CsrAddrOFfset];
+  assign io_ctrl_strideinnermostB_i = CSRs[StrideInnermostB_CSR - CsrAddrOFfset];
+  assign io_ctrl_strideinnermostC_i = CSRs[StrideInnermostC_CSR - CsrAddrOFfset];
 
   assign io_ctrl_ldA_i = CSRs[ldA_CSR - CsrAddrOFfset];
   assign io_ctrl_ldB_i = CSRs[ldB_CSR - CsrAddrOFfset];
@@ -231,6 +261,9 @@ module snax_gemm # (
     .io_ctrl_ptr_addr_b_i(io_ctrl_ptr_addr_b_i),
     .io_ctrl_ptr_addr_c_i(io_ctrl_ptr_addr_c_i),
     .io_ctrl_B_i(io_ctrl_B_i),
+    .io_ctrl_strideinnermostA_i(io_ctrl_strideinnermostA_i),
+    .io_ctrl_strideinnermostB_i(io_ctrl_strideinnermostB_i),
+    .io_ctrl_strideinnermostC_i(io_ctrl_strideinnermostC_i),    
     .io_ctrl_ldA_i(io_ctrl_ldA_i),
     .io_ctrl_ldB_i(io_ctrl_ldB_i),
     .io_ctrl_ldC_i(io_ctrl_ldC_i),
@@ -248,7 +281,8 @@ module snax_gemm # (
     .io_ctrl_addr_c_o(io_ctrl_addr_c_o),
     .io_ctrl_busy_o(io_ctrl_busy_o),
     .io_data_c_o(),
-    .io_data_multi_stage_c_o(io_data_multi_stage_c_o)
+    .io_data_multi_stage_c_o(io_data_multi_stage_c_o),
+    .io_ctrl_perf_counter(io_ctrl_perf_counter)
   );
 
   assign io_ctrl_start_do_i = snax_qvalid_i && (csr_addr == (STATE_CSR - CsrAddrOFfset)) && snax_qready_o && snax_req_i.data_arga[0] == 1'b1;

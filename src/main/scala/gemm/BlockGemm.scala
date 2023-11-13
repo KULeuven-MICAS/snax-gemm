@@ -24,6 +24,8 @@ class BlockGemmControllerIO extends Bundle {
 
   val busy_o = Output(Bool())
   val accumulate_i = Output(Bool())
+
+  val perf_counter = Output(UInt(32.W))
 }
 
 // BlockGemmController module. This module takes in the configurations and gives out read/write valid signals and the right addresses of the sub-matrices.
@@ -42,9 +44,9 @@ class BlockGemmController extends Module {
   val ptr_addr_c = RegInit(0.U(GemmConstant.addrWidth.W))
 
   // Counters for tracing the block matrix multiplication
-  val read_counter = RegInit(0.U(24.W))
-  val write_counter = RegInit(0.U(24.W))
-  val write_counter_next = RegInit(0.U(24.W))
+  val read_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
+  val write_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
+  val perf_counter = RegInit(0.U(32.W))
 
   // Counters for generating the right addresses
   val M_read_counter = WireInit(0.U(GemmConstant.sizeConfigWidth.W))
@@ -130,23 +132,19 @@ class BlockGemmController extends Module {
     read_counter := 0.U
   }
 
-  // Write counter next increment according to the io.data_valid_o
-  when(io.data_valid_o && io.busy_o) {
-    write_counter_next := write_counter_next + 1.U
-  }.elsewhen(cstate === sIDLE) {
-    write_counter_next := 0.U
+  when(io.start_do_i && !io.busy_o) {
+    perf_counter := 0.U
+  }.elsewhen(io.busy_o =/= 0.U) {
+    perf_counter := perf_counter + 1.U
   }
 
-  // Update write counter from write_counter_next when io.data_valid_o is asserted
-  // We need write_counter and write_counter_next because
-  // when io.data_valid_o for K cycle, then we can give a real io.gemm_write_valid_o valid in next cycle,
-  // but the write address is generated according to the previous cycle write_counter_next
-  when(io.data_valid_o) {
-    write_counter := write_counter_next
+  // Write counter increment according to the io.data_valid_o
+
+  when(io.data_valid_o && io.busy_o) {
+    write_counter := write_counter + 1.U
   }.elsewhen(cstate === sIDLE) {
     write_counter := 0.U
   }
-
   // Counters for generating the right addresses for block matrix multiplication
   M_read_counter := read_counter / (K * N)
   K_read_counter := (read_counter % (K * N)) % K
@@ -158,14 +156,14 @@ class BlockGemmController extends Module {
 
   // write_counter for the address generation to write submatrix of C
   when(
-    io.data_valid_o && write_valid_counter =/= K && cstate =/= sIDLE
+    io.data_valid_o && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
   ) {
     write_valid_counter := write_valid_counter + 1.U
   }.elsewhen(
-    io.data_valid_o && write_valid_counter === K && cstate =/= sIDLE
+    io.data_valid_o && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
   ) {
-    write_valid_counter := 1.U
-  }.elsewhen(write_valid_counter === K || cstate === sIDLE) {
+    write_valid_counter := 0.U
+  }.elsewhen(cstate === sIDLE) {
     write_valid_counter := 0.U
   }
 
@@ -187,7 +185,7 @@ class BlockGemmController extends Module {
   gemm_done := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && io.gemm_write_valid_o
 
   io.gemm_read_valid_o := (start_do === 1.B) || (io.data_valid_i && cstate === sREAD)
-  io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
+  io.gemm_write_valid_o := (write_valid_counter === K - 1.U) && io.data_valid_o && cstate =/= sIDLE
   io.accumulate_i := (accumulate_counter =/= K - 1.U && (io.data_valid_i === 1.B))
 
   io.busy_o := (cstate =/= sIDLE)
@@ -197,6 +195,7 @@ class BlockGemmController extends Module {
   io.addr_b_o := ptr_addr_b + (GemmConstant.baseAddrIncrementB.U) * (N_read_counter * K + K_read_counter)
   io.addr_c_o := ptr_addr_c + (GemmConstant.baseAddrIncrementC.U) * (M_write_counter * N + N_write_counter)
 
+  io.perf_counter := perf_counter
 }
 
 // The BlockGemm's control port declaration. Detailed explanation of these ports can be found in the README
@@ -220,6 +219,8 @@ class BlockGemmCtrlIO extends Bundle {
   val addr_c_o = Output(UInt(GemmConstant.addrWidth.W))
 
   val busy_o = Output(Bool())
+
+  val perf_counter = Output(UInt(32.W))
 }
 
 // BlockGemmIO definition
@@ -254,10 +255,11 @@ class BlockGemm extends Module {
   controller.io.addr_c_o <> io.ctrl.addr_c_o
   controller.io.busy_o <> io.ctrl.busy_o
   controller.io.data_valid_o := gemm_array.io.data_valid_o
+  controller.io.perf_counter <> io.ctrl.perf_counter
 
   gemm_array.io.data.a_i <> io.data.a_i
   gemm_array.io.data.b_i <> io.data.b_i
-  io.data.c_o <> RegNext(gemm_array.io.data.c_o)
+  io.data.c_o <> (gemm_array.io.data.c_o)
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i
   gemm_array.io.accumulate_i := controller.io.accumulate_i

@@ -103,7 +103,7 @@ class BatchGemmController extends BlockGemmController {
   gemm_done_once := (M_write_counter === (M - 1.U)) && (N_write_counter === (N - 1.U)) && (K_write_counter === (K - 1.U)) && (Batch_write_counter =/= B - 1.U) && cstate =/= sIDLE && io.gemm_write_valid_o
 
   io.gemm_read_valid_o := (start_do === 1.B || start_batch === 1.B) || (io.data_valid_i && (cstate === sREAD))
-  io.gemm_write_valid_o := (write_valid_counter === K) && cstate =/= sIDLE
+  io.gemm_write_valid_o := (write_valid_counter === K - 1.U) && io.data_valid_o && cstate =/= sIDLE
   io.accumulate_i := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
 
   start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && (Batch_read_counter =/= B - 1.U) && cstate === sREAD
@@ -111,9 +111,9 @@ class BatchGemmController extends BlockGemmController {
   io.busy_o := (cstate =/= sIDLE)
 
   // Address generation
-  io.addr_a_o := io.ptr_addr_a_i + Batch_read_counter * strideA + M_read_counter * ldA + strideinnermostA_i * (K_read_counter)
-  io.addr_b_o := io.ptr_addr_b_i + Batch_read_counter * strideB + N_read_counter * ldB + strideinnermostB_i * (K_read_counter)
-  io.addr_c_o := io.ptr_addr_c_i + Batch_write_counter * strideC + M_write_counter * ldC + strideinnermostC_i * (N_write_counter)
+  io.addr_a_o := ptr_addr_a + Batch_read_counter * strideA + M_read_counter * ldA + strideinnermostA_i * (K_read_counter)
+  io.addr_b_o := ptr_addr_b + Batch_read_counter * strideB + N_read_counter * ldB + strideinnermostB_i * (K_read_counter)
+  io.addr_c_o := ptr_addr_c + Batch_write_counter * strideC + M_write_counter * ldC + strideinnermostC_i * (N_write_counter)
 }
 
 // The BatchGemm's control port declaration.

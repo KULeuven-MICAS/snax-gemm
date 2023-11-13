@@ -104,7 +104,7 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
     stalled_by_write_reg := 0.B
   }
 
-  controller.io.stalled_by_write := start_stall_counter || stalled_by_write_reg
+  controller.io.stalled_by_write := start_stall_counter || (stalled_by_write_reg && ~output_start)
 
   // store the address and extra data for later output
   when(controller.io.gemm_write_valid_o) {
