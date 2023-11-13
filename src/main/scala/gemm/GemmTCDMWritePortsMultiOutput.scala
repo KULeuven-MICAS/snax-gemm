@@ -18,19 +18,17 @@ class TCDMWritePortsCtrlIO extends BatchGemmCtrlIO {
 }
 
 // Override old gemm io ports with new ports
-class BatchGemmTCDMWritePortsMultiOutputIO(TCDMWritePorts: Int = 8)
-    extends BatchGemmIO {
+class BatchGemmSnaxTopIO(TCDMWritePorts: Int = 8) extends BatchGemmIO {
   override val data = new TCDMWritePortsDataIO(TCDMWritePorts)
   override val ctrl = new TCDMWritePortsCtrlIO()
 }
 
 // The Gemm with multiple cycle output port
-// BatchGemmTCDMWritePortsMultiOutput inherits BatchGemmTCDMWritePorts
-class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
-    extends BatchGemm {
+// BatchGemmSnaxTop inherits BatchGemmTCDMWritePorts
+class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
   override lazy val io = noPrefix {
-    IO(new BatchGemmTCDMWritePortsMultiOutputIO(TCDMWritePorts))
+    IO(new BatchGemmSnaxTopIO(TCDMWritePorts))
   }
 
   io.suggestName("io")
@@ -196,9 +194,9 @@ class BatchGemmTCDMWritePortsMultiOutput(TCDMWritePorts: Int = 8)
 
 }
 
-object BatchGemmTCDMWritePortsMultiOutput extends App {
+object BatchGemmSnaxTop extends App {
   emitVerilog(
-    new (BatchGemmTCDMWritePortsMultiOutput),
+    new (BatchGemmSnaxTop),
     Array("--target-dir", "generated/gemm")
   )
 }

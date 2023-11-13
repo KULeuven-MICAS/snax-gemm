@@ -220,29 +220,38 @@ In the current unit test, we only test the GEMM with input datatype as int8 and 
 
 ## Quickstart
 Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
-### Install Java
+### Set up Chisel environment
+Run following script: 
 ```
-sudo apt install openjdk-11-jre-headless
-sudo apt install openjdk-11-jdk-headless
+./install.sh
 ```
-
-### Install Sbt
-```
-echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
-echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
-curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo apt-key add
-sudo apt-get update
-sudo apt-get install sbt
-```
-
-### Install Firtool
-* Download the Firtool from https://github.com/llvm/circt/releases/tag/firtool-1.42.0 and unzip it. The version is 1.42.0.
-* Add the bin of Firtool to the PATH
 
 ## Run tests
-To run the Gemm accelerator tests, use:
+To run all the Gemm accelerator tests, use:
 ```
 sbt test
+```
+
+To run specific test, use:
+```
+sbt "testOnly gemm.${chisel_test_name}"
+```
+where `chisel_test_name` is the class name of the specific test. For instance, use:
+```
+sbt "testOnly gemm.GemmArrayRandomTest"
+```
+to only run the random data and random matrix size test for Base Gemm.
+
+Note: run the test for the Chisel module also generate the corresponding system verilog file to test if the system verilog file can be generated correctly.
+
+## Generate System Verilog file
+To generate the corresponding system verilog file for specific Chisel module, use:
+```
+sbt "runMain gemm.${chisel_module_name}"
+```
+For instance, to generate the system verilog file for Base Gemm, use:
+```
+sbt "runMain gemm.GemmArray"
 ```
 
 ## Acknowledgement

@@ -249,7 +249,7 @@ module snax_gemm # (
   assign io_ctrl_strideC_i = CSRs[StrideC_CSR - CsrAddrOFfset];
 
   // gemm instiantion and ports connection
-  BatchGemmTCDMWritePortsMultiOutput inst_BatchGemmTCDMWritePortsMultiOutput (
+  BatchGemmSnaxTop inst_BatchGemmSnaxTop (
     .clock(clk_i), 
     .reset(!rst_ni),
     .io_ctrl_M_i(io_ctrl_M_i),

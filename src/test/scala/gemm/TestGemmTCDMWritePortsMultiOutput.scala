@@ -6,12 +6,12 @@ import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
 // This is a manual test for the Gemm with multiple cycle output port
-// TODO: add random and automatic test for BatchGemmTCDMWritePortsMultiOutput
-class BatchGemmTCDMWritePortsMultiOutputManualTest
+// TODO: add random and automatic test for BatchGemmSnaxTop
+class BatchGemmSnaxTopManualTest
     extends AnyFlatSpec
     with ChiselScalatestTester {
   "DUT" should "pass" in {
-    test(new BatchGemmTCDMWritePortsMultiOutput(8))
+    test(new BatchGemmSnaxTop(8))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step(5)
         dut.io.ctrl.start_do_i.poke(false.B)
@@ -90,7 +90,7 @@ class BatchGemmTCDMWritePortsMultiOutputManualTest
         dut.clock.step(15)
 
         emitVerilog(
-          new BatchGemmTCDMWritePortsMultiOutput(8),
+          new BatchGemmSnaxTop(8),
           Array("--target-dir", "generated/gemm")
         )
       }
