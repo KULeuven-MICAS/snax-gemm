@@ -27,7 +27,7 @@ class BatchGemmSnaxTopManualTest
         dut.io.ctrl.K_i.poke(2)
         // dut.io.ctrl.K_i.poke(1)
         dut.io.ctrl.N_i.poke(2)
-        dut.io.ctrl.B_i.poke(2)
+        dut.io.ctrl.Batch_i.poke(2)
 
         dut.io.ctrl.ldA_i.poke(0x10)
         dut.io.ctrl.ldB_i.poke(0x10)

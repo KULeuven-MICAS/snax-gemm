@@ -153,9 +153,9 @@ trait AbstractBatchGemmtest {
     val (ld_addr_A, ld_addr_B, ld_addr_C) = MatrixLibBlock.GenRandSizeTest()
     val (stride_addr_A, stride_addr_B, stride_addr_C) =
       MatrixLibBlock.GenRandSizeTest()
-    val strideinnermostA_i = GemmConstant.baseAddrIncrementA
-    val strideinnermostB_i = GemmConstant.baseAddrIncrementB
-    val strideinnermostC_i = GemmConstant.baseAddrIncrementC
+    val strideinnermost_A = GemmConstant.baseAddrIncrementA
+    val strideinnermost_B = GemmConstant.baseAddrIncrementB
+    val strideinnermost_C = GemmConstant.baseAddrIncrementC
     // println(split_matrix_A.size, split_matrix_B.size)
 
     // Generation of golden result in Scala
@@ -201,7 +201,7 @@ trait AbstractBatchGemmtest {
     dut.clock.step(5)
     dut.io.ctrl.start_do_i.poke(true.B)
 
-    dut.io.ctrl.B_i.poke(size_Batch)
+    dut.io.ctrl.Batch_i.poke(size_Batch)
     dut.io.ctrl.M_i.poke(size_M)
     dut.io.ctrl.K_i.poke(size_K)
     dut.io.ctrl.N_i.poke(size_N)
@@ -210,9 +210,9 @@ trait AbstractBatchGemmtest {
     dut.io.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-    dut.io.ctrl.strideinnermostA_i.poke(strideinnermostA_i)
-    dut.io.ctrl.strideinnermostB_i.poke(strideinnermostB_i)
-    dut.io.ctrl.strideinnermostC_i.poke(strideinnermostC_i)
+    dut.io.ctrl.strideinnermost_A.poke(strideinnermost_A)
+    dut.io.ctrl.strideinnermost_B.poke(strideinnermost_B)
+    dut.io.ctrl.strideinnermost_C.poke(strideinnermost_C)
 
     dut.io.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.ctrl.ldB_i.poke(ld_addr_B)
@@ -409,7 +409,7 @@ class BatchGemmTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.io.ctrl.K_i.poke(1)
         dut.io.ctrl.N_i.poke(2)
 
-        dut.io.ctrl.B_i.poke(2)
+        dut.io.ctrl.Batch_i.poke(2)
         dut.io.ctrl.strideA_i.poke(1)
         dut.io.ctrl.strideB_i.poke(1)
         dut.io.ctrl.strideC_i.poke(1)
@@ -477,7 +477,7 @@ class BatchGemmTest extends AnyFlatSpec with ChiselScalatestTester {
         dut.io.ctrl.M_i.poke(1)
         dut.io.ctrl.K_i.poke(4)
         dut.io.ctrl.N_i.poke(1)
-        dut.io.ctrl.B_i.poke(1)
+        dut.io.ctrl.Batch_i.poke(1)
         dut.clock.step(1)
         dut.io.ctrl.start_do_i.poke(false.B)
         dut.clock.step(1)

@@ -109,9 +109,9 @@ trait AbstractGemmTestWrapperBaseTest {
     val (ld_addr_A, ld_addr_B, ld_addr_C) = MatrixLibBlock.GenRandSizeTest()
     val (stride_addr_A, stride_addr_B, stride_addr_C) =
       MatrixLibBlock.GenRandSizeTest()
-    val strideinnermostA_i = GemmConstant.baseAddrIncrementA
-    val strideinnermostB_i = GemmConstant.baseAddrIncrementB
-    val strideinnermostC_i = GemmConstant.baseAddrIncrementC
+    val strideinnermost_A = GemmConstant.baseAddrIncrementA
+    val strideinnermost_B = GemmConstant.baseAddrIncrementB
+    val strideinnermost_C = GemmConstant.baseAddrIncrementC
     // println(split_matrix_A.size, split_matrix_B.size)
 
     // Generation of golden result in Scala
@@ -157,7 +157,7 @@ trait AbstractGemmTestWrapperBaseTest {
     dut.clock.step(5)
     dut.io.batch_gemm.ctrl.start_do_i.poke(true.B)
 
-    dut.io.batch_gemm.ctrl.B_i.poke(size_Batch)
+    dut.io.batch_gemm.ctrl.Batch_i.poke(size_Batch)
     dut.io.batch_gemm.ctrl.M_i.poke(size_M)
     dut.io.batch_gemm.ctrl.K_i.poke(size_K)
     dut.io.batch_gemm.ctrl.N_i.poke(size_N)
@@ -166,9 +166,9 @@ trait AbstractGemmTestWrapperBaseTest {
     dut.io.batch_gemm.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.batch_gemm.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-    dut.io.batch_gemm.ctrl.strideinnermostA_i.poke(strideinnermostA_i)
-    dut.io.batch_gemm.ctrl.strideinnermostB_i.poke(strideinnermostB_i)
-    dut.io.batch_gemm.ctrl.strideinnermostC_i.poke(strideinnermostC_i)
+    dut.io.batch_gemm.ctrl.strideinnermost_A.poke(strideinnermost_A)
+    dut.io.batch_gemm.ctrl.strideinnermost_B.poke(strideinnermost_B)
+    dut.io.batch_gemm.ctrl.strideinnermost_C.poke(strideinnermost_C)
 
     dut.io.batch_gemm.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.batch_gemm.ctrl.ldB_i.poke(ld_addr_B)
@@ -409,7 +409,7 @@ class BatchGemmTCDMWritePortsManualTest
         // dut.io.ctrl.K_i.poke(2)
         // dut.io.ctrl.K_i.poke(1)
         dut.io.ctrl.N_i.poke(2)
-        dut.io.ctrl.B_i.poke(2)
+        dut.io.ctrl.Batch_i.poke(2)
 
         dut.io.ctrl.ldA_i.poke(0x10)
         dut.io.ctrl.ldB_i.poke(0x10)

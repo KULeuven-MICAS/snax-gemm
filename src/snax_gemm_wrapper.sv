@@ -12,7 +12,7 @@
 import riscv_instr::*;
 import reqrsp_pkg::*;
 
-module snax_gemm # (
+module snax_gemm_wrapper # (
   parameter int unsigned DataWidth     = 64,
   parameter int unsigned SnaxTcdmPorts = 24,
   parameter type         acc_req_t     = logic,
@@ -36,27 +36,34 @@ module snax_gemm # (
 );
 
   // CSR addresses setting
-  localparam int unsigned B_M_K_N_CSR = 32'h3c0;
+  // matrix size setting, MatrixSizeCsr[31:24] = Batch 
+  // MatrixSizeCsr[23:16] = M, MatrixSizeCsr[15:8] = K, 
+  // MatrixSizeCsr[7:0] = N
+  localparam int unsigned MatrixSizeCsr = 32'h3c0;
 
-  localparam int unsigned Address_A_CSR = 32'h3c1;
-  localparam int unsigned Address_B_CSR = 32'h3c2;
-  localparam int unsigned Address_C_CSR = 32'h3c3;
+  // pointers for start address of matrix A, B and C
+  localparam int unsigned AddrACsr = 32'h3c1;
+  localparam int unsigned AddrBCsr = 32'h3c2;
+  localparam int unsigned AddrCCsr = 32'h3c3;
 
-  localparam int unsigned StrideInnermostA_CSR = 32'h3c4;
-  localparam int unsigned StrideInnermostB_CSR = 32'h3c5;
-  localparam int unsigned StrideInnermostC_CSR = 32'h3c6;
+  // address strides setting, see readme for better understanding
+  localparam int unsigned StrideInnermostACsr = 32'h3c4;
+  localparam int unsigned StrideInnermostBCsr = 32'h3c5;
+  localparam int unsigned StrideInnermostCCsr = 32'h3c6;
 
-  localparam int unsigned ldA_CSR = 32'h3c7;
-  localparam int unsigned ldB_CSR = 32'h3c8;
-  localparam int unsigned ldC_CSR = 32'h3c9;
+  localparam int unsigned LdACsr = 32'h3c7;
+  localparam int unsigned LdBCsr = 32'h3c8;
+  localparam int unsigned LdCCsr = 32'h3c9;
 
-  localparam int unsigned StrideA_CSR = 32'h3ca;
-  localparam int unsigned StrideB_CSR = 32'h3cb;
-  localparam int unsigned StrideC_CSR = 32'h3cc;
+  localparam int unsigned StrideACsr = 32'h3ca;
+  localparam int unsigned StrideBCsr = 32'h3cb;
+  localparam int unsigned StrideCCsr = 32'h3cc;
 
-  localparam int unsigned PERF_COUNTER_CSR = 32'h3cd;
+  // performance counter csr for how many cycle used for finishing GEMM operation
+  localparam int unsigned PerfCounterCsr = 32'h3cd;
 
-  localparam int unsigned STATE_CSR = 32'h3ce;
+  // state csr, indicating when to start GEMM and if the GEMM is busy
+  localparam int unsigned StateCsr = 32'h3ce;
 
   // Local parameters for input and output sizes
   localparam int unsigned InputTcdmPorts = 16;
@@ -67,11 +74,11 @@ module snax_gemm # (
   localparam int unsigned AddrWidth = 32;
   localparam int unsigned SizeConfigWidth = 8;
 
-  // CSRs wires
+  // CSR wires
   localparam int unsigned RegNum        = 15;
   localparam int unsigned CsrAddrOFfset = 32'h3c0;
 
-  logic [31:0] CSRs [RegNum];
+  logic [31:0] CSR [RegNum];
   logic [31:0] csr_addr;
 
   logic write_csr;
@@ -141,28 +148,28 @@ module snax_gemm # (
   tcdm_req_t  [InputTcdmPorts-1:0] snax_tcdm_req_o_input;
   tcdm_req_t  [OutputTcdmPorts-1:0] snax_tcdm_req_o_output;
 
-  // Write CSRs
+  // Write CSR
   always_ff @ (posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       for (int i=0; i < RegNum - 1; i++) begin
-        CSRs[i] <= 32'd0;
+        CSR[i] <= 32'd0;
       end     
-      CSRs[STATE_CSR - CsrAddrOFfset] <= 32'b10;
+      CSR[StateCsr - CsrAddrOFfset] <= {30'b0,2'b10};
     end else begin
       // if changing gemm state, no state CSR settings
       if (gemm_idle2busy == 1'b1) begin
-        CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd0;          
+        CSR[StateCsr - CsrAddrOFfset][1] <= 32'd0;          
       end        
       else if (gemm_busy2idle == 1'b1) begin
-        CSRs[STATE_CSR - CsrAddrOFfset][1] <= 32'd1;
+        CSR[StateCsr - CsrAddrOFfset][1] <= 32'd1;
       end
       if(write_csr == 1'b1 && snax_qready_o) begin
-        CSRs[csr_addr] <= snax_req_i.data_arga[31:0];
+        CSR[csr_addr] <= snax_req_i.data_arga[31:0];
       end 
     end
   end
 
-  // Read CSRs
+  // Read CSR
   // TODO: add check for snax_pready_i
   always_comb begin
     if (!rst_ni) begin
@@ -172,7 +179,7 @@ module snax_gemm # (
         snax_pvalid_o     = 1'b0;        
     end else begin
       if(read_csr) begin
-        snax_resp_o.data  = {32'b0,CSRs[csr_addr]};
+        snax_resp_o.data  = {32'b0,CSR[csr_addr]};
         snax_resp_o.id    = snax_req_i.id;
         snax_resp_o.error = 1'b0;
         snax_pvalid_o     = 1'b1;
@@ -223,30 +230,30 @@ module snax_gemm # (
   end
 
   // when writing state csr and attempt accessing state csr, not ready for CSR settings
-  assign snax_qready_o = !(write_state_csr == 1'b1 && csr_addr == STATE_CSR - CsrAddrOFfset && write_csr);
+  assign snax_qready_o = !(write_state_csr == 1'b1 && csr_addr == StateCsr - CsrAddrOFfset && write_csr);
   assign csr_addr = snax_req_i.data_argb - CsrAddrOFfset;
 
   // configuration of gemm
-  assign io_ctrl_B_i = CSRs[B_M_K_N_CSR - CsrAddrOFfset][31:24];
-  assign io_ctrl_M_i = CSRs[B_M_K_N_CSR - CsrAddrOFfset][23:16];
-  assign io_ctrl_K_i = CSRs[B_M_K_N_CSR - CsrAddrOFfset][15:8];
-  assign io_ctrl_N_i = CSRs[B_M_K_N_CSR - CsrAddrOFfset][7:0];
+  assign io_ctrl_B_i = CSR[MatrixSizeCsr - CsrAddrOFfset][31:24];
+  assign io_ctrl_M_i = CSR[MatrixSizeCsr - CsrAddrOFfset][23:16];
+  assign io_ctrl_K_i = CSR[MatrixSizeCsr - CsrAddrOFfset][15:8];
+  assign io_ctrl_N_i = CSR[MatrixSizeCsr - CsrAddrOFfset][7:0];
 
-  assign io_ctrl_ptr_addr_a_i = CSRs[Address_A_CSR - CsrAddrOFfset];
-  assign io_ctrl_ptr_addr_b_i = CSRs[Address_B_CSR - CsrAddrOFfset];
-  assign io_ctrl_ptr_addr_c_i = CSRs[Address_C_CSR - CsrAddrOFfset];
+  assign io_ctrl_ptr_addr_a_i = CSR[AddrACsr - CsrAddrOFfset];
+  assign io_ctrl_ptr_addr_b_i = CSR[AddrBCsr - CsrAddrOFfset];
+  assign io_ctrl_ptr_addr_c_i = CSR[AddrCCsr - CsrAddrOFfset];
 
-  assign io_ctrl_strideinnermostA_i = CSRs[StrideInnermostA_CSR - CsrAddrOFfset];
-  assign io_ctrl_strideinnermostB_i = CSRs[StrideInnermostB_CSR - CsrAddrOFfset];
-  assign io_ctrl_strideinnermostC_i = CSRs[StrideInnermostC_CSR - CsrAddrOFfset];
+  assign io_ctrl_strideinnermostA_i = CSR[StrideInnermostACsr - CsrAddrOFfset];
+  assign io_ctrl_strideinnermostB_i = CSR[StrideInnermostBCsr - CsrAddrOFfset];
+  assign io_ctrl_strideinnermostC_i = CSR[StrideInnermostCCsr - CsrAddrOFfset];
 
-  assign io_ctrl_ldA_i = CSRs[ldA_CSR - CsrAddrOFfset];
-  assign io_ctrl_ldB_i = CSRs[ldB_CSR - CsrAddrOFfset];
-  assign io_ctrl_ldC_i = CSRs[ldC_CSR - CsrAddrOFfset];
+  assign io_ctrl_ldA_i = CSR[LdACsr - CsrAddrOFfset];
+  assign io_ctrl_ldB_i = CSR[LdBCsr - CsrAddrOFfset];
+  assign io_ctrl_ldC_i = CSR[LdCCsr - CsrAddrOFfset];
 
-  assign io_ctrl_strideA_i = CSRs[StrideA_CSR - CsrAddrOFfset];
-  assign io_ctrl_strideB_i = CSRs[StrideB_CSR - CsrAddrOFfset];
-  assign io_ctrl_strideC_i = CSRs[StrideC_CSR - CsrAddrOFfset];
+  assign io_ctrl_strideA_i = CSR[StrideACsr - CsrAddrOFfset];
+  assign io_ctrl_strideB_i = CSR[StrideBCsr - CsrAddrOFfset];
+  assign io_ctrl_strideC_i = CSR[StrideCCsr - CsrAddrOFfset];
 
   // gemm instiantion and ports connection
   BatchGemmSnaxTop inst_BatchGemmSnaxTop (
@@ -285,7 +292,7 @@ module snax_gemm # (
     .io_ctrl_perf_counter(io_ctrl_perf_counter)
   );
 
-  assign io_ctrl_start_do_i = snax_qvalid_i && (csr_addr == (STATE_CSR - CsrAddrOFfset)) && snax_qready_o && snax_req_i.data_arga[0] == 1'b1;
+  assign io_ctrl_start_do_i = snax_qvalid_i && (csr_addr == (StateCsr - CsrAddrOFfset)) && snax_qready_o && snax_req_i.data_arga[0] == 1'b1;
 
   // request for reading data from TCDM and writing data to TCDM
   // reading request
@@ -407,18 +414,18 @@ module snax_gemm # (
   always_ff @(posedge clk_i or negedge rst_ni) begin
       for (int i = 0; i < InputTcdmPorts; i++) begin
         if(!rst_ni) begin
-          snax_tcdm_rsp_i_p_valid_reg[i] = 1'b0;
-          data_reg[i * DataWidth +: DataWidth] = {DataWidth{1'b0}};
+          snax_tcdm_rsp_i_p_valid_reg[i] <= 1'b0;
+          data_reg[i * DataWidth +: DataWidth] <= {DataWidth{1'b0}};
         end
         else begin
           if(wait_for_p_valid_read && !io_ctrl_data_valid_i) begin
             if(snax_tcdm_rsp_i[i].p_valid) begin
-              snax_tcdm_rsp_i_p_valid_reg[i] = snax_tcdm_rsp_i[i].p_valid;
-              data_reg[i * DataWidth +: DataWidth] = snax_tcdm_rsp_i[i].p.data;              
+              snax_tcdm_rsp_i_p_valid_reg[i] <= snax_tcdm_rsp_i[i].p_valid;
+              data_reg[i * DataWidth +: DataWidth] <= snax_tcdm_rsp_i[i].p.data;              
             end
           end
           else begin
-            snax_tcdm_rsp_i_p_valid_reg[i] = 1'b0;  
+            snax_tcdm_rsp_i_p_valid_reg[i] <= 1'b0;  
           end
         end 
       end    
@@ -507,28 +514,28 @@ module snax_gemm # (
   always_ff @(posedge clk_i or negedge rst_ni) begin
       for (int i = 0; i < SnaxTcdmPorts; i++) begin
         if(!rst_ni) begin
-          snax_tcdm_rsp_i_q_ready_reg[i] = 1'b0;
+          snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
         end
         else begin
           // for read q_ready
           if(i < InputTcdmPorts) begin
             if(wait_for_q_ready_read && !io_ctrl_read_mem_ready) begin
               if(snax_tcdm_rsp_i[i].q_ready) begin
-                snax_tcdm_rsp_i_q_ready_reg[i] = snax_tcdm_rsp_i[i].q_ready;                
+                snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;                
               end
             end
             else begin
-              snax_tcdm_rsp_i_q_ready_reg[i] = 1'b0;  
+              snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;  
             end            
           // for write q_ready
           end else begin
             if(wait_for_q_ready_write && !io_ctrl_write_mem_ready) begin
               if(snax_tcdm_rsp_i[i].q_ready) begin
-                snax_tcdm_rsp_i_q_ready_reg[i] = snax_tcdm_rsp_i[i].q_ready;                
+                snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;                
               end
             end
             else begin
-              snax_tcdm_rsp_i_q_ready_reg[i] = 1'b0;  
+              snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;  
             end            
           end
 
