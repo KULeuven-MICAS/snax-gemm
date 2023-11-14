@@ -163,7 +163,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
   )
   io.ctrl.addr_c_o := Mux(
     new_output_fire,
-    controller.io.addr_c_o,
+    block_gemm_addr_c_o,
     addr_c + addrDelta.U * output_counter
   )
   gemm_write_ready_o := new_output_ready

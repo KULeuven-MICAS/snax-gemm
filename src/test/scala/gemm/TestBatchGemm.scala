@@ -210,9 +210,9 @@ trait AbstractBatchGemmtest {
     dut.io.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-    dut.io.ctrl.strideinnermost_A.poke(strideinnermost_A)
-    dut.io.ctrl.strideinnermost_B.poke(strideinnermost_B)
-    dut.io.ctrl.strideinnermost_C.poke(strideinnermost_C)
+    dut.io.ctrl.strideinnermost_A_i.poke(strideinnermost_A)
+    dut.io.ctrl.strideinnermost_B_i.poke(strideinnermost_B)
+    dut.io.ctrl.strideinnermost_C_i.poke(strideinnermost_C)
 
     dut.io.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.ctrl.ldB_i.poke(ld_addr_B)

@@ -105,7 +105,7 @@ module snax_gemm_wrapper # (
   logic [31:0] io_ctrl_perf_counter;
   
   // gemm matrix size configuration and address setting signals
-  logic [SizeConfigWidth - 1:0] io_ctrl_B_i;
+  logic [SizeConfigWidth - 1:0] io_ctrl_Batch_i;
   logic [SizeConfigWidth - 1:0] io_ctrl_M_i;
   logic [SizeConfigWidth - 1:0] io_ctrl_K_i;
   logic [SizeConfigWidth - 1:0] io_ctrl_N_i;
@@ -234,7 +234,7 @@ module snax_gemm_wrapper # (
   assign csr_addr = snax_req_i.data_argb - CsrAddrOFfset;
 
   // configuration of gemm
-  assign io_ctrl_B_i = CSR[MatrixSizeCsr - CsrAddrOFfset][31:24];
+  assign io_ctrl_Batch_i = CSR[MatrixSizeCsr - CsrAddrOFfset][31:24];
   assign io_ctrl_M_i = CSR[MatrixSizeCsr - CsrAddrOFfset][23:16];
   assign io_ctrl_K_i = CSR[MatrixSizeCsr - CsrAddrOFfset][15:8];
   assign io_ctrl_N_i = CSR[MatrixSizeCsr - CsrAddrOFfset][7:0];
@@ -267,10 +267,10 @@ module snax_gemm_wrapper # (
     .io_ctrl_ptr_addr_a_i(io_ctrl_ptr_addr_a_i),
     .io_ctrl_ptr_addr_b_i(io_ctrl_ptr_addr_b_i),
     .io_ctrl_ptr_addr_c_i(io_ctrl_ptr_addr_c_i),
-    .io_ctrl_B_i(io_ctrl_B_i),
-    .io_ctrl_strideinnermostA_i(io_ctrl_strideinnermostA_i),
-    .io_ctrl_strideinnermostB_i(io_ctrl_strideinnermostB_i),
-    .io_ctrl_strideinnermostC_i(io_ctrl_strideinnermostC_i),    
+    .io_ctrl_Batch_i(io_ctrl_Batch_i),
+    .io_ctrl_strideinnermost_A_i(io_ctrl_strideinnermostA_i),
+    .io_ctrl_strideinnermost_B_i(io_ctrl_strideinnermostB_i),
+    .io_ctrl_strideinnermost_C_i(io_ctrl_strideinnermostC_i),    
     .io_ctrl_ldA_i(io_ctrl_ldA_i),
     .io_ctrl_ldB_i(io_ctrl_ldB_i),
     .io_ctrl_ldC_i(io_ctrl_ldC_i),
