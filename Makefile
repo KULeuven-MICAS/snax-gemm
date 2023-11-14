@@ -1,6 +1,6 @@
 MK_DIR   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
-CHIISEL_GENERATED_DIR = $(MK_DIR)/generated/
+CHIISEL_GENERATED_DIR = $(MK_DIR)/generated
 
 CHISEL_MODULE = BatchGemmSnaxTop
 # CHISEL_MODULE = BatchGemm
@@ -8,7 +8,7 @@ CHISEL_MODULE = BatchGemmSnaxTop
 CHIISEL_GENERATED_FILES = $(MK_DIR)/generated/gemm/$(CHISEL_MODULE).sv
 
 $(CHIISEL_GENERATED_FILES):
-	cd $(MK_DIR) && sbt "runMain gemm.$(CHISEL_MODULE)"
+	mkdir -p $(MK_DIR)/generated/gemm && cd $(MK_DIR) && sbt "runMain gemm.$(CHISEL_MODULE)"
 
 .PHONY: clean-data clean
 
