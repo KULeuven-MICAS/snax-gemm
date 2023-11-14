@@ -1,5 +1,5 @@
 package:
-  name: sanx-gemm
+  name: snax-gemm
   authors:
     - "Xiaoling Yi <xiaoling.yi@kuleuven.be>"
 
