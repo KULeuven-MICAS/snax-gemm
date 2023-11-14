@@ -9,9 +9,6 @@
 // verilog_lint: waive-start line-length
 // verilog_lint: waive-start no-trailing-spaces
 
-import riscv_instr::*;
-import reqrsp_pkg::*;
-
 module snax_gemm_wrapper # (
   parameter int unsigned DataWidth     = 64,
   parameter int unsigned SnaxTcdmPorts = 24,
