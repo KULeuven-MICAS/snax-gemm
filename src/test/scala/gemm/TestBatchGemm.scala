@@ -179,7 +179,7 @@ trait AbstractBatchGemmtest {
         val addr_slide_C = M_write_counter * size_N + N_write_counter
         assert(
           dut.io.ctrl.addr_c_o.peekInt() ==
-            start_addr_C + current_write_batch * stride_addr_C + M_write_counter * ld_addr_C + GemmConstant.baseAddrIncrementC * N_write_counter
+            start_addr_C + current_write_batch * stride_addr_C + M_write_counter * ld_addr_C + strideinnermost_C * N_write_counter
         )
 
         split_matrix_C(current_write_batch)(addr_slide_C.toInt) =
@@ -249,11 +249,11 @@ trait AbstractBatchGemmtest {
       // Check if the output address matches the address in the golden model
       assert(
         dut.io.ctrl.addr_a_o.peekInt() ==
-          start_addr_A + M_read_counter * ld_addr_A + stride_addr_A * current_read_batch + GemmConstant.baseAddrIncrementA * K_read_counter
+          start_addr_A + M_read_counter * ld_addr_A + stride_addr_A * current_read_batch + strideinnermost_A * K_read_counter
       )
       assert(
         dut.io.ctrl.addr_b_o.peekInt() ==
-          start_addr_B + N_read_counter * ld_addr_B + stride_addr_B * current_read_batch + GemmConstant.baseAddrIncrementB * K_read_counter
+          start_addr_B + N_read_counter * ld_addr_B + stride_addr_B * current_read_batch + strideinnermost_B * K_read_counter
       )
 
       dut.clock.step(1)

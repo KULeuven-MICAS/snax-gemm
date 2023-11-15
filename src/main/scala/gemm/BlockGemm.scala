@@ -241,7 +241,7 @@ class BlockGemm extends Module {
   lazy val controller = Module(new BlockGemmController())
 
   val addr_c_o = RegInit(0.U(GemmConstant.addrWidth.W))
-  val block_gemm_addr_c_o = RegInit(0.U(GemmConstant.addrWidth.W))
+  val block_gemm_addr_c_o = WireInit(0.U(GemmConstant.addrWidth.W))
   val gemm_write_ready_o = WireInit(false.B)
   val keep_gemm_write_valid_o = RegInit(false.B)
   val gemm_write_valid_o =
