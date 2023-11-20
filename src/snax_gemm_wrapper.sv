@@ -80,6 +80,7 @@ module snax_gemm_wrapper #(
 
   logic                                  write_csr;
   logic                                  read_csr;
+  logic                                  keep_read_csr;
   logic                                  gemm_state;
   logic                                  gemm_busy2idle;
   logic                                  gemm_idle2busy;
@@ -166,7 +167,6 @@ module snax_gemm_wrapper #(
   end
 
   // Read CSR
-  // TODO: add check for snax_pready_i
   always_comb begin
     if (!rst_ni) begin
       snax_resp_o.data  = 0;
@@ -174,7 +174,7 @@ module snax_gemm_wrapper #(
       snax_resp_o.error = 1'b0;
       snax_pvalid_o     = 1'b0;
     end else begin
-      if (read_csr) begin
+      if (read_csr || keep_read_csr) begin
         snax_resp_o.data  = {32'b0, CSR[csr_addr]};
         snax_resp_o.id    = snax_req_i.id;
         snax_resp_o.error = 1'b0;
@@ -188,6 +188,15 @@ module snax_gemm_wrapper #(
     end
   end
 
+  // keep sending responds when receive side not ready
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+      keep_read_csr <= 1'b0;
+    end else begin
+      keep_read_csr <= (keep_read_csr || read_csr) && !snax_pready_i;
+    end
+  end
+
   // Read or write control logic
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
@@ -197,10 +206,12 @@ module snax_gemm_wrapper #(
     end
   end
 
+  // gemm state change signal
   assign gemm_busy2idle  = gemm_state == 1'b1 && io_ctrl_busy_o == 1'b0;
   assign gemm_idle2busy  = gemm_state == 1'b0 && io_ctrl_busy_o == 1'b1;
   assign write_state_csr = gemm_state != io_ctrl_busy_o;
 
+  // assert read/write csr signal according to the data_op when snax_qvalid_i
   always_comb begin
     if (!rst_ni) begin
       read_csr  = 1'b0;

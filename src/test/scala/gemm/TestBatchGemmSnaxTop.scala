@@ -5,6 +5,7 @@ import chisel3.util._
 import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
+// test wrapper module for test ideal situation when tcdm ready always asserted
 class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int) extends Module {
 
   val io = IO(new Bundle {
@@ -20,12 +21,14 @@ class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int) extends Module {
 
   data_valid_i_from_tcdm := RegNext(gemm.io.ctrl.gemm_read_valid_o)
   gemm.io.ctrl.data_valid_i := data_valid_i_from_tcdm
+  // tcdm ready always asserted
   gemm.io.ctrl.read_mem_ready := 1.B
   gemm.io.ctrl.write_mem_ready := 1.B
   io.perf_counter := gemm.io.ctrl.perf_counter
 
 }
 
+// This tets is for test ideal situation when tcdm ready always asserted
 class BatchGemmSnaxTopWrapperManualTest
     extends AnyFlatSpec
     with ChiselScalatestTester {
