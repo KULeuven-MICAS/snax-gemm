@@ -153,9 +153,14 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     addr_c := io.ctrl.addr_c_o
   }
 
-  // multi-stage output data and address
+  // set new_output_ready when it is not the output state
   new_output_ready := !output_state
   new_output_fire := new_output_ready && (gemm_write_valid_from_block_gemm)
+
+  // give ready signal to block gemm
+  gemm_write_ready_o := new_output_ready
+
+  // multi-stage output data and address
   io.data.multi_stage_c_o := Mux(
     new_output_fire,
     io.data.c_o((TCDMWritePorts * GemmConstant.TCDMDataWidth) - 1, 0),
@@ -166,12 +171,12 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     block_gemm_addr_c_o,
     addr_c + addrDelta.U * output_counter
   )
-  gemm_write_ready_o := new_output_ready
 
   // not busy util all write finish
   io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
   controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
 
+  // performance counter for profiling
   when(io.ctrl.start_do_i && !io.ctrl.busy_o) {
     perf_counter := 0.U
   }.elsewhen(io.ctrl.busy_o =/= 0.U) {

@@ -240,8 +240,7 @@ class BlockGemm extends Module {
   val gemm_array = Module(new GemmArray())
   lazy val controller = Module(new BlockGemmController())
 
-  val addr_c_o = RegInit(0.U(GemmConstant.addrWidth.W))
-  val block_gemm_addr_c_o = WireInit(0.U(GemmConstant.addrWidth.W))
+  // add ready signal, if not receive a ready signal, keep sending valid signal
   val gemm_write_ready_o = WireInit(false.B)
   val keep_gemm_write_valid_o = RegInit(false.B)
   val gemm_write_valid_o =
@@ -250,6 +249,11 @@ class BlockGemm extends Module {
   gemm_write_ready_o := 1.B
   dontTouch(keep_gemm_write_valid_o)
 
+  // if not ready immediately when valid is asserted, need to save the addr_c
+  // use the old addr_c when ready
+  // addr_c is only right when valid is asserted from controller (one cycle)
+  val addr_c_o = RegInit(0.U(GemmConstant.addrWidth.W))
+  val block_gemm_addr_c_o = WireInit(0.U(GemmConstant.addrWidth.W))
   addr_c_o := Mux(
     controller.io.gemm_write_valid_o,
     controller.io.addr_c_o,
@@ -268,7 +272,9 @@ class BlockGemm extends Module {
   io.ctrl.gemm_write_valid_o := gemm_write_valid_o
   controller.io.addr_a_o <> io.ctrl.addr_a_o
   controller.io.addr_b_o <> io.ctrl.addr_b_o
+
   io.ctrl.addr_c_o := block_gemm_addr_c_o
+  // when keep_gemm_write_valid_o is asserted, use old addr_c instead of current controller.io.addr_c_o
   block_gemm_addr_c_o := Mux(
     keep_gemm_write_valid_o,
     addr_c_o,

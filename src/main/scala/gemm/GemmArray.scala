@@ -40,6 +40,7 @@ class Tile extends Module {
   chisel3.dontTouch(mul_add_result)
 
   check_data_i_valid_reg := io.control_i.data_valid_i
+  // when ont ready, keep sending valid
   keep_output := io.data_valid_o && !io.control_i.data_ready_o
 
   // Element-wise multiply
