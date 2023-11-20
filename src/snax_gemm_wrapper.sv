@@ -81,6 +81,8 @@ module snax_gemm_wrapper #(
   logic                                  write_csr;
   logic                                  read_csr;
   logic                                  keep_read_csr;
+  logic                                  read_perf_counter;
+  logic                                  keep_read_perf_counter;
   logic                                  gemm_state;
   logic                                  gemm_busy2idle;
   logic                                  gemm_idle2busy;
@@ -179,6 +181,11 @@ module snax_gemm_wrapper #(
         snax_resp_o.id    = snax_req_i.id;
         snax_resp_o.error = 1'b0;
         snax_pvalid_o     = 1'b1;
+      end else if (read_perf_counter || keep_read_perf_counter) begin
+        snax_resp_o.data  = {32'b0, io_ctrl_perf_counter};
+        snax_resp_o.id    = snax_req_i.id;
+        snax_resp_o.error = 1'b0;
+        snax_pvalid_o     = 1'b1;
       end else begin
         snax_resp_o.data  = 0;
         snax_resp_o.id    = 0;
@@ -192,8 +199,10 @@ module snax_gemm_wrapper #(
   always_ff @(posedge clk_i or negedge rst_ni) begin
     if (!rst_ni) begin
       keep_read_csr <= 1'b0;
+      keep_read_perf_counter <= 1'b0;
     end else begin
       keep_read_csr <= (keep_read_csr || read_csr) && !snax_pready_i;
+      keep_read_perf_counter <= (keep_read_perf_counter || read_perf_counter) && !snax_pready_i;
     end
   end
 
@@ -219,7 +228,11 @@ module snax_gemm_wrapper #(
     end else if (snax_qvalid_i) begin
       unique casez (snax_req_i.data_op)
         CSRRS, CSRRSI, CSRRC, CSRRCI: begin
-          read_csr  = 1'b1;
+          if (csr_addr == PerfCounterCsr) begin
+            read_perf_counter = 1'b1;
+          end else begin
+            read_csr = 1'b1;
+          end
           write_csr = 1'b0;
         end
         default: begin
