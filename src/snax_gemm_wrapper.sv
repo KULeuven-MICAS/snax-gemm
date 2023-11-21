@@ -225,24 +225,29 @@ module snax_gemm_wrapper #(
     if (!rst_ni) begin
       read_csr  = 1'b0;
       write_csr = 1'b0;
+      read_perf_counter = 1'b0;
     end else if (snax_qvalid_i) begin
       unique casez (snax_req_i.data_op)
         CSRRS, CSRRSI, CSRRC, CSRRCI: begin
-          if (csr_addr == PerfCounterCsr) begin
+          if (csr_addr == PerfCounterCsr - CsrAddrOFfset) begin
             read_perf_counter = 1'b1;
+            read_csr  = 1'b0;
           end else begin
             read_csr = 1'b1;
+            read_perf_counter  = 1'b0;
           end
           write_csr = 1'b0;
         end
         default: begin
           write_csr = 1'b1;
           read_csr  = 1'b0;
+          read_perf_counter = 1'b0;
         end
       endcase
     end else begin
       read_csr  = 1'b0;
       write_csr = 1'b0;
+      read_perf_counter = 1'b0;
     end
   end
 
