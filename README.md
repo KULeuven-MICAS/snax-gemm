@@ -194,7 +194,7 @@ The data layout of Batch Stride GEMM is the same as Block GEMM except for there 
 
 ```
 <T>gemmStridedBatched(
-int Bacth, int M, int N, int K,
+int Batch, int M, int N, int K,
 const T* A, int strideInnermostA, int ldA, int strideA, 
 const T* B, int strideInnermostB, int ldB, int strideB, 
 const T* C, int strideInnermostC, int ldC, int strideC,
