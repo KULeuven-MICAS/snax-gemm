@@ -24,7 +24,7 @@ class BatchGemmSnaxTopIO(TCDMWritePorts: Int = 8) extends BatchGemmIO {
 }
 
 // The Gemm with multiple cycle output port
-// BatchGemmSnaxTop inherits BatchGemmTCDMWritePorts
+// BatchGemmSnaxTop inherits BatchGemm
 class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
   override lazy val io = noPrefix {
@@ -218,7 +218,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
 object BatchGemmSnaxTop extends App {
   emitVerilog(
-    new (BatchGemmSnaxTop),
+    new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
     Array("--target-dir", "generated/gemm")
   )
 }
