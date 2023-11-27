@@ -6,15 +6,19 @@ It is written in CHISEL 5.0.0 and connected to the SNAX accelerator RISC-V manag
 
 ## Microarchitecture
 
+
 The microarchitecture of the GEMM accelerator is shown below. The GEMM array has meshRow row and meshCol column tiles. Each tile implements a tileSize vector dot product.
 
 ![](./docs/microarch.png)
 
 ## Functional description
 
+
 This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch Stride GEMM.
 
+
 ### Base GEMM
+
 
 Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
 | Parameter | Meaning |
@@ -38,6 +42,7 @@ The base GEMM also has an accumulation option. If the signal `accumulate` is one
 This option is useful for using the base GEMM for software-managed block matrix multiplication.
 
 The Base GEMM function definition pseudocode is shown below.
+
 
 ```
 bool gemm(int8_t *A, int8_t *B, int32_t * C, bool accumulate)
@@ -64,6 +69,7 @@ Take a Block Gemm with hardware parameters: `meshRow == tileSize == meshCol == 8
 ![](./docs/block_mm.png)
 
 The pseudocode is :
+
 
 ```
 for (m1 = 0 to M’/Mu - 1); 
@@ -95,13 +101,16 @@ To illustrate it more for clarification, another example is for Block Gemm with 
 
 #### Programming model
 
+
 The Block GEMM function c wrapper pseudocode is shown below.
+
 
 ```
 bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 ```
 
 #### Ports
+
 
 | Signals | Signal name in generated SV | Width | Dir | Description |
 | - | - | - | - | - |
@@ -123,12 +132,15 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 
 ### Batch Stride GEMM
 
+
 The Batch Stride GEMM is built with the Block GEMM. Basically, the Batch Stride GEMM does multiple block matrix multiplication. The pseudocode is:
+
 
 ```
 for (b = 0; b < B; b++) {
   C[b] = A[b] * B[b] // Each is a blockGemm
 }
+```
 ```
 
 Besides M, K and N, it takes in an extra Batch configuration (B). It also takes in nine extra strides configuration, eg., strideInnermostA, strideInnermostB, strideInnermostC, ldA, ldB, ldC, strideA, strideB, and strideC, for computing the address for each sub-matrix in the block matrix multiplication and the start matrix for each batch.
@@ -149,12 +161,14 @@ The illustration of strideInnermostA, strideInnermostB, strideInnermostC, ldA, l
 
 #### Computation analysis
 
+
 Batch Stride GEMM does Batch number of the same size Block Gemm.
 The computation flow is shown as the following picture.
 
 ![](./docs/batch_block_matrix_mul.png)
 
 The pseudocode is :
+
 
 ```
 
@@ -188,9 +202,11 @@ To better illustrate the meaning of the strideInnermostA, strideInnermostB, stri
 
 #### Data layout
 
+
 The data layout of Batch Stride GEMM is the same as Block GEMM except for there is another outmost dimension which is B.
 
 #### Programming model
+
 
 ```
 <T>gemmStridedBatched(
@@ -202,6 +218,7 @@ const T* C, int strideInnermostC, int ldC, int strideC,
 ```
 
 #### Ports
+
 
 Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra ports which is listed below.
 
@@ -220,10 +237,12 @@ Except the ports already listed in Block GEMM, Batch Stride GEMM has some extra 
 
 ### Batch Stride GEMM with multi-cycle output
 
+
 This module adds support for 8, 16 32 TCDM ports with 64 bits width for each TCDM ports. There is no functionality difference from software side.
 In hardware, the Gemm will stall the input and the computation until the output is finished.
 
 #### Ports
+
 
 Besides the ports already in Batch Stride GEMM, this module add another multi cycle output port.
 | Signals | Signal name in generated SV | Width | Dir | Description |
@@ -285,7 +304,9 @@ In the current unit test, we only test the GEMM with input datatype as int8 and 
 
 ## Quickstart
 
+
 Follow this quickstart to set up the Chisel environment and run the unit tests of the GEMM accelerator.
+
 
 ### Set up Chisel environment
 
@@ -297,7 +318,9 @@ Run following script:
 
 ## Run tests
 
+
 To run all the Gemm accelerator tests, use:
+
 
 ```
 sbt test
@@ -305,15 +328,19 @@ sbt test
 
 To run specific test, use:
 
+
 ```
 sbt "testOnly gemm.${chisel_test_name}"
 ```
 
+
 where `chisel_test_name` is the class name of the specific test. For instance, use:
+
 
 ```
 sbt "testOnly gemm.GemmArrayRandomTest"
 ```
+
 
 to only run the random data and random matrix size test for Base Gemm.
 
@@ -321,7 +348,9 @@ Note: run the test for the Chisel module also generate the corresponding system 
 
 ## Generate System Verilog file
 
+
 To generate the corresponding system verilog file for specific Chisel module, use:
+
 
 ```
 sbt "runMain gemm.${chisel_module_name}"
