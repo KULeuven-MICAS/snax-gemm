@@ -58,6 +58,8 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
   val output_counter = RegInit(0.U(log2Ceil(stages).W))
   // indicating if we are output result matrix
   val output_state = RegInit(0.U(1.W))
+  val new_output_ready = WireInit(false.B)
+  val new_output_fire = WireInit(false.B)
 
   // regs to store data and address when output in multi-cycle or waiting for q_ready
   val output_reg = RegInit(
@@ -75,6 +77,11 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
   // when output_valid_multi_stages is asserted, the output data valid is asserted too
   def output_valid_multi_stages = output_state =/= 0.U
+
+  val gemm_write_valid_from_block_gemm =
+    controller.io.gemm_write_valid_o || keep_gemm_write_valid_o
+
+  val perf_counter = RegInit(0.U(32.W))
 
   K := Mux(io.ctrl.start_do_i && !controller.io.busy_o, io.ctrl.K_i, K)
 
@@ -102,17 +109,12 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     stalled_by_write_reg := 0.B
   }
 
-  controller.io.stalled_by_write := start_stall_counter || (stalled_by_write_reg && ~output_start)
+  controller.io.stalled_by_write := start_stall_counter || (stalled_by_write_reg && ~output_start) || (!new_output_ready && (gemm_write_valid_from_block_gemm))
 
-  // store the address and extra data for later output
-  when(controller.io.gemm_write_valid_o) {
-    addr_c := io.ctrl.addr_c_o
-  }
-
-  when(controller.io.gemm_write_valid_o) {
+  when(new_output_fire) {
     output_state := 1.U
   }.elsewhen(
-    output_state === 1.U && output_done && !controller.io.gemm_write_valid_o
+    output_state === 1.U && output_done
   ) {
     output_state := 0.U
   }
@@ -133,34 +135,53 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
   }
 
   dontTouch(output_done)
-  output_start := controller.io.gemm_write_valid_o
+  output_start := new_output_fire
   output_done := output_counter === (stages.U - 1.U) && write_fire
 
   // right shift the result data to support only output the lowest part of bits every time without changing the index
   // storing io.data.c_o when it is valid for later output
-  when(write_fire && controller.io.gemm_write_valid_o) {
+  when(write_fire && new_output_fire) {
     output_reg := io.data.c_o >> (TCDMWritePorts * GemmConstant.TCDMDataWidth).U
-  }.elsewhen(!write_fire && controller.io.gemm_write_valid_o) {
+  }.elsewhen(!write_fire && new_output_fire) {
     output_reg := io.data.c_o
   }.elsewhen(write_fire) {
     output_reg := output_reg >> (TCDMWritePorts * GemmConstant.TCDMDataWidth).U
   }
 
+  // store the address and extra data for later output
+  when(new_output_fire) {
+    addr_c := io.ctrl.addr_c_o
+  }
+
+  // set new_output_ready when it is not the output state
+  new_output_ready := !output_state
+  new_output_fire := new_output_ready && (gemm_write_valid_from_block_gemm)
+
+  // give ready signal to block gemm
+  gemm_write_ready_o := new_output_ready
+
   // multi-stage output data and address
   io.data.multi_stage_c_o := Mux(
-    controller.io.gemm_write_valid_o,
+    new_output_fire,
     io.data.c_o((TCDMWritePorts * GemmConstant.TCDMDataWidth) - 1, 0),
     output_reg((TCDMWritePorts * GemmConstant.TCDMDataWidth) - 1, 0)
   )
   io.ctrl.addr_c_o := Mux(
-    controller.io.gemm_write_valid_o,
-    controller.io.addr_c_o,
+    new_output_fire,
+    block_gemm_addr_c_o,
     addr_c + addrDelta.U * output_counter
   )
 
   // not busy util all write finish
   io.ctrl.busy_o := controller.io.busy_o || io.ctrl.gemm_write_valid_o
   controller.io.start_do_i := io.ctrl.start_do_i && !io.ctrl.busy_o
+
+  // performance counter for profiling
+  when(io.ctrl.start_do_i && !io.ctrl.busy_o) {
+    perf_counter := 0.U
+  }.elsewhen(io.ctrl.busy_o =/= 0.U) {
+    perf_counter := perf_counter + 1.U
+  }
 
   // below is for if not q_ready, keep sending read/write request
   read_fire := io.ctrl.gemm_read_valid_o && io.ctrl.read_mem_ready
@@ -180,7 +201,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
   // giving output
   io.ctrl.gemm_read_valid_o := controller.io.gemm_read_valid_o || keep_read
-  io.ctrl.gemm_write_valid_o := controller.io.gemm_write_valid_o || output_valid_multi_stages || keep_write
+  io.ctrl.gemm_write_valid_o := new_output_fire || output_valid_multi_stages || keep_write
   io.ctrl.addr_a_o := Mux(
     controller.io.gemm_read_valid_o,
     controller.io.addr_a_o,
@@ -192,6 +213,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     addr_b
   )
 
+  io.ctrl.perf_counter := perf_counter
 }
 
 object BatchGemmSnaxTop extends App {

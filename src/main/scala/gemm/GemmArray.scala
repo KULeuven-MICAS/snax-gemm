@@ -7,6 +7,7 @@ import chisel3.VecInit
 class TileControl extends Bundle {
   val data_valid_i = Input(Bool())
   val accumulate_i = Input(Bool())
+  val data_ready_o = Input(Bool())
 }
 
 // Tile IO definition
@@ -30,6 +31,7 @@ class Tile extends Module {
   val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val result_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val check_data_i_valid_reg = RegInit(0.B)
+  val keep_output = RegInit(false.B)
   val mul_add_result_vec = Wire(
     Vec(GemmConstant.tileSize, SInt(GemmConstant.dataWidthMul.W))
   )
@@ -38,6 +40,8 @@ class Tile extends Module {
   chisel3.dontTouch(mul_add_result)
 
   check_data_i_valid_reg := io.control_i.data_valid_i
+  // when ont ready, keep sending valid
+  keep_output := io.data_valid_o && !io.control_i.data_ready_o
 
   // Element-wise multiply
   for (i <- 0 until GemmConstant.tileSize) {
@@ -63,7 +67,7 @@ class Tile extends Module {
   }
 
   io.c_o := result_reg
-  io.data_valid_o := check_data_i_valid_reg
+  io.data_valid_o := check_data_i_valid_reg || keep_output
 }
 
 // Mesh IO definition, an extended version of Tile IO
@@ -136,6 +140,7 @@ class GemmArrayIO extends Bundle {
   val data_valid_i = Input(Bool())
   val accumulate_i = Input(Bool())
   val data_valid_o = Output(Bool())
+  val data_ready_o = Input(Bool())
   val data = new GemmDataIO()
 }
 
@@ -205,6 +210,7 @@ class GemmArray extends Module {
 
   mesh.io.control_i.data_valid_i := io.data_valid_i
   mesh.io.control_i.accumulate_i := io.accumulate_i
+  mesh.io.control_i.data_ready_o := io.data_ready_o
   io.data_valid_o := mesh.io.data_valid_o
 }
 

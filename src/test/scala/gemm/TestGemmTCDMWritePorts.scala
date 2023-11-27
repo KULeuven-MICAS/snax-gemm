@@ -135,7 +135,7 @@ trait AbstractGemmTestWrapperBaseTest {
         val addr_slide_C = M_write_counter * size_N + N_write_counter
         assert(
           dut.io.batch_gemm.ctrl.addr_c_o.peekInt() ==
-            start_addr_C + current_write_batch * stride_addr_C + M_write_counter * ld_addr_C + GemmConstant.baseAddrIncrementC * N_write_counter
+            start_addr_C + current_write_batch * stride_addr_C + M_write_counter * ld_addr_C + strideinnermost_C * N_write_counter
         )
 
         split_matrix_C(current_write_batch)(addr_slide_C.toInt) =
@@ -166,9 +166,9 @@ trait AbstractGemmTestWrapperBaseTest {
     dut.io.batch_gemm.ctrl.ptr_addr_b_i.poke(start_addr_B)
     dut.io.batch_gemm.ctrl.ptr_addr_c_i.poke(start_addr_C)
 
-    dut.io.batch_gemm.ctrl.strideinnermost_A.poke(strideinnermost_A)
-    dut.io.batch_gemm.ctrl.strideinnermost_B.poke(strideinnermost_B)
-    dut.io.batch_gemm.ctrl.strideinnermost_C.poke(strideinnermost_C)
+    dut.io.batch_gemm.ctrl.strideinnermost_A_i.poke(strideinnermost_A)
+    dut.io.batch_gemm.ctrl.strideinnermost_B_i.poke(strideinnermost_B)
+    dut.io.batch_gemm.ctrl.strideinnermost_C_i.poke(strideinnermost_C)
 
     dut.io.batch_gemm.ctrl.ldA_i.poke(ld_addr_A)
     dut.io.batch_gemm.ctrl.ldB_i.poke(ld_addr_B)
@@ -208,11 +208,11 @@ trait AbstractGemmTestWrapperBaseTest {
         // dut.io.addr_a_o.peekInt() is delayed by the same cycle as data_valid_i
         assert(
           dut.io.addr_a_o.peekInt() ==
-            start_addr_A + M_read_counter * ld_addr_A + stride_addr_A * current_read_batch + GemmConstant.baseAddrIncrementA * K_read_counter
+            start_addr_A + M_read_counter * ld_addr_A + stride_addr_A * current_read_batch + strideinnermost_A * K_read_counter
         )
         assert(
           dut.io.addr_b_o.peekInt() ==
-            start_addr_B + N_read_counter * ld_addr_B + stride_addr_B * current_read_batch + GemmConstant.baseAddrIncrementB * K_read_counter
+            start_addr_B + N_read_counter * ld_addr_B + stride_addr_B * current_read_batch + strideinnermost_B * K_read_counter
         )
 
         // Give the right a_i and b_i data according to the address

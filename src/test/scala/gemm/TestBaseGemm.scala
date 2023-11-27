@@ -53,6 +53,7 @@ class GemmArrayRandomTest
 
           // Invoke data_valid_i to send the test data
           dut.io.data_valid_i.poke(1.U)
+          dut.io.data_ready_o.poke(true.B)
           dut.io.data.a_i.poke(RandomBigBus_A)
           dut.io.data.b_i.poke(RandomBigBus_B)
 
