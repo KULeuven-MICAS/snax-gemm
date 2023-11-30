@@ -33,7 +33,7 @@ class BatchGemmSnaxTopWrapperManualTest
     extends AnyFlatSpec
     with ChiselScalatestTester {
   "DUT" should "pass" in {
-    test(new BatchGemmSnaxTopWrapper(8))
+    test(new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         val Bacth = 1
         val M = 4
@@ -65,7 +65,7 @@ class BatchGemmSnaxTopWrapperManualTest
         dut.clock.step(1)
 
         emitVerilog(
-          new BatchGemmSnaxTopWrapper(8),
+          new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts),
           Array("--target-dir", "generated/gemm")
         )
       }
@@ -78,7 +78,7 @@ class BatchGemmSnaxTopManualTest
     extends AnyFlatSpec
     with ChiselScalatestTester {
   "DUT" should "pass" in {
-    test(new BatchGemmSnaxTop(8))
+    test(new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts))
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step(5)
         dut.io.ctrl.start_do_i.poke(false.B)
