@@ -17,6 +17,7 @@ class ConfigGemmTest extends AnyFlatSpec with ChiselScalatestTester {
         }
     }
 
+    // These test if each version gemm can be generated successfully
     GenGEMM(1)
     GenGEMM(2)
     GenGEMM(3)
