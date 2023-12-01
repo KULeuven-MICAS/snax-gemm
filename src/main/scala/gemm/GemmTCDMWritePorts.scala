@@ -18,7 +18,7 @@ class BatchGemmWithStallController extends BatchGemmController {
 
   // These two signal are used for generating new read request after the stall finishes
   val read_rsp_counter = RegInit(0.U(24.W))
-  val new_read_K = WireInit(false.B)
+  val new_read = WireInit(false.B)
 
   when(io.data_valid_i && io.busy_o) {
     read_rsp_counter := read_rsp_counter + 1.U
@@ -26,12 +26,11 @@ class BatchGemmWithStallController extends BatchGemmController {
     read_rsp_counter := 0.U
   }
 
-  // If K_read_counter === 0.U, it means the start of a new output matrix generation
   // If read_counter <= read_rsp_counter, it means the read request number is equal or less the read responds number
   // So another read request can be sent
-  new_read_K := K_read_counter === 0.U && read_counter <= read_rsp_counter
+  new_read := read_counter <= read_rsp_counter
 
-  io.gemm_read_valid_o := ((io.data_valid_i === 1.B || start_batch === 1.B || new_read_K === 1.B) && (!io.stalled_by_write) && (cstate === sREAD))
+  io.gemm_read_valid_o := ((io.data_valid_i === 1.B || start_batch === 1.B || new_read === 1.B) && (!io.stalled_by_write) && (cstate === sREAD))
 
 }
 
