@@ -21,7 +21,7 @@ class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int) extends Module {
 
   data_valid_i_from_tcdm := RegNext(gemm.io.ctrl.gemm_read_valid_o)
   gemm.io.ctrl.data_valid_i := data_valid_i_from_tcdm
-  // tcdm ready always asserted to minic no contention
+  // tcdm ready always asserted to mimic no contention
   gemm.io.ctrl.read_mem_ready := 1.B
   gemm.io.ctrl.write_mem_ready := 1.B
   io.perf_counter := gemm.io.ctrl.perf_counter
@@ -77,28 +77,31 @@ class BatchGemmSnaxTopWrapperManualTest
     }
 
     // matrix size various corner case test
+    // smallest test case
     CornerCaseTest(1, 1, 1, 1)
 
-    CornerCaseTest(1, 1, 2, 1)
-    CornerCaseTest(1, 2, 1, 1)
-    CornerCaseTest(1, 1, 1, 2)
-
+    // tests with one smallest size which is 1 in each dimension
     CornerCaseTest(1, 2, 1, 2)
     CornerCaseTest(1, 1, 2, 2)
     CornerCaseTest(1, 2, 2, 1)
     CornerCaseTest(2, 1, 2, 2)
+
+    // tests with different number of smallest size which is 1 in each dimension
+    CornerCaseTest(1, 1, 2, 1)
+    CornerCaseTest(2, 2, 1, 1)
+    CornerCaseTest(2, 1, 2, 1)
+    CornerCaseTest(2, 1, 1, 2)
     CornerCaseTest(2, 2, 2, 2)
 
-    CornerCaseTest(1, 3, 2, 4)
-    CornerCaseTest(1, 3, 1, 4)
-    CornerCaseTest(1, 3, 4, 2)
-    CornerCaseTest(1, 3, 4, 4)
-
-    CornerCaseTest(1, 3, 5, 2)
+    // for performance analysis, in this test, the computation cycle is 128
+    // there should only be 1 extra cycle for the first read request
+    // and the extra cycle for outputting the last result, which is 4 for tcdm write port = 8 and is 2 for tcdm write port = 16
     CornerCaseTest(1, 4, 8, 4)
+
+    // extreme test for K = 1 which gives most pressure to the output part
     CornerCaseTest(1, 4, 1, 4)
     CornerCaseTest(1, 5, 1, 5)
-    CornerCaseTest(1, 4, 4, 4)
+    CornerCaseTest(1, 3, 1, 4)
 
     emitVerilog(
       new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts),
