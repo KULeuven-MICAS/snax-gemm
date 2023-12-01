@@ -21,55 +21,91 @@ class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int) extends Module {
 
   data_valid_i_from_tcdm := RegNext(gemm.io.ctrl.gemm_read_valid_o)
   gemm.io.ctrl.data_valid_i := data_valid_i_from_tcdm
-  // tcdm ready always asserted
+  // tcdm ready always asserted to minic no contention
   gemm.io.ctrl.read_mem_ready := 1.B
   gemm.io.ctrl.write_mem_ready := 1.B
   io.perf_counter := gemm.io.ctrl.perf_counter
 
 }
 
-// This tets is for test ideal situation when tcdm ready always asserted
+// This test is for test ideal situation when tcdm ready always asserted
 class BatchGemmSnaxTopWrapperManualTest
     extends AnyFlatSpec
     with ChiselScalatestTester {
   "DUT" should "pass" in {
-    test(new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts))
-      .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
-        val Bacth = 1
-        val M = 4
-        val K = 8
-        val N = 4
+    // a function to simulate different matrix size
+    // TODO: Test for random data input BatchGemmSnaxTop with refactored true double buffering strategy
+    def CornerCaseTest(Batch: Int, M: Int, K: Int, N: Int) = {
+      test(new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts))
+        .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
+          dut.clock.step(5)
+          dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(false.B)
+          dut.clock.step(5)
+          dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(true.B)
 
-        dut.clock.step(5)
-        dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(false.B)
-        dut.clock.step(5)
-        dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(true.B)
+          dut.io.batch_gemm_snanx_top.ctrl.M_i.poke(M)
+          dut.io.batch_gemm_snanx_top.ctrl.K_i.poke(K)
+          dut.io.batch_gemm_snanx_top.ctrl.N_i.poke(N)
+          dut.io.batch_gemm_snanx_top.ctrl.Batch_i.poke(Batch)
 
-        dut.io.batch_gemm_snanx_top.ctrl.M_i.poke(M)
-        dut.io.batch_gemm_snanx_top.ctrl.K_i.poke(K)
-        dut.io.batch_gemm_snanx_top.ctrl.N_i.poke(N)
-        dut.io.batch_gemm_snanx_top.ctrl.Batch_i.poke(Bacth)
-
-        dut.clock.step(1)
-        dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(false.B)
-
-        dut.clock.step(2)
-
-        while (dut.io.batch_gemm_snanx_top.ctrl.busy_o.peekBoolean()) {
           dut.clock.step(1)
+          dut.io.batch_gemm_snanx_top.ctrl.start_do_i.poke(false.B)
+
+          dut.clock.step(2)
+
+          while (dut.io.batch_gemm_snanx_top.ctrl.busy_o.peekBoolean()) {
+            dut.clock.step(1)
+          }
+
+          println(
+            "Computing Batch",
+            Batch,
+            "M",
+            M,
+            "K",
+            K,
+            "N",
+            N,
+            "ideal cycle number used: ",
+            dut.io.perf_counter.peekInt()
+          )
+          println("test finish!")
+
+          dut.clock.step(1)
+
         }
+    }
 
-        println(dut.io.perf_counter.peekInt())
-        println("test finish!")
+    // matrix size various corner case test
+    CornerCaseTest(1, 1, 1, 1)
 
-        dut.clock.step(1)
+    CornerCaseTest(1, 1, 2, 1)
+    CornerCaseTest(1, 2, 1, 1)
+    CornerCaseTest(1, 1, 1, 2)
 
-        emitVerilog(
-          new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts),
-          Array("--target-dir", "generated/gemm")
-        )
-      }
+    CornerCaseTest(1, 2, 1, 2)
+    CornerCaseTest(1, 1, 2, 2)
+    CornerCaseTest(1, 2, 2, 1)
+    CornerCaseTest(2, 1, 2, 2)
+    CornerCaseTest(2, 2, 2, 2)
+
+    CornerCaseTest(1, 3, 2, 4)
+    CornerCaseTest(1, 3, 1, 4)
+    CornerCaseTest(1, 3, 4, 2)
+    CornerCaseTest(1, 3, 4, 4)
+
+    CornerCaseTest(1, 3, 5, 2)
+    CornerCaseTest(1, 4, 8, 4)
+    CornerCaseTest(1, 4, 1, 4)
+    CornerCaseTest(1, 5, 1, 5)
+    CornerCaseTest(1, 4, 4, 4)
+
+    emitVerilog(
+      new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts),
+      Array("--target-dir", "generated/gemm")
+    )
   }
+
 }
 
 // This is a manual test for the Gemm with multiple cycle output port
@@ -90,9 +126,7 @@ class BatchGemmSnaxTopManualTest
 
         dut.io.ctrl.start_do_i.poke(true.B)
         dut.io.ctrl.M_i.poke(2)
-        // dut.io.ctrl.K_i.poke(3)
         dut.io.ctrl.K_i.poke(2)
-        // dut.io.ctrl.K_i.poke(1)
         dut.io.ctrl.N_i.poke(2)
         dut.io.ctrl.Batch_i.poke(1)
 
@@ -138,9 +172,6 @@ class BatchGemmSnaxTopManualTest
         dut.io.ctrl.data_valid_i.poke(false.B)
 
         dut.clock.step(2)
-        // dut.io.ctrl.read_mem_ready.poke(false.B)
-        // dut.clock.step(2)
-        // dut.io.ctrl.read_mem_ready.poke(true.B)
 
         dut.io.ctrl.data_valid_i.poke(true.B)
         dut.clock.step(2)
@@ -161,7 +192,7 @@ class BatchGemmSnaxTopManualTest
         dut.clock.step(15)
 
         emitVerilog(
-          new BatchGemmSnaxTop(8),
+          new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
           Array("--target-dir", "generated/gemm")
         )
       }
