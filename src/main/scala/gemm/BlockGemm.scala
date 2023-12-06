@@ -306,8 +306,8 @@ class BlockGemm extends Module {
   gemm_array.io.data.a_i <> io.data.a_i
   gemm_array.io.data.b_i <> io.data.b_i
 
-  gemm_array.io.subtraction_a_i <> io.ctrl.subtraction_a_i
-  gemm_array.io.subtraction_b_i <> io.ctrl.subtraction_b_i
+  gemm_array.io.subtraction_a_i <> controller.io.subtraction_a_o
+  gemm_array.io.subtraction_b_i <> controller.io.subtraction_b_o
 
   io.data.c_o <> (gemm_array.io.data.c_o)
 
