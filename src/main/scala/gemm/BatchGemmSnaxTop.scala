@@ -147,8 +147,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
   is_pong_output_for_read_reg := is_pong_output_for_read
 
   dontTouch(controller.io.stalled_by_write)
-  // controller.io.stalled_by_write := ((ping_new_output_fire || !output_reg_ready_ping) && is_ping_output_for_read) || ((pong_new_output_fire || !output_reg_ready_pong) && is_pong_output_for_read)
-  controller.io.stalled_by_write := ((!output_reg_ready_ping) && is_ping_output_for_read) || ((!output_reg_ready_pong) && is_pong_output_for_read)
+  controller.io.stalled_by_write := ((ping_new_output_fire || !output_reg_ready_ping) && is_ping_output_for_read) || ((pong_new_output_fire || !output_reg_ready_pong) && is_pong_output_for_read)
 
   // shift the ping/pong buffer for writing the results form GEMM
   new_output_fire := ping_new_output_fire || pong_new_output_fire
