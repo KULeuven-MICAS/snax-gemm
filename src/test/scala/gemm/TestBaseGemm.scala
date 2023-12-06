@@ -31,13 +31,19 @@ class GemmArrayRandomTest
           val random_matrix_A = RandomMatrixs._1
           val random_matrix_B = RandomMatrixs._2
 
+          val RandomSubtractionValue = MatrixLibBase.GenRandomSubtractionValue()
+          val subtraction_a = RandomSubtractionValue._1
+          val subtraction_b = RandomSubtractionValue._2
+
           // Generate golden result data for verification
           val golden_array = MatrixLibBase.MatrixMul_1D(
             GemmConstant.meshRow,
             GemmConstant.tileSize,
             GemmConstant.meshCol,
             random_matrix_A,
-            random_matrix_B
+            random_matrix_B,
+            subtraction_a,
+            subtraction_b
           )
           /* Translate data array to big bus for Gemm module input */
           val RandomBigBuses =
@@ -54,6 +60,9 @@ class GemmArrayRandomTest
           // Invoke data_valid_i to send the test data
           dut.io.data_valid_i.poke(1.U)
           dut.io.data_ready_o.poke(true.B)
+
+          dut.io.subtraction_a_i.poke(subtraction_a)
+          dut.io.subtraction_b_i.poke(subtraction_b)
           dut.io.data.a_i.poke(RandomBigBus_A)
           dut.io.data.b_i.poke(RandomBigBus_B)
 
