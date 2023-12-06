@@ -107,6 +107,10 @@ class BatchGemmSnaxTopWrapperManualTest
       new BatchGemmSnaxTopWrapper(GemmConstant.TCDMWritePorts),
       Array("--target-dir", "generated/gemm")
     )
+    emitVerilog(
+      new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
+      Array("--target-dir", "generated/gemm")
+    )
   }
 
 }
