@@ -32,6 +32,11 @@ object MatrixLibBase {
     (random_matrix_A, random_matrix_B)
   }
 
+  def GenRandomSubtractionValue() = {
+    val rand = new scala.util.Random
+    (rand.between(0, 127).toByte, rand.between(0, 127).toByte)
+  }
+
   // This function prints the matrix with Byte data type
   def PrintMatrixByte_1D(
       meshRow: Int,
@@ -142,7 +147,7 @@ object MatrixLibBase {
       B: Array[Int]
   ) = {
     for (i <- 0 until Len) {
-      // println(A(i),B(i))
+      // println(A(i), B(i))
       assert(A(i) == B(i))
     }
   }
@@ -165,7 +170,9 @@ object MatrixLibBase {
       tileSize: Int,
       meshCol: Int,
       A: Array[Byte],
-      B: Array[Byte]
+      B: Array[Byte],
+      subtraction_a: Byte,
+      subtraction_b: Byte
   ): Array[Int] = {
     val golden = Array.ofDim[Int](meshRow * meshCol)
     for (i <- 0 until meshRow) {
@@ -177,7 +184,9 @@ object MatrixLibBase {
           /* assuming the matrix B is arranged as N data layout */
           golden(i * meshCol + j) = golden(
             i * meshCol + j
-          ) + A(i * tileSize + k) * B(k + j * tileSize)
+          ) + (A(i * tileSize + k) - subtraction_a) * (B(
+            k + j * tileSize
+          ) - subtraction_b)
         }
         // println("golden",golden(i * meshCol + j))
       }

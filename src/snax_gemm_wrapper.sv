@@ -59,8 +59,11 @@ module snax_gemm_wrapper #(
   // performance counter csr for how many cycle used for finishing GEMM operation
   localparam int unsigned PerfCounterCsr = 32'h3cd;
 
+  // substraction CSR
+  localparam int unsigned SubstractionCsr = 32'h3ce;
+
   // state csr, indicating when to start GEMM and if the GEMM is busy
-  localparam int unsigned StateCsr = 32'h3ce;
+  localparam int unsigned StateCsr = 32'h3cf;
 
   // Local parameters for input and output sizes
   localparam int unsigned InputTcdmPorts = 16;
@@ -71,8 +74,12 @@ module snax_gemm_wrapper #(
   localparam int unsigned AddrWidth = 32;
   localparam int unsigned SizeConfigWidth = 8;
 
+  // Local parameters for subtraction a and subtraction b
+  localparam int unsigned dataWidthA = 8;
+  localparam int unsigned dataWidthB = 8;
+
   // CSR wires
-  localparam int unsigned RegNum = 15;
+  localparam int unsigned RegNum = 16;
   localparam int unsigned CsrAddrOFfset = 32'h3c0;
 
   logic      [                     31:0] CSR                         [RegNum];
@@ -129,6 +136,10 @@ module snax_gemm_wrapper #(
   logic      [          AddrWidth - 1:0] io_ctrl_addr_a_o;
   logic      [          AddrWidth - 1:0] io_ctrl_addr_b_o;
   logic      [          AddrWidth - 1:0] io_ctrl_addr_c_o;
+
+  // substraction a and b for gemm
+  logic [dataWidthA - 1:0] substraction_a;
+  logic [dataWidthB - 1:0] substraction_b;
 
   // local input matrix buffer
   logic      [InputMatrixSize * 2 - 1:0] data_reg;
@@ -261,6 +272,9 @@ module snax_gemm_wrapper #(
   assign io_ctrl_K_i = CSR[MatrixSizeCsr-CsrAddrOFfset][15:8];
   assign io_ctrl_N_i = CSR[MatrixSizeCsr-CsrAddrOFfset][7:0];
 
+  assign substraction_a = CSR[SubstractionCsr - CsrAddrOFfset][7:0];
+  assign substraction_b = CSR[SubstractionCsr - CsrAddrOFfset][15:8];
+
   assign io_ctrl_ptr_addr_a_i = CSR[AddrACsr-CsrAddrOFfset];
   assign io_ctrl_ptr_addr_b_i = CSR[AddrBCsr-CsrAddrOFfset];
   assign io_ctrl_ptr_addr_c_i = CSR[AddrCCsr-CsrAddrOFfset];
@@ -284,6 +298,8 @@ module snax_gemm_wrapper #(
       .io_ctrl_M_i(io_ctrl_M_i),
       .io_ctrl_K_i(io_ctrl_K_i),
       .io_ctrl_N_i(io_ctrl_N_i),
+      .io_ctrl_subtraction_a_i(substraction_a),
+      .io_ctrl_subtraction_b_i(substraction_b),
       .io_ctrl_start_do_i(io_ctrl_start_do_i),
       .io_ctrl_data_valid_i(io_ctrl_data_valid_i),
       .io_ctrl_ptr_addr_a_i(io_ctrl_ptr_addr_a_i),

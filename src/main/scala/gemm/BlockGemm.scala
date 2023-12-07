@@ -7,6 +7,8 @@ class BlockGemmControllerIO extends Bundle {
   val M_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
   val K_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
   val N_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val start_do_i = Input(Bool())
   val data_valid_o = Input(Bool())
   val data_valid_i = Input(Bool())
@@ -21,6 +23,9 @@ class BlockGemmControllerIO extends Bundle {
   val addr_a_o = Output(UInt(GemmConstant.addrWidth.W))
   val addr_b_o = Output(UInt(GemmConstant.addrWidth.W))
   val addr_c_o = Output(UInt(GemmConstant.addrWidth.W))
+
+  val subtraction_a_o = Output(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_o = Output(UInt(GemmConstant.dataWidthB.W))
 
   val busy_o = Output(Bool())
   val accumulate_i = Output(Bool())
@@ -38,6 +43,8 @@ class BlockGemmController extends Module {
   val M = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
   val K = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
   val N = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+  val a = RegInit(0.U(GemmConstant.dataWidthA.W))
+  val b = RegInit(0.U(GemmConstant.dataWidthB.W))
 
   val ptr_addr_a = RegInit(0.U(GemmConstant.addrWidth.W))
   val ptr_addr_b = RegInit(0.U(GemmConstant.addrWidth.W))
@@ -102,6 +109,8 @@ class BlockGemmController extends Module {
     M := io.M_i
     N := io.N_i
     K := io.K_i
+    a := io.subtraction_a_i
+    b := io.subtraction_b_i
     ptr_addr_a := io.ptr_addr_a_i
     ptr_addr_b := io.ptr_addr_b_i
     ptr_addr_c := io.ptr_addr_c_i
@@ -113,6 +122,8 @@ class BlockGemmController extends Module {
     M := 0.U
     N := 0.U
     K := 0.U
+    a := 0.U
+    b := 0.U
     ptr_addr_a := 0.U
     ptr_addr_b := 0.U
     ptr_addr_c := 0.U
@@ -196,6 +207,9 @@ class BlockGemmController extends Module {
   io.addr_c_o := ptr_addr_c + (GemmConstant.baseAddrIncrementC.U) * (M_write_counter * N + N_write_counter)
 
   io.perf_counter := perf_counter
+
+  io.subtraction_a_o := a
+  io.subtraction_b_o := b
 }
 
 // The BlockGemm's control port declaration. Detailed explanation of these ports can be found in the README
@@ -203,6 +217,8 @@ class BlockGemmCtrlIO extends Bundle {
   val M_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
   val K_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
   val N_i = Input(UInt(GemmConstant.sizeConfigWidth.W))
+  val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
 
   val start_do_i = Input(Bool())
   val data_valid_i = Input(Bool())
@@ -263,6 +279,9 @@ class BlockGemm extends Module {
   controller.io.M_i <> io.ctrl.M_i
   controller.io.K_i <> io.ctrl.K_i
   controller.io.N_i <> io.ctrl.N_i
+  controller.io.subtraction_a_i <> io.ctrl.subtraction_a_i
+  controller.io.subtraction_b_i <> io.ctrl.subtraction_b_i
+
   controller.io.start_do_i <> io.ctrl.start_do_i
   controller.io.data_valid_i <> io.ctrl.data_valid_i
   controller.io.ptr_addr_a_i <> io.ctrl.ptr_addr_a_i
@@ -286,6 +305,10 @@ class BlockGemm extends Module {
 
   gemm_array.io.data.a_i <> io.data.a_i
   gemm_array.io.data.b_i <> io.data.b_i
+
+  gemm_array.io.subtraction_a_i <> controller.io.subtraction_a_o
+  gemm_array.io.subtraction_b_i <> controller.io.subtraction_b_o
+
   io.data.c_o <> (gemm_array.io.data.c_o)
 
   gemm_array.io.data_valid_i := io.ctrl.data_valid_i

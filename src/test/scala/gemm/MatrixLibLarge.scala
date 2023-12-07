@@ -162,7 +162,9 @@ object MatrixLibBlock {
             B.slice(
               (k + j * K) * GemmConstant.tileSize * GemmConstant.meshCol,
               (k + j * K + 1) * GemmConstant.tileSize * GemmConstant.meshCol
-            )
+            ),
+            0,
+            0
           )
           submatrx_temp = golden
             .slice(

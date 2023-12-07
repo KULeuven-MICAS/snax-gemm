@@ -19,6 +19,8 @@ class TileIO extends Bundle {
     Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
   )
   val c_o = Output(SInt(GemmConstant.dataWidthC.W))
+  val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val control_i = Input(new TileControl())
   val data_valid_o = Output(Bool())
 }
@@ -32,6 +34,12 @@ class Tile extends Module {
   val result_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val check_data_i_valid_reg = RegInit(0.B)
   val keep_output = RegInit(false.B)
+  val data_a_i_subtracted = Wire(
+    Vec(GemmConstant.tileSize, SInt((GemmConstant.dataWidthA + 1).W))
+  )
+  val data_b_i_subtracted = Wire(
+    Vec(GemmConstant.tileSize, SInt((GemmConstant.dataWidthB + 1).W))
+  )
   val mul_add_result_vec = Wire(
     Vec(GemmConstant.tileSize, SInt(GemmConstant.dataWidthMul.W))
   )
@@ -45,7 +53,16 @@ class Tile extends Module {
 
   // Element-wise multiply
   for (i <- 0 until GemmConstant.tileSize) {
-    mul_add_result_vec(i) := io.data_a_i(i).asSInt * io.data_b_i(i).asSInt
+    data_a_i_subtracted(i) := (io
+      .data_a_i(i)
+      .asSInt -& io.subtraction_a_i.asSInt).asSInt
+    data_b_i_subtracted(i) := (io
+      .data_b_i(i)
+      .asSInt -& io.subtraction_b_i.asSInt).asSInt
+  }
+
+  for (i <- 0 until GemmConstant.tileSize) {
+    mul_add_result_vec(i) := (data_a_i_subtracted(i)) * (data_b_i_subtracted(i))
   }
 
   // Sum of element-wise multiply
@@ -90,6 +107,8 @@ class MeshIO extends Bundle {
       Vec(GemmConstant.meshCol, SInt(GemmConstant.dataWidthC.W))
     ))
   )
+  val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val control_i = Input(new TileControl())
   val data_valid_o = Output(Bool())
 }
@@ -111,6 +130,8 @@ class Mesh extends Module {
       mesh(r)(c).io.control_i <> io.control_i
       mesh(r)(c).io.data_a_i <> io.data_a_i(r)
       mesh(r)(c).io.data_b_i <> io.data_b_i(c)
+      mesh(r)(c).io.subtraction_a_i <> io.subtraction_a_i
+      mesh(r)(c).io.subtraction_b_i <> io.subtraction_b_i
       io.c_o(r)(c) := mesh(r)(c).io.c_o
     }
   }
@@ -141,6 +162,10 @@ class GemmArrayIO extends Bundle {
   val accumulate_i = Input(Bool())
   val data_valid_o = Output(Bool())
   val data_ready_o = Input(Bool())
+
+  val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
+  val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
+
   val data = new GemmDataIO()
 }
 
@@ -211,6 +236,10 @@ class GemmArray extends Module {
   mesh.io.control_i.data_valid_i := io.data_valid_i
   mesh.io.control_i.accumulate_i := io.accumulate_i
   mesh.io.control_i.data_ready_o := io.data_ready_o
+
+  mesh.io.subtraction_a_i := io.subtraction_a_i
+  mesh.io.subtraction_b_i := io.subtraction_b_i
+
   io.data_valid_o := mesh.io.data_valid_o
 }
 
