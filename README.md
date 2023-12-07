@@ -16,7 +16,7 @@ This repository contains three GEMM versions: Base GEMM, Block GEMM, and Batch S
 
 ### Base GEMM
 
-Base GEMM implements General Matrix Multiply: C = A * B. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
+Base GEMM implements General Matrix Multiply: C = (A -a) * (B - b), where a and b are scalar values. Base GEMM is parameterized and its parameters are listed below. These parameters can be configured in the `main/scala/gemm/Parameter.scala` file.
 | Parameter | Meaning |
 | - | -|
 | dataWidthA | Input matrix data width (integer) |
@@ -72,7 +72,7 @@ for (k1 = 0 to K’/Ku - 1);
   parallel_for(m2 = 0 to Mu)
   parallel_for(n2 = 0 to Nu)
   parallel_for(k2 = 0 to Ku)
-  o[m1*Mu+m2][n1*Nu+n2] += i[m1*Mu+m2][k1*Ku+k2] * w[k1*Ku+k2][n1*Nu+n2];
+  o[m1*Mu+m2][n1*Nu+n2] += (i[m1*Mu+m2][k1*Ku+k2] - a) * (w[k1*Ku+k2][n1*Nu+n2] - b);
 ```
 
 #### Data layout
@@ -120,14 +120,16 @@ bool blockGemm(int M, int K, int N, int8_t *A, int8_t *B, int32_t * C)
 | a_i | io_data_a_i | meshRow *tileSize* input | In | A big bus containing all the data elements of the input (sub-)matrix A |
 | b_i | io_data_b_i | tileSize *meshCol* input | In | A big bus containing all the data elements of the input (sub-)matrix B |
 | c_o | io_data_c_o | meshRow *meshCol* output | Out | A big bus containing all the data elements of the input (sub-)matrix C |
+| subtraction_a_i | io_ctrl_subtraction_a_i | 8 | In | The scalar value for A to subtract|
+| subtraction_b_i | io_ctrl_subtraction_b_i | 8 | In | The scalar value for B to subtract|
 
 ### Batch Stride GEMM
 
 The Batch Stride GEMM is built with the Block GEMM. Basically, the Batch Stride GEMM does multiple block matrix multiplication. The pseudocode is:
 
 ```
-for (b = 0; b < B; b++) {
-  C[b] = A[b] * B[b] // Each is a blockGemm
+for (batch = 0; batch < Batch; batch++) {
+  C[batch] = (A[batch] - a) * (B[batch]- b) // Each is a blockGemm
 }
 ```
 
@@ -270,17 +272,18 @@ More detailed illustration about the interface between SNAX and GEMM Accelerator
 | 0x3c1   | AddrACsr             | Start address of matrix A           |
 | 0x3c2   | AddrBCsr             | Start address of matrix B           |
 | 0x3c3   | AddrCCsr             | Start address of matrix C           |
-| 0x3c4   | StrideInnermostACsr  | the incremental address for a new submatrix of each block row of A   |
-| 0x3c5   | StrideInnermostBCsr  | the incremental address for a new submatrix of each block row of B   |
-| 0x3c6   | StrideInnermostCCsr  | the incremental address for a new submatrix of each block row of C   |
-| 0x3c7   | LdACsr               | the incremental address for a new block row of A             |
-| 0x3c8   | LdBCsr               | the incremental address for a new block column of B             |
-| 0x3c9   | LdCCsr               | the incremental address for a new block column of C             |
-| 0x3ca   | StrideACsr           | the incremental address of matrix A for each batch         |
-| 0x3cb   | StrideBCsr           | the incremental address of matrix B for each batch         |
-| 0x3cc   | StrideCCsr           | the incremental address of matrix C for each batch          |
+| 0x3c4   | StrideInnermostACsr  | The incremental address for a new submatrix of each block row of A   |
+| 0x3c5   | StrideInnermostBCsr  | The incremental address for a new submatrix of each block row of B   |
+| 0x3c6   | StrideInnermostCCsr  | The incremental address for a new submatrix of each block row of C   |
+| 0x3c7   | LdACsr               | The incremental address for a new block row of A             |
+| 0x3c8   | LdBCsr               | The incremental address for a new block column of B             |
+| 0x3c9   | LdCCsr               | The incremental address for a new block column of C             |
+| 0x3ca   | StrideACsr           | The incremental address of matrix A for each batch         |
+| 0x3cb   | StrideBCsr           | The incremental address of matrix B for each batch         |
+| 0x3cc   | StrideCCsr           | The incremental address of matrix C for each batch          |
 | 0x3cd   | PerfCounterCsr       | Performance counter for GEMM busy cycles |
-| 0x3ce   | StateCsr             | State CSR indicating GEMM start and busy status  |
+| 0x3ce   | SubtractionCsr       | The two subtraction value, SubtractionCsr[7:0] = a, SubtractionCsr[15:8] = b |
+| 0x3cf   | StateCsr             | State CSR indicating GEMM start and busy status  |
 
 ## Unit test
 
