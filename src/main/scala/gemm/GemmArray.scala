@@ -27,7 +27,7 @@ class TileIO extends Bundle {
 
 // Tile implementation, do a vector dot product of two vector
 // When data_valid_i assert, do the computation, and give the result next cycle, with a data_valid_o assert
-class Tile extends Module {
+class Tile extends Module with RequireAsyncReset {
   val io = IO(new TileIO())
 
   val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
@@ -114,7 +114,7 @@ class MeshIO extends Bundle {
 }
 
 // Mesh implementation, just create a mesh of TIles and do the connection
-class Mesh extends Module {
+class Mesh extends Module with RequireAsyncReset {
 
   val io = IO(new MeshIO())
 
@@ -170,7 +170,7 @@ class GemmArrayIO extends Bundle {
 }
 
 // Gemm implementation, create a Mesh and give out input data and collect results of each Tile
-class GemmArray extends Module {
+class GemmArray extends Module with RequireAsyncReset {
 
   val io = IO(new GemmArrayIO())
 

@@ -8,7 +8,7 @@ import scala.util.Random
 
 // A delay module to simulate the delay of the read responds
 // Also save the delayed address for comparison with the golden address later
-class GenDataValidAddrDelay extends Module {
+class GenDataValidAddrDelay extends Module with RequireAsyncReset {
   val io = IO(new Bundle {
     val data_valid_i = Input(Bool())
     val data_valid_o = Output(Bool())
@@ -28,7 +28,9 @@ class GenDataValidAddrDelay extends Module {
 }
 
 // A BatchGemmTCDMWritePorts test wrapper with the read responds delay module
-class GemmTestWrapper(TCDMWritePorts: Int) extends Module {
+class GemmTestWrapper(TCDMWritePorts: Int)
+    extends Module
+    with RequireAsyncReset {
 
   val io = IO(new Bundle {
     val batch_gemm = new BatchGemmIO()

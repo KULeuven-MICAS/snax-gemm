@@ -34,7 +34,7 @@ class BlockGemmControllerIO extends Bundle {
 }
 
 // BlockGemmController module. This module takes in the configurations and gives out read/write valid signals and the right addresses of the sub-matrices.
-class BlockGemmController extends Module {
+class BlockGemmController extends Module with RequireAsyncReset {
   lazy val io = IO(new BlockGemmControllerIO())
 
   val start_do = RegInit(false.B)
@@ -249,7 +249,7 @@ class BlockGemmIO extends Bundle {
 // In this module, a GemmArray is generated to do the computation and
 // a controller is generated to generate the control signals for
 // read/write request and related address
-class BlockGemm extends Module {
+class BlockGemm extends Module with RequireAsyncReset {
   lazy val io = IO(new BlockGemmIO())
   io.suggestName("io")
 

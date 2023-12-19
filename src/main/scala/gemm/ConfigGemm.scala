@@ -3,7 +3,9 @@ import chisel3._
 import chisel3.util._
 
 // A uniform Gemm Generator for generating three different kind of Gemm Accelerator
-class GemmGenerator(selectedGemm: Int = 3) extends Module {
+class GemmGenerator(selectedGemm: Int = 3)
+    extends Module
+    with RequireAsyncReset {
   require(
     selectedGemm == 1 || selectedGemm == 2 || selectedGemm == 3 || selectedGemm == 4,
     "Invalid configuration!"
