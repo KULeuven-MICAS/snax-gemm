@@ -6,7 +6,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
 // test wrapper module for test ideal situation when tcdm ready always asserted
-class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int) extends Module {
+class BatchGemmSnaxTopWrapper(TCDMWritePorts: Int)
+    extends Module
+    with RequireAsyncReset {
 
   val io = IO(new Bundle {
     val batch_gemm_snanx_top = new BatchGemmSnaxTopIO()
