@@ -29,7 +29,8 @@ module snax_gemm_wrapper #(
     input  logic     snax_pready_i,
 
     output tcdm_req_t [SnaxTcdmPorts-1:0] snax_tcdm_req_o,
-    input  tcdm_rsp_t [SnaxTcdmPorts-1:0] snax_tcdm_rsp_i
+    input  tcdm_rsp_t [SnaxTcdmPorts-1:0] snax_tcdm_rsp_i,
+    output logic                          snax_barrier_o
 );
 
   // CSR addresses setting
@@ -138,8 +139,8 @@ module snax_gemm_wrapper #(
   logic      [          AddrWidth - 1:0] io_ctrl_addr_c_o;
 
   // substraction a and b for gemm
-  logic [dataWidthA - 1:0] substraction_a;
-  logic [dataWidthB - 1:0] substraction_b;
+  logic      [         dataWidthA - 1:0] substraction_a;
+  logic      [         dataWidthB - 1:0] substraction_b;
 
   // local input matrix buffer
   logic      [InputMatrixSize * 2 - 1:0] data_reg;
@@ -234,7 +235,7 @@ module snax_gemm_wrapper #(
   // assert read/write csr signal according to the data_op when snax_qvalid_i
   always_comb begin
     if (!rst_ni) begin
-      read_csr  = 1'b0;
+      read_csr = 1'b0;
       write_csr = 1'b0;
       read_perf_counter = 1'b0;
     end else if (snax_qvalid_i) begin
@@ -242,21 +243,21 @@ module snax_gemm_wrapper #(
         CSRRS, CSRRSI, CSRRC, CSRRCI: begin
           if (csr_addr == PerfCounterCsr - CsrAddrOFfset) begin
             read_perf_counter = 1'b1;
-            read_csr  = 1'b0;
+            read_csr = 1'b0;
           end else begin
             read_csr = 1'b1;
-            read_perf_counter  = 1'b0;
+            read_perf_counter = 1'b0;
           end
           write_csr = 1'b0;
         end
         default: begin
           write_csr = 1'b1;
-          read_csr  = 1'b0;
+          read_csr = 1'b0;
           read_perf_counter = 1'b0;
         end
       endcase
     end else begin
-      read_csr  = 1'b0;
+      read_csr = 1'b0;
       write_csr = 1'b0;
       read_perf_counter = 1'b0;
     end
@@ -272,8 +273,8 @@ module snax_gemm_wrapper #(
   assign io_ctrl_K_i = CSR[MatrixSizeCsr-CsrAddrOFfset][15:8];
   assign io_ctrl_N_i = CSR[MatrixSizeCsr-CsrAddrOFfset][7:0];
 
-  assign substraction_a = CSR[SubstractionCsr - CsrAddrOFfset][7:0];
-  assign substraction_b = CSR[SubstractionCsr - CsrAddrOFfset][15:8];
+  assign substraction_a = CSR[SubstractionCsr-CsrAddrOFfset][7:0];
+  assign substraction_b = CSR[SubstractionCsr-CsrAddrOFfset][15:8];
 
   assign io_ctrl_ptr_addr_a_i = CSR[AddrACsr-CsrAddrOFfset];
   assign io_ctrl_ptr_addr_b_i = CSR[AddrBCsr-CsrAddrOFfset];
@@ -582,5 +583,7 @@ module snax_gemm_wrapper #(
   assign io_ctrl_data_valid_i = (&snax_tcdm_rsp_i_p_valid) === 1'b1;
   assign io_ctrl_write_mem_ready = (&snax_tcdm_rsp_i_q_ready[SnaxTcdmPorts - 1 : InputTcdmPorts]) === 1'b1;
   assign io_ctrl_read_mem_ready = (&snax_tcdm_rsp_i_q_ready[InputTcdmPorts-1 : 0]) === 1'b1;
+
+  assign snax_barrier_o = gemm_state == 1'b0;
 
 endmodule
