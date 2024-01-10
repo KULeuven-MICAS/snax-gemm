@@ -4,6 +4,7 @@ import chisel3._
 import org.scalatest.flatspec.AnyFlatSpec
 import chiseltest._
 
+// Simple Bare Block Gemm (for integrating with streamer) test to see if the control signals work well
 class BareBlockGemmBaseTest extends AnyFlatSpec with ChiselScalatestTester {
   "DUT" should "pass" taggedAs (Unnecessary) in {
     test(new BareBlockGemm)
