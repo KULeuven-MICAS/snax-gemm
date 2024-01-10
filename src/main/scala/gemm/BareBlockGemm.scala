@@ -3,6 +3,7 @@ package gemm
 import chisel3._
 import chisel3.util._
 
+// The BareBlockGemm's control port declaration.
 class BareBlockGemmCtrlIO extends Bundle {
 
   val M_i = (UInt(GemmConstant.sizeConfigWidth.W))
@@ -13,6 +14,7 @@ class BareBlockGemmCtrlIO extends Bundle {
 
 }
 
+// The BareBlockGemm's data port declaration. Decoupled interface connected to the streamer
 class BareBlockGemmDataIO extends Bundle {
   val a_i = Flipped(
     DecoupledIO(
@@ -35,6 +37,7 @@ class BareBlockGemmDataIO extends Bundle {
   )
 }
 
+// BareBlockGemmIO declaration, including control and data as well as two extra output signal
 class BareBlockGemmIO extends Bundle {
 
   val ctrl = Flipped(DecoupledIO(new BareBlockGemmCtrlIO()))
@@ -44,7 +47,9 @@ class BareBlockGemmIO extends Bundle {
 
 }
 
+// BareBlockGemm module
 class BareBlockGemm extends Module with RequireAsyncReset {
+
   val io = IO(new BareBlockGemmIO())
 
   val gemm_array = Module(new GemmArray())
@@ -57,14 +62,16 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   val subtraction_a = RegInit(0.U(GemmConstant.dataWidthA.W))
   val subtraction_b = RegInit(0.U(GemmConstant.dataWidthB.W))
 
+  // useful counters
   val accumulation_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
   val write_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
+  val perf_counter = RegInit(0.U(32.W))
+
+  // control signals for the counter incremental
   val accumulation = WireInit(0.B)
   val input_data_valid = WireInit(0.B)
-
-  val perf_counter = RegInit(0.U(32.W))
 
   // signals for state transition
   val config_valid = WireInit(0.B)
@@ -99,6 +106,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   config_valid := io.ctrl.fire
 
+  // Store the configurations when config valid
   when(config_valid) {
     M := io.ctrl.bits.M_i
     N := io.ctrl.bits.N_i
@@ -111,8 +119,10 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     subtraction_b := io.ctrl.bits.subtraction_b_i
   }
 
+  // write all the results out means the operation is done
   computation_finish := write_counter === (M * N * K - 1.U) && io.data.c_o.fire && cstate === sBUSY
 
+  // write counter increment according to output data fire
   when(io.data.c_o.fire) {
     write_counter := write_counter + 1.U
   }.elsewhen(cstate === sIDLE) {
@@ -121,6 +131,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   input_data_valid := io.data.a_i.fire && io.data.b_i.fire && cstate === sBUSY
 
+  // accumulation counter for generating the accumulation signal for Gemm Array
   when(
     input_data_valid && accumulation_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
   ) {
@@ -141,31 +152,37 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     perf_counter := 0.U
   }
 
+  // output control signals
   io.perf_counter := perf_counter
 
   io.busy_o := cstate =/= sIDLE
 
   io.ctrl.ready := cstate === sIDLE
 
+  // ready for getting new input data when gemm is ready for new computation, aka, not the the outputting previous result mode
   io.data.a_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o
   io.data.b_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o
 
-  // Gemm array signal connection
+  // Gemm Array signal connection
+  // control signals
   gemm_array.io.data_valid_i := input_data_valid
   gemm_array.io.accumulate_i := accumulation
   gemm_array.io.data_ready_o := io.data.c_o.ready
 
+  // data signals
   gemm_array.io.data.a_i := io.data.a_i.bits
   gemm_array.io.data.b_i := io.data.b_i.bits
 
   gemm_array.io.subtraction_a_i := subtraction_a
   gemm_array.io.subtraction_b_i := subtraction_b
 
+  // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
   io.data.c_o.valid := gemm_array.io.data_valid_o
 
 }
 
+// Scala main function for generating system verilog file for the BareBlockGemm module
 object BareBlockGemm extends App {
   emitVerilog(
     new (BareBlockGemm),
