@@ -112,7 +112,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     N := io.ctrl.bits.N_i
     K := io.ctrl.bits.K_i
     assert(
-      io.ctrl.bits.M_i =/= 0.U && io.ctrl.bits.K_i =/= 0.U && io.ctrl.bits.K_i =/= 0.U,
+      io.ctrl.bits.M_i =/= 0.U || io.ctrl.bits.K_i =/= 0.U || io.ctrl.bits.K_i =/= 0.U,
       " M == 0 or K ==0 or N == 0, invalid configuration!"
     )
     subtraction_a := io.ctrl.bits.subtraction_a_i
