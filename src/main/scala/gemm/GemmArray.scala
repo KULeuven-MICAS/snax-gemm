@@ -23,6 +23,7 @@ class TileIO extends Bundle {
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val control_i = Input(new TileControl())
   val data_valid_o = Output(Bool())
+  val gemm_ready_o = Output(Bool())
 }
 
 // Tile implementation, do a vector dot product of two vector
@@ -85,6 +86,8 @@ class Tile extends Module with RequireAsyncReset {
 
   io.c_o := result_reg
   io.data_valid_o := check_data_i_valid_reg || keep_output
+  io.gemm_ready_o := !keep_output
+
 }
 
 // Mesh IO definition, an extended version of Tile IO
@@ -111,6 +114,8 @@ class MeshIO extends Bundle {
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val control_i = Input(new TileControl())
   val data_valid_o = Output(Bool())
+  val gemm_ready_o = Output(Bool())
+
 }
 
 // Mesh implementation, just create a mesh of TIles and do the connection
@@ -136,6 +141,7 @@ class Mesh extends Module with RequireAsyncReset {
     }
   }
   io.data_valid_o := mesh(0)(0).io.data_valid_o
+  io.gemm_ready_o := mesh(0)(0).io.gemm_ready_o
 }
 
 class GemmDataIO extends Bundle {
@@ -162,6 +168,7 @@ class GemmArrayIO extends Bundle {
   val accumulate_i = Input(Bool())
   val data_valid_o = Output(Bool())
   val data_ready_o = Input(Bool())
+  val gemm_ready_o = Output(Bool())
 
   val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
@@ -241,6 +248,8 @@ class GemmArray extends Module with RequireAsyncReset {
   mesh.io.subtraction_b_i := io.subtraction_b_i
 
   io.data_valid_o := mesh.io.data_valid_o
+  io.gemm_ready_o := mesh.io.gemm_ready_o
+
 }
 
 object GemmArray extends App {
