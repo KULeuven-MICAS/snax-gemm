@@ -28,4 +28,7 @@ object GemmConstant {
   def idealTCDMWritePorts = 32
   def TCDMDataWidth = 64
 
+  def csrNum: Int = 5
+  def csrAddrWidth: Int = 32
+
 }
