@@ -113,7 +113,7 @@ class BatchGemmController extends BlockGemmController {
 
   io.gemm_read_valid_o := (start_do === 1.B || start_batch === 1.B) || (io.data_valid_i && (cstate === sREAD))
   io.gemm_write_valid_o := (write_valid_counter === K - 1.U) && io.data_valid_o && cstate =/= sIDLE
-  io.accumulate_i := (accumulate_counter =/= K - 1.U && io.data_valid_i === 1.B)
+  io.accumulate_i := (accumulate_counter =/= 0.U && io.data_valid_i === 1.B)
 
   start_batch := (M_read_counter === (0.U)) && (N_read_counter === (0.U)) && (K_read_counter === (0.U)) && (batchReadCounter =/= Batch - 1.U) && cstate === sREAD
 
