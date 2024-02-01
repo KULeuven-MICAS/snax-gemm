@@ -136,34 +136,93 @@ class BlockGemmController extends Module with RequireAsyncReset {
     start_do := false.B
   }
 
-  // Read counter increment according to the start_do and io.data_valid_i
-  when(io.gemm_read_valid_o && io.busy_o) {
-    read_counter := read_counter + 1.U
-  }.elsewhen(!io.busy_o) {
-    read_counter := 0.U
+  def loopCounterGen(
+      workingState: Bool,
+      increment: Bool,
+      loopBounds: Seq[UInt]
+  ): Vec[UInt] = {
+
+    /** Generates a nested loop counter based on the provided parameters.
+      */
+
+    def temporalLoopDim = loopBounds.length
+    val loop_counters = RegInit(
+      VecInit(
+        Seq.fill(temporalLoopDim)(
+          0.U(GemmConstant.sizeConfigWidth.W)
+        )
+      )
+    )
+    val loop_counters_next = WireInit(
+      VecInit(
+        Seq.fill(temporalLoopDim)(
+          0.U(GemmConstant.sizeConfigWidth.W)
+        )
+      )
+    )
+    val loop_counters_valid = WireInit(
+      VecInit(Seq.fill(temporalLoopDim)(0.B))
+    )
+    val loop_counters_last = WireInit(
+      VecInit(Seq.fill(temporalLoopDim)(0.B))
+    )
+
+    for (i <- 0 until temporalLoopDim) {
+      // the next loop counter is the current loop counter plus 1
+      loop_counters_next(i) := loop_counters(i) + 1.U
+      // the loop counter reaches the last value when the
+      // next loop counter equals the loop bound
+      loop_counters_last(i) := loop_counters_next(i) === loopBounds(i)
+    }
+
+    loop_counters_valid(0) := increment
+    for (i <- 1 until temporalLoopDim) {
+      // every loop counter must be incremented when the previous loop counter
+      // reaches the last value and is incremented
+      loop_counters_valid(i) := loop_counters_last(
+        i - 1
+      ) && loop_counters_valid(i - 1)
+    }
+
+    when(workingState) {
+      for (i <- 0 until temporalLoopDim) {
+        when(loop_counters_valid(i)) {
+          loop_counters(i) := Mux(
+            loop_counters_last(i),
+            0.U,
+            loop_counters_next(i)
+          )
+        }.otherwise {
+          loop_counters(i) := loop_counters(i)
+        }
+      }
+    }.otherwise {
+      for (i <- 0 until temporalLoopDim) {
+        loop_counters(i) := 0.U
+      }
+    }
+    loop_counters
   }
+
+  // Counters for generating the right addresses for block matrix multiplication
+  lazy val loopBounds = Seq(K, N, M)
+  lazy val readLoopCounters =
+    loopCounterGen(cstate =/= sIDLE, io.gemm_read_valid_o, loopBounds)
+  K_read_counter := readLoopCounters(0)
+  N_read_counter := readLoopCounters(1)
+  M_read_counter := readLoopCounters(2)
+
+  lazy val writeLoopCounters =
+    loopCounterGen(cstate =/= sIDLE, io.data_valid_o, loopBounds)
+  K_write_counter := writeLoopCounters(0)
+  N_write_counter := writeLoopCounters(1)
+  M_write_counter := writeLoopCounters(2)
 
   when(io.start_do_i && !io.busy_o) {
     perf_counter := 0.U
   }.elsewhen(io.busy_o =/= 0.U) {
     perf_counter := perf_counter + 1.U
   }
-
-  // Write counter increment according to the io.data_valid_o
-
-  when(io.data_valid_o && io.busy_o) {
-    write_counter := write_counter + 1.U
-  }.elsewhen(cstate === sIDLE) {
-    write_counter := 0.U
-  }
-  // Counters for generating the right addresses for block matrix multiplication
-  M_read_counter := read_counter / (K * N)
-  K_read_counter := (read_counter % (K * N)) % K
-  N_read_counter := (read_counter % (K * N)) / K
-
-  M_write_counter := (write_counter / K) / N
-  K_write_counter := write_counter % K
-  N_write_counter := (write_counter / K) % N
 
   // write_counter for the address generation to write submatrix of C
   when(
