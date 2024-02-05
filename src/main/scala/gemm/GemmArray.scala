@@ -32,7 +32,6 @@ class Tile extends Module with RequireAsyncReset {
   val io = IO(new TileIO())
 
   val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
-  val result_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
   val check_data_i_valid_reg = RegInit(0.B)
   val keep_output = RegInit(false.B)
   val data_a_i_subtracted = Wire(
@@ -69,22 +68,18 @@ class Tile extends Module with RequireAsyncReset {
   // Sum of element-wise multiply
   mul_add_result := mul_add_result_vec.reduce((a, b) => (a.asSInt + b.asSInt))
 
-  when(io.control_i.data_valid_i === 1.B) {
-    result_reg := accumulation_reg + mul_add_result
-  }
-
   // Accumulation, if io.control_i.accumulate === 0.B, clear the accumulation reg, otherwise store the current results
   when(
     io.control_i.data_valid_i === 1.B && io.control_i.accumulate_i === 0.B
   ) {
-    accumulation_reg := 0.S
+    accumulation_reg := mul_add_result
   }.elsewhen(
     io.control_i.data_valid_i === 1.B && io.control_i.accumulate_i === 1.B
   ) {
     accumulation_reg := accumulation_reg + mul_add_result
   }
 
-  io.c_o := result_reg
+  io.c_o := accumulation_reg
   io.data_valid_o := check_data_i_valid_reg || keep_output
   io.gemm_ready_o := !keep_output
 
