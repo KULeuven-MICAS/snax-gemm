@@ -218,6 +218,12 @@ class BlockGemmController extends Module with RequireAsyncReset {
   N_write_counter := writeLoopCounters(1)
   M_write_counter := writeLoopCounters(2)
 
+  when(io.gemm_read_valid_o && io.busy_o) {
+    read_counter := read_counter + 1.U
+  }.elsewhen(!io.busy_o) {
+    read_counter := 0.U
+  }
+
   when(io.start_do_i && !io.busy_o) {
     perf_counter := 0.U
   }.elsewhen(io.busy_o =/= 0.U) {
