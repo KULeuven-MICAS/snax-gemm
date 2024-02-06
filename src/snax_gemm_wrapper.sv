@@ -156,6 +156,21 @@ module snax_gemm_wrapper #(
   logic                                  wait_for_p_valid_read;
   logic                                  wait_for_q_ready_write;
 
+  // 
+  logic                                  wait_for_q_ready_read_reg;
+  logic                                  wait_for_q_ready_write_reg;
+
+  always_ff @(posedge clk_i or negedge rst_ni) begin
+    if (!rst_ni) begin
+      wait_for_q_ready_read_reg <= 1'b0;
+      wait_for_q_ready_write_reg <= 1'b0;
+    end
+    else begin
+      wait_for_q_ready_read_reg <= wait_for_q_ready_read;
+      wait_for_q_ready_write_reg <= wait_for_q_ready_write;
+    end
+  end
+  
   // split tcdm request to input and output
   tcdm_req_t [       InputTcdmPorts-1:0] snax_tcdm_req_o_input;
   tcdm_req_t [      OutputTcdmPorts-1:0] snax_tcdm_req_o_output;
@@ -354,7 +369,12 @@ module snax_gemm_wrapper #(
         snax_tcdm_req_o_input[i+InputTcdmPorts/2].q.strb = {(DataWidth / 8) {1'b0}};
         snax_tcdm_req_o_input[i+InputTcdmPorts/2].q.user = '0;
       end else if (io_ctrl_gemm_read_valid_o) begin
-        snax_tcdm_req_o_input[i].q_valid = 1'b1;
+        if(wait_for_q_ready_read_reg) begin
+          snax_tcdm_req_o_input[i].q_valid = ~snax_tcdm_rsp_i_q_ready_reg[i];
+        end
+        else begin
+          snax_tcdm_req_o_input[i].q_valid = 1'b1;
+        end
         snax_tcdm_req_o_input[i].q.addr = io_ctrl_addr_a_o + i * 8;
         snax_tcdm_req_o_input[i].q.write = 1'b0;
         snax_tcdm_req_o_input[i].q.amo = AMONone;
@@ -362,7 +382,12 @@ module snax_gemm_wrapper #(
         snax_tcdm_req_o_input[i].q.strb = {(DataWidth / 8) {1'b1}};
         snax_tcdm_req_o_input[i].q.user = '0;
 
-        snax_tcdm_req_o_input[i+InputTcdmPorts/2].q_valid = 1'b1;
+        if(wait_for_q_ready_read_reg) begin
+          snax_tcdm_req_o_input[i+InputTcdmPorts/2].q_valid = ~snax_tcdm_rsp_i_q_ready_reg[i+InputTcdmPorts/2];
+        end
+        else begin
+          snax_tcdm_req_o_input[i+InputTcdmPorts/2].q_valid = 1'b1;
+        end
         snax_tcdm_req_o_input[i+InputTcdmPorts/2].q.addr = io_ctrl_addr_b_o + i * 8;
         snax_tcdm_req_o_input[i+InputTcdmPorts/2].q.write = 1'b0;
         snax_tcdm_req_o_input[i+InputTcdmPorts/2].q.amo = AMONone;
@@ -401,7 +426,12 @@ module snax_gemm_wrapper #(
         snax_tcdm_req_o_output[i].q.strb  = {(DataWidth / 8) {1'b0}};
         snax_tcdm_req_o_output[i].q.user  = '0;
       end else if (io_ctrl_gemm_write_valid_o) begin
-        snax_tcdm_req_o_output[i].q_valid = 1'b1;
+        if(wait_for_q_ready_write) begin
+          snax_tcdm_req_o_output[i].q_valid = ~snax_tcdm_rsp_i_q_ready_reg[i + InputTcdmPorts];
+        end
+        else begin
+          snax_tcdm_req_o_output[i].q_valid = 1'b1;
+        end
         snax_tcdm_req_o_output[i].q.addr  = io_ctrl_addr_c_o + i * 8;
         snax_tcdm_req_o_output[i].q.write = 1'b1;
         snax_tcdm_req_o_output[i].q.amo   = AMONone;
@@ -536,7 +566,7 @@ module snax_gemm_wrapper #(
       end
     end
   end
-
+ 
   // store q_ready signals
   // when q_ready, it means that the request has been sent correctly
   always_ff @(posedge clk_i or negedge rst_ni) begin
