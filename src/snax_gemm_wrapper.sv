@@ -9,6 +9,11 @@
 // verilog_lint: waive-start line-length
 // verilog_lint: waive-start no-trailing-spaces
 
+`ifdef TARGET_SYNTHESIS
+import riscv_instr::*;
+import reqrsp_pkg::*;
+`endif 
+
 module snax_gemm_wrapper #(
     parameter int unsigned DataWidth     = 64,
     parameter int unsigned SnaxTcdmPorts = 24,
@@ -474,19 +479,21 @@ module snax_gemm_wrapper #(
   // get input data for gemm from tcdm responds
   // store p_valid and data when p_valid during the wait_for_p_valid_read && !io_ctrl_data_valid_i period
   always_ff @(posedge clk_i or negedge rst_ni) begin
-    for (int i = 0; i < InputTcdmPorts; i++) begin
       if (!rst_ni) begin
-        snax_tcdm_rsp_i_p_valid_reg[i]   <= 1'b0;
-        data_reg[i*DataWidth+:DataWidth] <= {DataWidth{1'b0}};
-      end else begin
-        if (wait_for_p_valid_read && !io_ctrl_data_valid_i) begin
-          if (snax_tcdm_rsp_i[i].p_valid) begin
-            snax_tcdm_rsp_i_p_valid_reg[i]   <= snax_tcdm_rsp_i[i].p_valid;
-            data_reg[i*DataWidth+:DataWidth] <= snax_tcdm_rsp_i[i].p.data;
-          end
-        end else begin
-          snax_tcdm_rsp_i_p_valid_reg[i] <= 1'b0;
+        for (int i = 0; i < InputTcdmPorts; i++) begin
+          snax_tcdm_rsp_i_p_valid_reg[i]   <= 1'b0;
+          data_reg[i*DataWidth+:DataWidth] <= {DataWidth{1'b0}};
         end
+      end else begin
+          for (int i = 0; i < InputTcdmPorts; i++) begin
+            if (wait_for_p_valid_read && !io_ctrl_data_valid_i) begin
+              if (snax_tcdm_rsp_i[i].p_valid) begin
+                snax_tcdm_rsp_i_p_valid_reg[i]   <= snax_tcdm_rsp_i[i].p_valid;
+                data_reg[i*DataWidth+:DataWidth] <= snax_tcdm_rsp_i[i].p.data;
+              end
+            end else begin
+              snax_tcdm_rsp_i_p_valid_reg[i] <= 1'b0;
+            end
       end
     end
   end
@@ -570,30 +577,31 @@ module snax_gemm_wrapper #(
   // store q_ready signals
   // when q_ready, it means that the request has been sent correctly
   always_ff @(posedge clk_i or negedge rst_ni) begin
-    for (int i = 0; i < SnaxTcdmPorts; i++) begin
       if (!rst_ni) begin
-        snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
-      end else begin
-        // for read q_ready
-        if (i < InputTcdmPorts) begin
-          if (wait_for_q_ready_read && !io_ctrl_read_mem_ready) begin
-            if (snax_tcdm_rsp_i[i].q_ready) begin
-              snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;
-            end
-          end else begin
-            snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
-          end
-          // for write q_ready
-        end else begin
-          if (wait_for_q_ready_write && !io_ctrl_write_mem_ready) begin
-            if (snax_tcdm_rsp_i[i].q_ready) begin
-              snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;
-            end
-          end else begin
-            snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
-          end
+        for (int i = 0; i < SnaxTcdmPorts; i++) begin
+          snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
         end
-
+      end else begin
+        for (int i = 0; i < SnaxTcdmPorts; i++) begin
+          // for read q_ready
+          if (i < InputTcdmPorts) begin
+            if (wait_for_q_ready_read && !io_ctrl_read_mem_ready) begin
+              if (snax_tcdm_rsp_i[i].q_ready) begin
+                snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;
+              end
+            end else begin
+              snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
+            end
+            // for write q_ready
+          end else begin
+            if (wait_for_q_ready_write && !io_ctrl_write_mem_ready) begin
+              if (snax_tcdm_rsp_i[i].q_ready) begin
+                snax_tcdm_rsp_i_q_ready_reg[i] <= snax_tcdm_rsp_i[i].q_ready;
+              end
+            end else begin
+              snax_tcdm_rsp_i_q_ready_reg[i] <= 1'b0;
+            end
+          end
       end
     end
   end
