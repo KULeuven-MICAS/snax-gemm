@@ -15,6 +15,7 @@ class TCDMWritePortsDataIO(TCDMWritePorts: Int = 8) extends GemmDataIO {
 class TCDMWritePortsCtrlIO extends BatchGemmCtrlIO {
   val read_mem_ready = Input(Bool())
   val write_mem_ready = Input(Bool())
+  val strideHalfC_i = Input(UInt(GemmConstant.addrWidth.W))
 }
 
 // Override old gemm io ports with new ports
@@ -247,6 +248,14 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
   gemm_write_ready_o := (output_reg_ready_ping && is_ping_output_for_write_reg) || (output_reg_ready_pong && is_pong_output_for_write_reg)
 
   // multi-stage output data and address according to the ping/pong
+
+  def last_half = output_counter >= (stages / 2).U
+  val strideHalfC = RegInit(0.U(GemmConstant.addrWidth.W))
+
+  when(io.ctrl.start_do_i && !io.ctrl.busy_o) {
+    strideHalfC := io.ctrl.strideHalfC_i
+  }
+
   when(is_ping_writing) {
     io.data.multi_stage_c_o := Mux(
       ping_new_output_fire,
@@ -256,7 +265,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     io.ctrl.addr_c_o := Mux(
       ping_new_output_fire,
       block_gemm_addr_c_o,
-      addr_c_reg_ping + addrDelta.U * output_counter
+      addr_c_reg_ping + addrDelta.U * output_counter + strideHalfC * last_half
     )
   }.otherwise {
     io.data.multi_stage_c_o := Mux(
@@ -267,7 +276,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
     io.ctrl.addr_c_o := Mux(
       pong_new_output_fire,
       block_gemm_addr_c_o,
-      addr_c_reg_pong + addrDelta.U * output_counter
+      addr_c_reg_pong + addrDelta.U * output_counter + strideHalfC * last_half
     )
   }
 
@@ -322,8 +331,15 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 }
 
 object BatchGemmSnaxTop extends App {
+  // val file_name = "BatchGemmSnaxTop_%s_%s_%s.sv".format(GemmConstant.meshRow, GemmConstant.tileSize,GemmConstant.meshCol)
+  val dir_name = "BatchGemmSnaxTop_%s_%s_%s_%s".format(
+    GemmConstant.meshRow,
+    GemmConstant.tileSize,
+    GemmConstant.meshCol,
+    GemmConstant.dataWidthA
+  )
   emitVerilog(
     new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
-    Array("--target-dir", "generated/gemm")
+    Array("--target-dir", "generated/%s".format(dir_name))
   )
 }
