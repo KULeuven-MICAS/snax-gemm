@@ -68,8 +68,10 @@ module snax_gemm_wrapper #(
   // substraction CSR
   localparam int unsigned SubstractionCsr = 32'h3ce;
 
+  localparam int unsigned StrideHalfCCsr = 32'h3cf;
+
   // state csr, indicating when to start GEMM and if the GEMM is busy
-  localparam int unsigned StateCsr = 32'h3cf;
+  localparam int unsigned StateCsr = 32'h3d0;
 
   // Local parameters for input and output sizes
   localparam int unsigned InputTcdmPorts = 16;
@@ -130,6 +132,8 @@ module snax_gemm_wrapper #(
   logic      [          AddrWidth - 1:0] io_ctrl_strideinnermostA_i;
   logic      [          AddrWidth - 1:0] io_ctrl_strideinnermostB_i;
   logic      [          AddrWidth - 1:0] io_ctrl_strideinnermostC_i;
+
+  logic      [          AddrWidth - 1:0] io_ctrl_strideHalfC_i;
 
   logic      [          AddrWidth - 1:0] io_ctrl_ldA_i;
   logic      [          AddrWidth - 1:0] io_ctrl_ldB_i;
@@ -252,6 +256,19 @@ module snax_gemm_wrapper #(
   assign gemm_idle2busy  = gemm_state == 1'b0 && io_ctrl_busy_o == 1'b1;
   assign write_state_csr = gemm_state != io_ctrl_busy_o;
 
+  int file_handle;
+
+`ifdef QUESTA_SIM_XYI
+  always_comb begin
+    if(gemm_busy2idle) begin
+      $display("performance counter value: %d", io_ctrl_perf_counter);
+      file_handle = $fopen("sim_output.txt", "w");
+      $fwrite(file_handle,"performance counter value: %d", io_ctrl_perf_counter);
+      $fclose(file_handle);
+    end
+  end
+`endif
+
   // assert read/write csr signal according to the data_op when snax_qvalid_i
   always_comb begin
     if (!rst_ni) begin
@@ -304,6 +321,8 @@ module snax_gemm_wrapper #(
   assign io_ctrl_strideinnermostB_i = CSR[StrideInnermostBCsr-CsrAddrOFfset];
   assign io_ctrl_strideinnermostC_i = CSR[StrideInnermostCCsr-CsrAddrOFfset];
 
+  assign io_ctrl_strideHalfC_i = CSR[StrideHalfCCsr-CsrAddrOFfset];
+
   assign io_ctrl_ldA_i = CSR[LdACsr-CsrAddrOFfset];
   assign io_ctrl_ldB_i = CSR[LdBCsr-CsrAddrOFfset];
   assign io_ctrl_ldC_i = CSR[LdCCsr-CsrAddrOFfset];
@@ -330,6 +349,7 @@ module snax_gemm_wrapper #(
       .io_ctrl_strideinnermost_A_i(io_ctrl_strideinnermostA_i),
       .io_ctrl_strideinnermost_B_i(io_ctrl_strideinnermostB_i),
       .io_ctrl_strideinnermost_C_i(io_ctrl_strideinnermostC_i),
+      .io_ctrl_strideHalfC_i(io_ctrl_strideHalfC_i),
       .io_ctrl_ldA_i(io_ctrl_ldA_i),
       .io_ctrl_ldB_i(io_ctrl_ldB_i),
       .io_ctrl_ldC_i(io_ctrl_ldC_i),
