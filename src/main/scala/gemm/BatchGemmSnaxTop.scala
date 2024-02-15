@@ -332,14 +332,18 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
 object BatchGemmSnaxTop extends App {
   // val file_name = "BatchGemmSnaxTop_%s_%s_%s.sv".format(GemmConstant.meshRow, GemmConstant.tileSize,GemmConstant.meshCol)
-  val dir_name = "BatchGemmSnaxTop_%s_%s_%s_%s".format(
-    GemmConstant.meshRow,
-    GemmConstant.tileSize,
-    GemmConstant.meshCol,
-    GemmConstant.dataWidthA
-  )
+  // val dir_name = "BatchGemmSnaxTop_%s_%s_%s_%s".format(
+  //   GemmConstant.meshRow,
+  //   GemmConstant.tileSize,
+  //   GemmConstant.meshCol,
+  //   GemmConstant.dataWidthA
+  // )
+  // emitVerilog(
+  //   new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
+  //   Array("--target-dir", "generated/%s".format(dir_name))
+  // )
   emitVerilog(
     new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
-    Array("--target-dir", "generated/%s".format(dir_name))
+    Array("--target-dir", "generated/gemm")
   )
 }
