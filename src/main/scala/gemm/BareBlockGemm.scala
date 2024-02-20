@@ -236,3 +236,13 @@ object BareBlockGemmTop extends App {
     Array("--target-dir", "generated/gemm")
   )
 }
+
+object BareBlockGemmTopGen {
+  def main(args: Array[String]): Unit = {
+    val outPath = args.headOption.getOrElse("../../../../rtl/.")
+    emitVerilog(
+      new BareBlockGemmTop,
+      Array("--target-dir", outPath)
+    )
+  }
+}
