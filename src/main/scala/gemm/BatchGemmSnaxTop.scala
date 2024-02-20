@@ -249,7 +249,7 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
   // multi-stage output data and address according to the ping/pong
 
-  def last_half = output_counter >= (stages / 2).U
+  def last_half = output_counter >= (stages / 2).U && (stages > 1).B
   val strideHalfC = RegInit(0.U(GemmConstant.addrWidth.W))
 
   when(io.ctrl.start_do_i && !io.ctrl.busy_o) {
@@ -332,18 +332,18 @@ class BatchGemmSnaxTop(TCDMWritePorts: Int = 8) extends BatchGemm {
 
 object BatchGemmSnaxTop extends App {
   // val file_name = "BatchGemmSnaxTop_%s_%s_%s.sv".format(GemmConstant.meshRow, GemmConstant.tileSize,GemmConstant.meshCol)
-  // val dir_name = "BatchGemmSnaxTop_%s_%s_%s_%s".format(
-  //   GemmConstant.meshRow,
-  //   GemmConstant.tileSize,
-  //   GemmConstant.meshCol,
-  //   GemmConstant.dataWidthA
-  // )
-  // emitVerilog(
-  //   new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
-  //   Array("--target-dir", "generated/%s".format(dir_name))
-  // )
+  val dir_name = "BatchGemmSnaxTop_%s_%s_%s_%s".format(
+    GemmConstant.meshRow,
+    GemmConstant.tileSize,
+    GemmConstant.meshCol,
+    GemmConstant.dataWidthA
+  )
   emitVerilog(
     new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
-    Array("--target-dir", "generated/gemm")
+    Array("--target-dir", "generated/%s".format(dir_name))
   )
+  // emitVerilog(
+  //   new BatchGemmSnaxTop(GemmConstant.TCDMWritePorts),
+  //   Array("--target-dir", "generated/gemm")
+  // )
 }

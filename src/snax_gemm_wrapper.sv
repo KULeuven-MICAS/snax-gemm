@@ -87,7 +87,7 @@ module snax_gemm_wrapper #(
   localparam int unsigned dataWidthB = 8;
 
   // CSR wires
-  localparam int unsigned RegNum = 16;
+  localparam int unsigned RegNum = 17;
   localparam int unsigned CsrAddrOFfset = 32'h3c0;
 
   logic      [                     31:0] CSR                         [RegNum];
