@@ -65,6 +65,8 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   // useful counters
   val accumulation_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
+  val write_valid_counter = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+
   val write_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
   val perf_counter = RegInit(0.U(32.W))
@@ -120,7 +122,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   }
 
   // write all the results out means the operation is done
-  computation_finish := write_counter === (M * N * K - 1.U) && io.data.c_o.fire && cstate === sBUSY
+  computation_finish := write_counter === (M * N - 1.U) && io.data.c_o.fire && cstate === sBUSY
 
   // write counter increment according to output data fire
   when(io.data.c_o.fire) {
@@ -144,12 +146,24 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     accumulation_counter := 0.U
   }
 
-  accumulation := accumulation_counter =/= K - 1.U
+  accumulation := accumulation_counter =/= 0.U
 
   when(cstate === sBUSY) {
     perf_counter := perf_counter + 1.U
   }.elsewhen(config_valid) {
     perf_counter := 0.U
+  }
+
+  when(
+    gemm_array.io.data_valid_o && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
+  ) {
+    write_valid_counter := write_valid_counter + 1.U
+  }.elsewhen(
+    gemm_array.io.data_valid_o && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
+  ) {
+    write_valid_counter := 0.U
+  }.elsewhen(cstate === sIDLE) {
+    write_valid_counter := 0.U
   }
 
   // output control signals
@@ -178,7 +192,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := gemm_array.io.data_valid_o
+  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.data_valid_o && cstate =/= sIDLE
 
 }
 
