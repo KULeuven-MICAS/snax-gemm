@@ -65,6 +65,8 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   // useful counters
   val accumulation_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
+  val write_valid_counter = RegInit(0.U(GemmConstant.sizeConfigWidth.W))
+
   val write_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
   val perf_counter = RegInit(0.U(32.W))
@@ -120,7 +122,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   }
 
   // write all the results out means the operation is done
-  computation_finish := write_counter === (M * N * K - 1.U) && io.data.c_o.fire && cstate === sBUSY
+  computation_finish := write_counter === (M * N - 1.U) && io.data.c_o.fire && cstate === sBUSY
 
   // write counter increment according to output data fire
   when(io.data.c_o.fire) {
@@ -144,12 +146,24 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     accumulation_counter := 0.U
   }
 
-  accumulation := accumulation_counter =/= K - 1.U
+  accumulation := accumulation_counter =/= 0.U
 
   when(cstate === sBUSY) {
     perf_counter := perf_counter + 1.U
   }.elsewhen(config_valid) {
     perf_counter := 0.U
+  }
+
+  when(
+    gemm_array.io.data_valid_o && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
+  ) {
+    write_valid_counter := write_valid_counter + 1.U
+  }.elsewhen(
+    gemm_array.io.data_valid_o && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
+  ) {
+    write_valid_counter := 0.U
+  }.elsewhen(cstate === sIDLE) {
+    write_valid_counter := 0.U
   }
 
   // output control signals
@@ -178,7 +192,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := gemm_array.io.data_valid_o
+  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.data_valid_o && cstate =/= sIDLE
 
 }
 
@@ -190,7 +204,7 @@ object BareBlockGemm extends App {
   )
 }
 
-// adds the csrManager for new gemm to be integrated with streamer.
+// adds the GemmCsrManager for new gemm to be integrated with streamer.
 // gives the new gemm the same interface to SNAX as streamer (the csrReqRspIO).
 class BareBlockGemmTop() extends Module with RequireAsyncReset {
   val io = IO(new Bundle {
@@ -198,32 +212,32 @@ class BareBlockGemmTop() extends Module with RequireAsyncReset {
     val data = new BareBlockGemmDataIO()
   })
 
-  val csrManager = Module(
-    new CsrManager(GemmConstant.csrNum, GemmConstant.csrAddrWidth)
+  val GemmCsrManager = Module(
+    new GemmCsrManager(GemmConstant.csrNum, GemmConstant.csrAddrWidth)
   )
   val bareBlockGemm = Module(new BareBlockGemm())
 
-  // io.csr and csrManager input connection
-  csrManager.io.csr_config_in <> io.csr
+  // io.csr and GemmCsrManager input connection
+  GemmCsrManager.io.csr_config_in <> io.csr
 
-  // csrManager output and bare block gemm control port connection
+  // GemmCsrManager output and bare block gemm control port connection
   // control signals
-  bareBlockGemm.io.ctrl.valid := csrManager.io.csr_config_out.valid
-  csrManager.io.csr_config_out.ready := bareBlockGemm.io.ctrl.ready
+  bareBlockGemm.io.ctrl.valid := GemmCsrManager.io.csr_config_out.valid
+  GemmCsrManager.io.csr_config_out.ready := bareBlockGemm.io.ctrl.ready
 
   // the first csr contains the outermost loop bound which is M
-  bareBlockGemm.io.ctrl.bits.M_i := csrManager.io.csr_config_out.bits(0)
-  // the second csr contains the next inside loop bound which is N
-  bareBlockGemm.io.ctrl.bits.K_i := csrManager.io.csr_config_out.bits(1)
-  // the third csr contains the innermost loop bound which is K
-  bareBlockGemm.io.ctrl.bits.N_i := csrManager.io.csr_config_out.bits(2)
+  bareBlockGemm.io.ctrl.bits.M_i := GemmCsrManager.io.csr_config_out.bits(0)
+  // the second csr contains the next inside loop bound which is K
+  bareBlockGemm.io.ctrl.bits.K_i := GemmCsrManager.io.csr_config_out.bits(1)
+  // the third csr contains the innermost loop bound which is N
+  bareBlockGemm.io.ctrl.bits.N_i := GemmCsrManager.io.csr_config_out.bits(2)
 
   // the forth csr contains the subtraction_a value
   bareBlockGemm.io.ctrl.bits.subtraction_a_i :=
-    csrManager.io.csr_config_out.bits(3)
+    GemmCsrManager.io.csr_config_out.bits(3)(7, 0)
   // the fifth csr contains the subtraction_b value
   bareBlockGemm.io.ctrl.bits.subtraction_b_i :=
-    csrManager.io.csr_config_out.bits(4)
+    GemmCsrManager.io.csr_config_out.bits(3)(15, 8)
 
   // io.data and bare block gemm data ports connection
   io.data <> bareBlockGemm.io.data

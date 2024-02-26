@@ -56,7 +56,7 @@ class CsrManagerIO(
   * @param csrAddrWidth
   *   the width of the address
   */
-class CsrManager(
+class GemmCsrManager(
     csrNum: Int,
     csrAddrWidth: Int
 ) extends Module
@@ -132,9 +132,9 @@ class CsrManager(
 }
 
 // Scala main function for generating CsrManager system verilog file
-object CsrManager extends App {
+object GemmCsrManager extends App {
   emitVerilog(
-    new CsrManager(
+    new GemmCsrManager(
       GemmConstant.csrNum,
       GemmConstant.csrAddrWidth
     ),
