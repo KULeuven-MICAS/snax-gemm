@@ -227,9 +227,9 @@ class BareBlockGemmTop() extends Module with RequireAsyncReset {
 
   // the first csr contains the outermost loop bound which is M
   bareBlockGemm.io.ctrl.bits.M_i := GemmCsrManager.io.csr_config_out.bits(0)
-  // the second csr contains the next inside loop bound which is N
+  // the second csr contains the next inside loop bound which is K
   bareBlockGemm.io.ctrl.bits.K_i := GemmCsrManager.io.csr_config_out.bits(1)
-  // the third csr contains the innermost loop bound which is K
+  // the third csr contains the innermost loop bound which is N
   bareBlockGemm.io.ctrl.bits.N_i := GemmCsrManager.io.csr_config_out.bits(2)
 
   // the forth csr contains the subtraction_a value
