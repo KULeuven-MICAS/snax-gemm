@@ -109,7 +109,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   config_valid := io.ctrl.fire
 
   // Store the configurations when config valid
-  when(config_valid) {
+  when(config_valid && cstate === sIDLE) {
     M := io.ctrl.bits.M_i
     N := io.ctrl.bits.N_i
     K := io.ctrl.bits.K_i
