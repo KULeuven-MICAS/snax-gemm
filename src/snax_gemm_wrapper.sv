@@ -9,7 +9,7 @@
 // verilog_lint: waive-start line-length
 // verilog_lint: waive-start no-trailing-spaces
 
-`ifdef TARGET_SYNTHESIS
+`ifdef TARGET_SYNTHESIS_SNAX_DEV_ONLY
 import riscv_instr::*;
 import reqrsp_pkg::*;
 `endif 
