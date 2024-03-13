@@ -131,7 +131,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     write_counter := 0.U
   }
 
-  input_data_valid := io.data.a_i.fire && io.data.b_i.fire && cstate === sBUSY
+  input_data_valid := io.data.a_i.valid && io.data.b_i.valid && cstate === sBUSY
 
   // accumulation counter for generating the accumulation signal for Gemm Array
   when(
@@ -174,8 +174,8 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   io.ctrl.ready := cstate === sIDLE
 
   // ready for getting new input data when gemm is ready for new computation, aka, not the the outputting previous result mode
-  io.data.a_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o
-  io.data.b_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o
+  io.data.a_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o && input_data_valid
+  io.data.b_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o && input_data_valid
 
   // Gemm Array signal connection
   // control signals
