@@ -56,7 +56,7 @@ class Tile extends Module with RequireAsyncReset {
   // when a_b_valid_i assert, and a_b_ready_o assert, do the computation
   data_i_fire := io.control_i.a_b_valid_i === 1.B && io.a_b_ready_o === 1.B
   // give the result next cycle, with a c_valid_o assert
-  data_i_fire_reg := RegNext(data_i_fire)
+  data_i_fire_reg := data_i_fire
 
   // when out c not ready but having a valid result locally, keep sending c_valid_o
   keep_output := io.c_valid_o && !io.control_i.c_ready_i
