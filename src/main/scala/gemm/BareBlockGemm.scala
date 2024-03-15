@@ -198,8 +198,9 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   gemm_array.io.subtraction_b_i := subtraction_b
 
   // ready for pop out the data from outside
-  io.data.a_i.ready := cstate === sBUSY && gemm_input_fire
-  io.data.b_i.ready := cstate === sBUSY && gemm_input_fire
+  val output_stalled = io.data.c_o.valid && !io.data.c_o.ready
+  io.data.a_i.ready := cstate === sBUSY && gemm_input_fire && !output_stalled
+  io.data.b_i.ready := cstate === sBUSY && gemm_input_fire && !output_stalled
 
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o

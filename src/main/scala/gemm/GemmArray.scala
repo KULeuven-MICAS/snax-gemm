@@ -92,7 +92,7 @@ class Tile extends Module with RequireAsyncReset {
 
   io.data_c_o := accumulation_reg
   io.c_valid_o := data_i_fire_reg || keep_output
-  io.a_b_ready_o := !keep_output
+  io.a_b_ready_o := !keep_output && !(io.c_valid_o && !io.control_i.c_ready_i)
 
 }
 
