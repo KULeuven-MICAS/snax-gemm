@@ -57,9 +57,9 @@ class GemmArrayRandomTest
           val RandomBigBus_A = RandomBigBuses._1
           val RandomBigBus_B = RandomBigBuses._2
 
-          // Invoke data_valid_i to send the test data
-          dut.io.data_valid_i.poke(1.U)
-          dut.io.data_ready_o.poke(true.B)
+          // Invoke a_b_valid_i to send the test data
+          dut.io.a_b_valid_i.poke(1.U)
+          dut.io.c_ready_i.poke(true.B)
 
           dut.io.subtraction_a_i.poke(subtraction_a)
           dut.io.subtraction_b_i.poke(subtraction_b)
@@ -67,9 +67,9 @@ class GemmArrayRandomTest
           dut.io.data.b_i.poke(RandomBigBus_B)
 
           dut.clock.step()
-          dut.io.data_valid_i.poke(0.U)
+          dut.io.a_b_valid_i.poke(0.U)
           /* Wait for data_valid_o assert, then take the result */
-          while (dut.io.data_valid_o.peekBoolean()) {
+          while (dut.io.a_b_valid_i.peekBoolean()) {
             dut.clock.step()
           }
           val results = dut.io.data.c_o.peek()
@@ -112,7 +112,7 @@ class GemmArrayBaseTest extends AnyFlatSpec with ChiselScalatestTester {
     test(new GemmArray)
       .withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
         dut.clock.step()
-        dut.io.data_valid_i.poke(1.U)
+        dut.io.a_b_valid_i.poke(1.U)
         for (i <- 0 until 8) {
           for (j <- 0 until 8) {
             dut.io.data.a_i.poke(1.U)
@@ -120,21 +120,21 @@ class GemmArrayBaseTest extends AnyFlatSpec with ChiselScalatestTester {
           }
         }
         dut.clock.step()
-        dut.io.data_valid_i.poke(0.U)
+        dut.io.a_b_valid_i.poke(0.U)
 
         dut.clock.step(10)
 
         dut.clock.step()
-        dut.io.data_valid_i.poke(1.U)
+        dut.io.a_b_valid_i.poke(1.U)
         dut.clock.step()
-        dut.io.data_valid_i.poke(0.U)
+        dut.io.a_b_valid_i.poke(0.U)
         dut.clock.step()
         dut.clock.step()
 
         dut.clock.step(10)
 
         dut.clock.step()
-        dut.io.data_valid_i.poke(1.U)
+        dut.io.a_b_valid_i.poke(1.U)
         dut.io.accumulate_i.poke(1)
 
         for (i <- 0 until 8) {
@@ -145,7 +145,7 @@ class GemmArrayBaseTest extends AnyFlatSpec with ChiselScalatestTester {
         }
 
         dut.clock.step()
-        dut.io.data_valid_i.poke(0.U)
+        dut.io.a_b_valid_i.poke(0.U)
 
         dut.clock.step(10)
 
@@ -160,10 +160,10 @@ class GemmArrayBaseTest extends AnyFlatSpec with ChiselScalatestTester {
 
         dut.clock.step()
         dut.clock.step(10)
-        dut.io.data_valid_i.poke(1.U)
+        dut.io.a_b_valid_i.poke(1.U)
 
         dut.clock.step()
-        dut.io.data_valid_i.poke(0.U)
+        dut.io.a_b_valid_i.poke(0.U)
         dut.clock.step(10)
 
         emitVerilog(

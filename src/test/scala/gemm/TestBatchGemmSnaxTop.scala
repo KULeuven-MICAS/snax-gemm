@@ -134,9 +134,9 @@ class BatchGemmSnaxTopManualTest
         dut.io.ctrl.write_mem_ready.poke(true.B)
 
         dut.io.ctrl.start_do_i.poke(true.B)
-        dut.io.ctrl.M_i.poke(2)
-        dut.io.ctrl.K_i.poke(2)
-        dut.io.ctrl.N_i.poke(2)
+        dut.io.ctrl.M_i.poke(4)
+        dut.io.ctrl.K_i.poke(8)
+        dut.io.ctrl.N_i.poke(4)
         dut.io.ctrl.Batch_i.poke(1)
 
         dut.io.ctrl.strideinnermost_A_i.poke(0x5)
@@ -195,7 +195,7 @@ class BatchGemmSnaxTopManualTest
         dut.io.ctrl.data_valid_i.poke(false.B)
         dut.clock.step(2)
         dut.io.ctrl.data_valid_i.poke(true.B)
-        dut.clock.step(2)
+        dut.clock.step(200)
         dut.io.ctrl.data_valid_i.poke(false.B)
 
         dut.clock.step(15)
