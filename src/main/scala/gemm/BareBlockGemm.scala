@@ -78,9 +78,6 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   val gemm_input_fire = WireInit(0.B)
   val gemm_output_fire = WireInit(0.B)
 
-  val streamer_input_fire = WireInit(0.B)
-  val streamer_output_fire = WireInit(0.B)
-
   // State declaration
   val sIDLE :: sBUSY :: Nil = Enum(2)
   val cstate = RegInit(sIDLE)
@@ -206,7 +203,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.c_valid_o && cstate =/= sIDLE
+  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_output_fire && cstate =/= sIDLE
 
 }
 
