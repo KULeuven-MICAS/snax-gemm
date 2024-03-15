@@ -365,7 +365,7 @@ class BlockGemm extends Module with RequireAsyncReset {
     controller.io.addr_c_o
   )
   controller.io.busy_o <> io.ctrl.busy_o
-  controller.io.data_valid_o := gemm_array.io.data_valid_o
+  controller.io.data_valid_o := gemm_array.io.c_valid_o
   controller.io.perf_counter <> io.ctrl.perf_counter
 
   gemm_array.io.data.a_i <> io.data.a_i
@@ -376,9 +376,9 @@ class BlockGemm extends Module with RequireAsyncReset {
 
   io.data.c_o <> (gemm_array.io.data.c_o)
 
-  gemm_array.io.data_valid_i := io.ctrl.data_valid_i
+  gemm_array.io.a_b_valid_i := io.ctrl.data_valid_i
   gemm_array.io.accumulate_i := controller.io.accumulate_i
-  gemm_array.io.data_ready_o := 1.B
+  gemm_array.io.c_ready_i := 1.B
 }
 
 object BlockGemm extends App {

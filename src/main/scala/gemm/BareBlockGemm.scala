@@ -75,14 +75,20 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   val accumulation = WireInit(0.B)
   val input_data_valid = WireInit(0.B)
 
-  // signals for state transition
-  val config_valid = WireInit(0.B)
-  val computation_finish = WireInit(0.B)
+  val gemm_input_fire = WireInit(0.B)
+  val gemm_output_fire = WireInit(0.B)
+
+  val streamer_input_fire = WireInit(0.B)
+  val streamer_output_fire = WireInit(0.B)
 
   // State declaration
   val sIDLE :: sBUSY :: Nil = Enum(2)
   val cstate = RegInit(sIDLE)
   val nstate = WireInit(sIDLE)
+
+  // signals for state transition
+  val config_valid = WireInit(0.B)
+  val computation_finish = WireInit(0.B)
 
   // Changing states
   cstate := nstate
@@ -131,21 +137,26 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     write_counter := 0.U
   }
 
+  // input data valid signal, when both a and b are valid, the input data is valid
   input_data_valid := io.data.a_i.valid && io.data.b_i.valid && cstate === sBUSY
+  // gemm input fire signal, when both a and b are valid and gemm is ready for new input data
+  gemm_input_fire := gemm_array.io.a_b_ready_o && gemm_array.io.a_b_valid_i
 
   // accumulation counter for generating the accumulation signal for Gemm Array
+  // value change according to gemm_input_fire
   when(
-    input_data_valid && accumulation_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
+    gemm_input_fire && accumulation_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
   ) {
     accumulation_counter := accumulation_counter + 1.U
   }.elsewhen(
-    (input_data_valid) && accumulation_counter === K - 1.U && cstate =/= sIDLE
+    gemm_input_fire && accumulation_counter === K - 1.U && cstate =/= sIDLE
   ) {
     accumulation_counter := 0.U
   }.elsewhen(cstate === sIDLE) {
     accumulation_counter := 0.U
   }
 
+  // accumulation control signal
   accumulation := accumulation_counter =/= 0.U
 
   when(cstate === sBUSY) {
@@ -154,12 +165,15 @@ class BareBlockGemm extends Module with RequireAsyncReset {
     perf_counter := 0.U
   }
 
+  // gemm output fire signal, asserted when gemm is fire for outputting the result
+  gemm_output_fire := gemm_array.io.c_valid_o && gemm_array.io.c_ready_i
+
   when(
-    gemm_array.io.data_valid_o && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
+    gemm_output_fire && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
   ) {
     write_valid_counter := write_valid_counter + 1.U
   }.elsewhen(
-    gemm_array.io.data_valid_o && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
+    gemm_output_fire && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
   ) {
     write_valid_counter := 0.U
   }.elsewhen(cstate === sIDLE) {
@@ -173,15 +187,11 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   io.ctrl.ready := cstate === sIDLE
 
-  // ready for getting new input data when gemm is ready for new computation, aka, not the the outputting previous result mode
-  io.data.a_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o && input_data_valid
-  io.data.b_i.ready := cstate === sBUSY && gemm_array.io.gemm_ready_o && input_data_valid
-
   // Gemm Array signal connection
   // control signals
-  gemm_array.io.data_valid_i := input_data_valid
+  gemm_array.io.a_b_valid_i := input_data_valid
   gemm_array.io.accumulate_i := accumulation
-  gemm_array.io.data_ready_o := io.data.c_o.ready
+  gemm_array.io.c_ready_i := io.data.c_o.ready || write_valid_counter =/= K - 1.U
 
   // data signals
   gemm_array.io.data.a_i := io.data.a_i.bits
@@ -190,9 +200,13 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   gemm_array.io.subtraction_a_i := subtraction_a
   gemm_array.io.subtraction_b_i := subtraction_b
 
+  // ready for pop out the data from outside
+  io.data.a_i.ready := cstate === sBUSY && gemm_input_fire
+  io.data.b_i.ready := cstate === sBUSY && gemm_input_fire
+
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.data_valid_o && cstate =/= sIDLE
+  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.c_valid_o && cstate =/= sIDLE
 
 }
 

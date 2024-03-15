@@ -3,11 +3,11 @@ import chisel3._
 import chisel3.util._
 import chisel3.VecInit
 
-// Control signals for Gemm. Currently, we only have data_valid_i and accumulate_i
+// Control signals for Gemm. Currently, we only have a_b_valid_i and accumulate_i
 class TileControl extends Bundle {
-  val data_valid_i = Input(Bool())
+  val a_b_valid_i = Input(Bool())
   val accumulate_i = Input(Bool())
-  val data_ready_o = Input(Bool())
+  val c_ready_i = Input(Bool())
 }
 
 // Tile IO definition
@@ -18,22 +18,28 @@ class TileIO extends Bundle {
   val data_b_i = Input(
     Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
   )
-  val c_o = Output(SInt(GemmConstant.dataWidthC.W))
+  val data_c_o = Output(SInt(GemmConstant.dataWidthC.W))
   val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
+
   val control_i = Input(new TileControl())
-  val data_valid_o = Output(Bool())
-  val gemm_ready_o = Output(Bool())
+
+  val c_valid_o = Output(Bool())
+  val a_b_ready_o = Output(Bool())
 }
 
 // Tile implementation, do a vector dot product of two vector
-// When data_valid_i assert, do the computation, and give the result next cycle, with a data_valid_o assert
+// !!! When a_b_valid_i and a_b_ready_o assert, do the computation, and give the result next cycle, with a c_valid_o assert
 class Tile extends Module with RequireAsyncReset {
   val io = IO(new TileIO())
 
   val accumulation_reg = RegInit(0.S(GemmConstant.dataWidthAccum.W))
-  val check_data_i_valid_reg = RegInit(0.B)
+
+  val data_i_fire = WireInit(0.B)
+  val data_i_fire_reg = RegInit(0.B)
+
   val keep_output = RegInit(false.B)
+
   val data_a_i_subtracted = Wire(
     Vec(GemmConstant.tileSize, SInt((GemmConstant.dataWidthA + 1).W))
   )
@@ -47,11 +53,15 @@ class Tile extends Module with RequireAsyncReset {
 
   chisel3.dontTouch(mul_add_result)
 
-  check_data_i_valid_reg := io.control_i.data_valid_i
-  // when ont ready, keep sending valid
-  keep_output := io.data_valid_o && !io.control_i.data_ready_o
+  // when a_b_valid_i assert, and a_b_ready_o assert, do the computation
+  data_i_fire := io.control_i.a_b_valid_i === 1.B && io.a_b_ready_o === 1.B
+  // give the result next cycle, with a c_valid_o assert
+  data_i_fire_reg := data_i_fire
 
-  // Element-wise multiply
+  // when out c not ready but having a valid result locally, keep sending c_valid_o
+  keep_output := io.c_valid_o && !io.control_i.c_ready_i
+
+  // Subtraction computation
   for (i <- 0 until GemmConstant.tileSize) {
     data_a_i_subtracted(i) := (io
       .data_a_i(i)
@@ -61,6 +71,7 @@ class Tile extends Module with RequireAsyncReset {
       .asSInt -& io.subtraction_b_i.asSInt).asSInt
   }
 
+  // Element-wise multiply
   for (i <- 0 until GemmConstant.tileSize) {
     mul_add_result_vec(i) := (data_a_i_subtracted(i)) * (data_b_i_subtracted(i))
   }
@@ -70,18 +81,18 @@ class Tile extends Module with RequireAsyncReset {
 
   // Accumulation, if io.control_i.accumulate === 0.B, clear the accumulation reg, otherwise store the current results
   when(
-    io.control_i.data_valid_i === 1.B && io.control_i.accumulate_i === 0.B
+    data_i_fire === 1.B && io.control_i.accumulate_i === 0.B
   ) {
     accumulation_reg := mul_add_result
   }.elsewhen(
-    io.control_i.data_valid_i === 1.B && io.control_i.accumulate_i === 1.B
+    data_i_fire === 1.B && io.control_i.accumulate_i === 1.B
   ) {
     accumulation_reg := accumulation_reg + mul_add_result
   }
 
-  io.c_o := accumulation_reg
-  io.data_valid_o := check_data_i_valid_reg || keep_output
-  io.gemm_ready_o := !keep_output
+  io.data_c_o := accumulation_reg
+  io.c_valid_o := data_i_fire_reg || keep_output
+  io.a_b_ready_o := !keep_output
 
 }
 
@@ -99,7 +110,7 @@ class MeshIO extends Bundle {
       Vec(GemmConstant.tileSize, UInt(GemmConstant.dataWidthB.W))
     )
   )
-  val c_o = Output(
+  val data_c_o = Output(
     (Vec(
       GemmConstant.meshRow,
       Vec(GemmConstant.meshCol, SInt(GemmConstant.dataWidthC.W))
@@ -108,8 +119,8 @@ class MeshIO extends Bundle {
   val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
   val control_i = Input(new TileControl())
-  val data_valid_o = Output(Bool())
-  val gemm_ready_o = Output(Bool())
+  val c_valid_o = Output(Bool())
+  val a_b_ready_o = Output(Bool())
 
 }
 
@@ -132,11 +143,11 @@ class Mesh extends Module with RequireAsyncReset {
       mesh(r)(c).io.data_b_i <> io.data_b_i(c)
       mesh(r)(c).io.subtraction_a_i <> io.subtraction_a_i
       mesh(r)(c).io.subtraction_b_i <> io.subtraction_b_i
-      io.c_o(r)(c) := mesh(r)(c).io.c_o
+      io.data_c_o(r)(c) := mesh(r)(c).io.data_c_o
     }
   }
-  io.data_valid_o := mesh(0)(0).io.data_valid_o
-  io.gemm_ready_o := mesh(0)(0).io.gemm_ready_o
+  io.c_valid_o := mesh(0)(0).io.c_valid_o
+  io.a_b_ready_o := mesh(0)(0).io.a_b_ready_o
 }
 
 class GemmDataIO extends Bundle {
@@ -159,11 +170,12 @@ class GemmDataIO extends Bundle {
 
 // Gemm IO definition
 class GemmArrayIO extends Bundle {
-  val data_valid_i = Input(Bool())
+  val a_b_valid_i = Input(Bool())
+  val a_b_ready_o = Output(Bool())
+  val c_valid_o = Output(Bool())
+  val c_ready_i = Input(Bool())
+
   val accumulate_i = Input(Bool())
-  val data_valid_o = Output(Bool())
-  val data_ready_o = Input(Bool())
-  val gemm_ready_o = Output(Bool())
 
   val subtraction_a_i = Input(UInt(GemmConstant.dataWidthA.W))
   val subtraction_b_i = Input(UInt(GemmConstant.dataWidthB.W))
@@ -225,7 +237,7 @@ class GemmArray extends Module with RequireAsyncReset {
 
   for (r <- 0 until GemmConstant.meshRow) {
     for (c <- 0 until GemmConstant.meshCol) {
-      c_out_wire(r)(c) := mesh.io.c_o(r)(c)
+      c_out_wire(r)(c) := mesh.io.data_c_o(r)(c)
     }
     c_out_wire_2(r) := Cat(c_out_wire(r).reverse)
   }
@@ -235,21 +247,27 @@ class GemmArray extends Module with RequireAsyncReset {
   b_i_wire <> mesh.io.data_b_i
   io.data.c_o := Cat(c_out_wire_2.reverse)
 
-  mesh.io.control_i.data_valid_i := io.data_valid_i
+  mesh.io.control_i.a_b_valid_i := io.a_b_valid_i
   mesh.io.control_i.accumulate_i := io.accumulate_i
-  mesh.io.control_i.data_ready_o := io.data_ready_o
+  mesh.io.control_i.c_ready_i := io.c_ready_i
 
   mesh.io.subtraction_a_i := io.subtraction_a_i
   mesh.io.subtraction_b_i := io.subtraction_b_i
 
-  io.data_valid_o := mesh.io.data_valid_o
-  io.gemm_ready_o := mesh.io.gemm_ready_o
+  io.c_valid_o := mesh.io.c_valid_o
+  io.a_b_ready_o := mesh.io.a_b_ready_o
 
 }
 
 object GemmArray extends App {
+  val dir_name = "GemmArray_%s_%s_%s_%s".format(
+    GemmConstant.meshRow,
+    GemmConstant.tileSize,
+    GemmConstant.meshCol,
+    GemmConstant.dataWidthA
+  )
   emitVerilog(
-    new (GemmArray),
-    Array("--target-dir", "generated/gemm")
+    new GemmArray,
+    Array("--target-dir", "generated/%s".format(dir_name))
   )
 }
