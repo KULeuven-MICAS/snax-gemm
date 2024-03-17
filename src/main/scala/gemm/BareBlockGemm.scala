@@ -204,7 +204,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   // gemm output signals
   io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_output_fire && cstate =/= sIDLE
+  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.c_valid_o && cstate =/= sIDLE
 
 }
 
