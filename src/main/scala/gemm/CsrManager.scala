@@ -47,6 +47,7 @@ class CsrManagerIO(
   val csr_config_in = new CsrReqRspIO(csrAddrWidth)
   val csr_config_out = Decoupled(Vec(csrNum, UInt(32.W)))
 
+  val GeMMBusy2Idle = Input(Bool())
 }
 
 /** This class represents the CsrManager module. It contains the csr registers
@@ -69,7 +70,8 @@ class GemmCsrManager(
 
   // read and write csr cmd
   val read_csr = io.csr_config_in.req.fire && !io.csr_config_in.req.bits.write
-  val write_csr = io.csr_config_in.req.fire && io.csr_config_in.req.bits.write
+  val write_csr =
+    (io.csr_config_in.req.fire || io.GeMMBusy2Idle) && io.csr_config_in.req.bits.write
 
   // keep sending response to a read request until we receive the response ready signal
   val keep_sending_csr_rsp = RegNext(
@@ -120,7 +122,7 @@ class GemmCsrManager(
   // we are ready for a new request if two conditions hold:
   // if we write to the config_valid register (the last one), the streamer must not be busy (io.csr_config_out.ready)
   // if there is a read request in progress, we only accept new write requests
-  io.csr_config_in.req.ready := (io.csr_config_out.ready || !(io.csr_config_in.req.bits.addr === startCsrAddr)) && (!keep_sending_csr_rsp || io.csr_config_in.req.bits.write)
+  io.csr_config_in.req.ready := !io.GeMMBusy2Idle && (io.csr_config_out.ready || !(io.csr_config_in.req.bits.addr === startCsrAddr)) && (!keep_sending_csr_rsp || io.csr_config_in.req.bits.write)
 
   // a write/read to the last csr means the config is valid
   config_valid := io.csr_config_in.req.fire && (io.csr_config_in.req.bits.addr === startCsrAddr) && io.csr_config_in.req.bits.data === 1.U

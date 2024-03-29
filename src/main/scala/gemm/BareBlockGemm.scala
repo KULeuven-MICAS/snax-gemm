@@ -43,7 +43,7 @@ class BareBlockGemmIO extends Bundle {
   val ctrl = Flipped(DecoupledIO(new BareBlockGemmCtrlIO()))
   val data = new BareBlockGemmDataIO()
   val busy_o = Output(Bool())
-  val perf_counter = Output(UInt(32.W))
+  val performance_counter = Output(UInt(32.W))
 
 }
 
@@ -69,7 +69,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
 
   val write_counter = RegInit(0.U((3 * GemmConstant.sizeConfigWidth).W))
 
-  val perf_counter = RegInit(0.U(32.W))
+  val performance_counter = RegInit(0.U(32.W))
 
   // control signals for the counter incremental
   val accumulation = WireInit(0.B)
@@ -157,9 +157,9 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   accumulation := accumulation_counter =/= 0.U
 
   when(cstate === sBUSY) {
-    perf_counter := perf_counter + 1.U
+    performance_counter := performance_counter + 1.U
   }.elsewhen(config_valid) {
-    perf_counter := 0.U
+    performance_counter := 0.U
   }
 
   // gemm output fire signal, asserted when gemm is fire for outputting the result
@@ -178,7 +178,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   }
 
   // output control signals
-  io.perf_counter := perf_counter
+  io.performance_counter := performance_counter
 
   io.busy_o := cstate =/= sIDLE
 
@@ -230,7 +230,30 @@ class BareBlockGemmTop() extends Module with RequireAsyncReset {
   val bareBlockGemm = Module(new BareBlockGemm())
 
   // io.csr and GemmCsrManager input connection
-  GemmCsrManager.io.csr_config_in <> io.csr
+  // rsp port connected directly to the outside
+  GemmCsrManager.io.csr_config_in.rsp <> io.csr.rsp
+
+  // csr req port connected with both the outside and the GEMM performacne counter write
+  val csr_config_in_req_valid = WireInit(false.B)
+  val csr_config_in_req_bits = Wire(new CsrReq(GemmConstant.csrAddrWidth))
+
+  val GeMMBusy2Idle = WireInit(false.B)
+  GeMMBusy2Idle := !bareBlockGemm.io.busy_o && RegNext(bareBlockGemm.io.busy_o)
+
+  csr_config_in_req_valid := io.csr.req.valid
+  when(GeMMBusy2Idle) {
+    csr_config_in_req_bits.addr := GemmConstant.csrNum.U - 2.U
+    csr_config_in_req_bits.data := bareBlockGemm.io.performance_counter
+    csr_config_in_req_bits.write := true.B
+  }.otherwise {
+    csr_config_in_req_bits := io.csr.req.bits
+  }
+
+  GemmCsrManager.io.csr_config_in.req.valid := csr_config_in_req_valid
+  GemmCsrManager.io.csr_config_in.req.bits := csr_config_in_req_bits
+  io.csr.req.ready := GemmCsrManager.io.csr_config_in.req.ready
+
+  GemmCsrManager.io.GeMMBusy2Idle := GeMMBusy2Idle
 
   // GemmCsrManager output and bare block gemm control port connection
   // control signals
