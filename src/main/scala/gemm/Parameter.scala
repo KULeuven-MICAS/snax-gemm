@@ -31,7 +31,12 @@ object GemmConstant {
   def TCDMDataWidth = 64
   def idealTCDMWritePorts = meshRow * meshCol * dataWidthC / TCDMDataWidth
 
-  def csrNum: Int = 5
-  def csrAddrWidth: Int = 3
+  // add one extra performance counter
+  // CSR 0 is for K, CSR 1 is for N, CSR 2 is for M
+  // CSR 3 is for subtractions
+  // CSR 4 is for performance counter
+  // CSR 5 is for STATUS
+  def csrNum: Int = 6
+  def csrAddrWidth: Int = log2Up(csrNum)
 
 }
