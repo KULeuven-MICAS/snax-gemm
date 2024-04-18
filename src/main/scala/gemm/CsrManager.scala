@@ -74,9 +74,9 @@ class GemmCsrManager(
     (io.csr_config_in.req.fire || io.GeMMBusy2Idle) && io.csr_config_in.req.bits.write
 
   // keep sending response to a read request until we receive the response ready signal
-  val keep_sending_csr_rsp = RegNext(
-    io.csr_config_in.rsp.valid && !io.csr_config_in.rsp.ready
-  )
+  val keep_sending_csr_rsp = RegInit(0.B)
+  keep_sending_csr_rsp := io.csr_config_in.rsp.valid && !io.csr_config_in.rsp.ready
+
   // a register to store the read request response data until the request is successful
   val csr_rsp_data_reg = RegInit(0.U(32.W))
 
