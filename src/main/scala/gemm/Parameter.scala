@@ -17,7 +17,7 @@ object GemmConstant {
   def meshCol = 8
 
   def addrWidth = 32
-  def sizeConfigWidth = 16
+  def sizeConfigWidth = 32
 
   def dataWidthPerAddr = 8
   def baseAddrIncrementA =
