@@ -9,8 +9,7 @@ class BareBlockGemmCtrlIO extends Bundle {
   val M_i = (UInt(GemmConstant.sizeConfigWidth.W))
   val K_i = (UInt(GemmConstant.sizeConfigWidth.W))
   val N_i = (UInt(GemmConstant.sizeConfigWidth.W))
-  val subtraction_a_i = (UInt(GemmConstant.dataWidthA.W))
-  val subtraction_b_i = (UInt(GemmConstant.dataWidthB.W))
+  val subtraction_constant_i = (UInt(GemmConstant.subtractionCfgWidth.W))
 
 }
 
@@ -120,8 +119,8 @@ class BareBlockGemm extends Module with RequireAsyncReset {
       io.ctrl.bits.M_i =/= 0.U || io.ctrl.bits.K_i =/= 0.U || io.ctrl.bits.K_i =/= 0.U,
       " M == 0 or K ==0 or N == 0, invalid configuration!"
     )
-    subtraction_a := io.ctrl.bits.subtraction_a_i
-    subtraction_b := io.ctrl.bits.subtraction_b_i
+    subtraction_a := io.ctrl.bits.subtraction_constant_i(7, 0)
+    subtraction_b := io.ctrl.bits.subtraction_constant_i(15, 8)
   }
 
   // write all the results out means the operation is done
@@ -268,11 +267,8 @@ class BareBlockGemmTop() extends Module with RequireAsyncReset {
   bareBlockGemm.io.ctrl.bits.M_i := GemmCsrManager.io.csr_config_out.bits(2)
 
   // the forth csr contains the subtraction_a value
-  bareBlockGemm.io.ctrl.bits.subtraction_a_i :=
-    GemmCsrManager.io.csr_config_out.bits(3)(7, 0)
-  // the fifth csr contains the subtraction_b value
-  bareBlockGemm.io.ctrl.bits.subtraction_b_i :=
-    GemmCsrManager.io.csr_config_out.bits(3)(15, 8)
+  bareBlockGemm.io.ctrl.bits.subtraction_constant_i :=
+    GemmCsrManager.io.csr_config_out.bits(3)
 
   // io.data and bare block gemm data ports connection
   io.data <> bareBlockGemm.io.data
