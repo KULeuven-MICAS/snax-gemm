@@ -2,8 +2,7 @@ MK_DIR   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 CHISEL_GENERATED_DIR = $(MK_DIR)generated
 
-CHISEL_MODULE = BatchGemmSnaxTop
-# CHISEL_MODULE = BatchGemm
+CHISEL_MODULE = BareBlockGemm
 
 CHISEL_GENERATED_FILES = $(MK_DIR)generated/gemm/$(CHISEL_MODULE).sv
 
