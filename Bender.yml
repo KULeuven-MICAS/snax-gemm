@@ -14,4 +14,6 @@ sources:
       # levels 1 and 0, etc. Files within a level are ordered alphabetically.
       # Level 0
       - src/snax_gemm_wrapper.sv    
+      - src/snax_gemm_shell_wrapper.sv    
+      - generated/gemm/BareBlockGemm.sv
       - generated/gemm/BatchGemmSnaxTop.sv
