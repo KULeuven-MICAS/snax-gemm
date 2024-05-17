@@ -31,16 +31,16 @@ module snax_streamer_gemm_shell_wrapper #(
     // just to comply with the top-level wrapper
 
     // Ports from accelerator to streamer
-    output logic [DataWidthA-1:0] acc2stream_0_data_o,
+    output logic [DataWidthC-1:0] acc2stream_0_data_o,
     output logic acc2stream_0_valid_o,
     input logic acc2stream_0_ready_i,
 
     // Ports from streamer to accelerator
-    input logic [DataWidthB-1:0] stream2acc_0_data_i,
+    input logic [DataWidthA-1:0] stream2acc_0_data_i,
     input logic stream2acc_0_valid_i,
     output logic stream2acc_0_ready_o,
 
-    input logic [DataWidthC-1:0] stream2acc_1_data_i,
+    input logic [DataWidthB-1:0] stream2acc_1_data_i,
     input logic stream2acc_1_valid_i,
     output logic stream2acc_1_ready_o,
 
@@ -57,9 +57,9 @@ module snax_streamer_gemm_shell_wrapper #(
       .clock(clk_i),
       .reset(~rst_ni),
       .io_ctrl_valid(csr_reg_set_valid_i),
-      .io_ctrl_bits_M_i(csr_reg_set_i[0]),
-      .io_ctrl_bits_K_i(csr_reg_set_i[1]),
-      .io_ctrl_bits_N_i(csr_reg_set_i[2]),
+      .io_ctrl_bits_M_i(csr_reg_set_i[2]),
+      .io_ctrl_bits_K_i(csr_reg_set_i[0]),
+      .io_ctrl_bits_N_i(csr_reg_set_i[1]),
       .io_ctrl_bits_subtraction_constant_i(csr_reg_set_i[3]),
       .io_data_a_i_valid(stream2acc_0_valid_i),
       .io_data_a_i_bits(stream2acc_0_data_i),
