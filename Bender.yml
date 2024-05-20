@@ -4,10 +4,7 @@ package:
     - "Xiaoling Yi <xiaoling.yi@kuleuven.be>"
 
 sources:
-  - include_dirs:
-      - src
-      - generated
-    target: snax-gemm
+  - target: snax-gemm
     files:
       # Source files grouped in levels. Files in level 0 have no dependencies on files in this
       # package. Files in level 1 only depend on files in level 0, files in level 2 on files in
@@ -15,3 +12,7 @@ sources:
       # Level 0
       - src/snax_gemm_wrapper.sv    
       - generated/gemm/BatchGemmSnaxTop.sv
+  - target: snax-streamer-gemm
+    files:
+      - generated/gemm/BareBlockGemm.sv
+      - src/snax_streamer_gemm_shell_wrapper.sv    

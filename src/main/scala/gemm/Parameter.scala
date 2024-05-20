@@ -12,6 +12,8 @@ object GemmConstant {
   def dataWidthC = dataWidthA * 4
   def dataWidthAccum = dataWidthA * 4
 
+  def subtractionCfgWidth = 32
+
   def meshRow = 8
   def tileSize = 8
   def meshCol = 8
