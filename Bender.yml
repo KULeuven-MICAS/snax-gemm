@@ -12,7 +12,7 @@ sources:
       # Level 0
       - src/snax_gemm_wrapper.sv    
       - generated/gemm/BatchGemmSnaxTop.sv
-  - target: snax-streamer-gemm
+  - target: snax_streamer_gemm
     files:
       - generated/gemm/BareBlockGemm.sv
       - src/snax_streamer_gemm_shell_wrapper.sv    
