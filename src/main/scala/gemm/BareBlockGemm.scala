@@ -29,7 +29,14 @@ class BareBlockGemmDataIO extends Bundle {
       )
     )
   )
-  val c_o = DecoupledIO(
+  val c_i = Flipped(
+    DecoupledIO(
+      UInt(
+        (GemmConstant.meshRow * GemmConstant.meshCol * GemmConstant.dataWidthC).W
+      )
+    )
+  )
+  val d_o = DecoupledIO(
     UInt(
       (GemmConstant.meshRow * GemmConstant.meshCol * GemmConstant.dataWidthC).W
     )
@@ -74,7 +81,7 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   val accumulation = WireInit(0.B)
   val input_data_valid = WireInit(0.B)
 
-  val gemm_input_fire = WireInit(0.B)
+  val gemm_a_b_input_fire = WireInit(0.B)
   val gemm_output_fire = WireInit(0.B)
 
   // State declaration
@@ -124,10 +131,10 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   }
 
   // write all the results out means the operation is done
-  computation_finish := write_counter === (M * N - 1.U) && io.data.c_o.fire && cstate === sBUSY
+  computation_finish := write_counter === (M * N - 1.U) && io.data.d_o.fire && cstate === sBUSY
 
   // write counter increment according to output data fire
-  when(io.data.c_o.fire) {
+  when(io.data.d_o.fire) {
     write_counter := write_counter + 1.U
   }.elsewhen(cstate === sIDLE) {
     write_counter := 0.U
@@ -136,16 +143,16 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   // input data valid signal, when both a and b are valid, the input data is valid
   input_data_valid := io.data.a_i.valid && io.data.b_i.valid && cstate === sBUSY
   // gemm input fire signal, when both a and b are valid and gemm is ready for new input data
-  gemm_input_fire := gemm_array.io.a_b_ready_o && gemm_array.io.a_b_valid_i
+  gemm_a_b_input_fire := gemm_array.io.a_b_c_ready_o && gemm_array.io.a_b_valid_i
 
   // accumulation counter for generating the accumulation signal for Gemm Array
-  // value change according to gemm_input_fire
+  // value change according to gemm_a_b_input_fire
   when(
-    gemm_input_fire && accumulation_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
+    gemm_a_b_input_fire && accumulation_counter =/= K - 1.U && K =/= 1.U && cstate =/= sIDLE
   ) {
     accumulation_counter := accumulation_counter + 1.U
   }.elsewhen(
-    gemm_input_fire && accumulation_counter === K - 1.U && cstate =/= sIDLE
+    gemm_a_b_input_fire && accumulation_counter === K - 1.U && cstate =/= sIDLE
   ) {
     accumulation_counter := 0.U
   }.elsewhen(cstate === sIDLE) {
@@ -162,19 +169,35 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   }
 
   // gemm output fire signal, asserted when gemm is fire for outputting the result
-  gemm_output_fire := gemm_array.io.c_valid_o && gemm_array.io.c_ready_i
+  gemm_output_fire := gemm_array.io.d_valid_o && gemm_array.io.d_ready_i
 
   when(
-    gemm_output_fire && write_valid_counter =/= (K - 1.U) && cstate =/= sIDLE
+    gemm_output_fire && write_valid_counter =/= ((K - 1.U) + 1.U) && cstate =/= sIDLE
   ) {
     write_valid_counter := write_valid_counter + 1.U
   }.elsewhen(
-    gemm_output_fire && write_valid_counter === (K - 1.U) && cstate =/= sIDLE
+    gemm_output_fire && write_valid_counter === ((K - 1.U) + 1.U) && cstate =/= sIDLE
   ) {
     write_valid_counter := 0.U
   }.elsewhen(cstate === sIDLE) {
     write_valid_counter := 0.U
   }
+
+  // in the middle of the K accumulation
+  val needs_add_c = RegInit(0.B)
+  when(add_c){
+    needs_add_c = 0.B
+  }.elsewhen(gemm_output_fire && write_valid_counter =/= ((K - 1.U) + 1.U) && !needs_add_c){
+    needs_add_c = 1.B
+  }
+
+  // after the K accumulation, waiting for add C matrix
+  val must_add_c = RegInit(0.B)
+  must_add_c := needs_add_c && (write_valid_counter === ((K - 1.U) + 1.U))
+
+  // wire for the addition control signal
+  val add_c = WireInit(0.B)
+  add_c := cstate === sBUSY && ((needs_add_c && !input_data_valid) || must_add_c) && io.data.c_i.valid && gemm_array.io.a_b_c_ready_o
 
   // output control signals
   io.performance_counter := performance_counter
@@ -186,24 +209,27 @@ class BareBlockGemm extends Module with RequireAsyncReset {
   // Gemm Array signal connection
   // control signals
   gemm_array.io.a_b_valid_i := input_data_valid
+  gemm_array.io.add_c_i := add_c
   gemm_array.io.accumulate_i := accumulation
-  gemm_array.io.c_ready_i := io.data.c_o.ready || write_valid_counter =/= K - 1.U
+  gemm_array.io.d_ready_i := io.data.d_o.ready || write_valid_counter =/= ((K - 1.U) + 1.U)
 
   // data signals
   gemm_array.io.data.a_i := io.data.a_i.bits
   gemm_array.io.data.b_i := io.data.b_i.bits
+  gemm_array.io.data_c_i := io.data.c_i.bits
 
   gemm_array.io.subtraction_a_i := subtraction_a
   gemm_array.io.subtraction_b_i := subtraction_b
 
   // ready for pop out the data from outside
-  val output_stalled = io.data.c_o.valid && !io.data.c_o.ready
-  io.data.a_i.ready := cstate === sBUSY && gemm_input_fire && !output_stalled
-  io.data.b_i.ready := cstate === sBUSY && gemm_input_fire && !output_stalled
+  val output_stalled = io.data.d_o.valid && !io.data.d_o.ready
+  io.data.a_i.ready := cstate === sBUSY && gemm_a_b_input_fire && !output_stalled && !must_add_c
+  io.data.b_i.ready := cstate === sBUSY && gemm_a_b_input_fire && !output_stalled && !must_add_c
+  io.data.c_i.ready := cstate === sBUSY && add_c && !output_stalled
 
   // gemm output signals
-  io.data.c_o.bits := gemm_array.io.data.c_o
-  io.data.c_o.valid := (write_valid_counter === K - 1.U) && gemm_array.io.c_valid_o && cstate =/= sIDLE
+  io.data.d_o.bits := gemm_array.io.data.d_o
+  io.data.d_o.valid := (write_valid_counter === ((K - 1.U) + 1.U)) && gemm_array.io.d_valid_o && cstate =/= sIDLE && !needs_add_c
 
 }
 
